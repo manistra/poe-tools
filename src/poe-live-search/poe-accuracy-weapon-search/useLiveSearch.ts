@@ -3,6 +3,15 @@ import { useState, useEffect } from "react";
 declare global {
   interface Window {
     electron: {
+      api: {
+        request: (options: {
+          url: string;
+          method: string;
+          headers?: Record<string, string>;
+          data?: any;
+          params?: Record<string, string>;
+        }) => Promise<any>;
+      };
       websocket: {
         connect: (wsUri: string, sessionId: string) => void;
         disconnect: () => void;
@@ -34,14 +43,14 @@ interface UseLiveSearchReturn {
 
 export const useLiveSearch = (): UseLiveSearchReturn => {
   const [searchUrl, setSearchUrl] = useState(
-    "https://www.pathofexile.com/trade2/search/poe2/Dawn%20of%20the%20Hunt/neo0a8Mt0/live"
+    window.localStorage.getItem("searchUrl") || ""
   );
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState<{ time: string; items: string[] }[]>(
     []
   );
   const [sessionId, setSessionId] = useState(
-    "b3d08bb568a0c48c7a5cd08f681cd73a"
+    window.localStorage.getItem("poeSessionId") || ""
   );
   const [error, setError] = useState<string | null>(null);
 

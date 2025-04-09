@@ -40,4 +40,15 @@ contextBridge.exposeInMainWorld("electron", {
       };
     },
   },
+  api: {
+    request: (options: {
+      url: string;
+      method: string;
+      headers?: Record<string, string>;
+      data?: any;
+      params?: Record<string, string>;
+    }) => {
+      return ipcRenderer.invoke("api-request", options);
+    },
+  },
 });
