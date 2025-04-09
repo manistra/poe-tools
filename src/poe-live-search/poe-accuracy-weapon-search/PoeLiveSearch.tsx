@@ -1,12 +1,28 @@
 import React from "react";
 import { useLiveSearch } from "./useLiveSearch";
 
+// Add TypeScript interface for the electron API
+declare global {
+  interface Window {
+    electron: {
+      websocket: {
+        connect: (wsUri: string, sessionId: string) => void;
+        disconnect: () => void;
+        onConnected: (callback: () => void) => () => void;
+        onDisconnected: (callback: () => void) => () => void;
+        onMessage: (callback: (data: any) => void) => () => void;
+        onError: (callback: (error: string) => void) => () => void;
+      };
+    };
+  }
+}
+
 const PoELiveSearch = () => {
   const {
-    searchUrl,
-    setSearchUrl,
     sessionId,
     setSessionId,
+    setSearchUrl,
+    searchUrl,
     isConnected,
     messages,
     error,

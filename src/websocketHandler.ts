@@ -1,6 +1,5 @@
 import { WebSocket } from "ws";
 import { ipcMain } from "electron";
-import { apiHeaders } from "./poe-live-search/api";
 
 let activeSocket: WebSocket | null = null;
 
@@ -9,65 +8,53 @@ export function setupWebSocketHandlers() {
   ipcMain.on("ws-connect", (event, { wsUri, sessionId }) => {
     // Close existing connection if any
     if (activeSocket) {
-      console.log("Closing existing WebSocket connection");
       activeSocket.close();
       activeSocket = null;
     }
 
     try {
-      console.log(`Attempting to connect to WebSocket: ${wsUri}`);
-      console.log(`Using session ID: ${sessionId.substring(0, 5)}...`); // Only log first few chars for security
+      console.log(`Connecting to WebSocket: ${wsUri}`);
 
       // Add headers with the session cookie
       const socket = new WebSocket(wsUri, {
-        headers: apiHeaders(),
+        headers: {
+          Cookie: `POESESSID=${sessionId}`,
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+          Origin: "https://www.pathofexile.com",
+          Referer: "https://www.pathofexile.com/trade",
+        },
       });
 
-      console.log("WebSocket instance created, waiting for connection...");
-
       socket.on("open", () => {
-        console.log("WebSocket connection successfully opened");
-        console.log("Ready state:", socket.readyState);
+        console.log("WebSocket connection opened");
         event.sender.send("ws-connected");
       });
 
       socket.on("message", (data) => {
         try {
           const parsedData = JSON.parse(data.toString());
-          console.log("Reeived WebSocket message:", parsedData);
+          console.log("Received message:", parsedData);
           event.sender.send("ws-message", parsedData);
         } catch (e) {
-          console.error("Error parsing WebSocket message:", e);
-          console.log("Raw message data:", data.toString());
+          console.error("Error parsing message:", e);
         }
       });
 
       socket.on("error", (error) => {
-        console.error("WebSocket error occurred:", error);
-        console.log("Error details:", JSON.stringify(error, null, 2));
+        console.error("WebSocket error:", error);
         event.sender.send("ws-error", error.message);
       });
 
       socket.on("close", (code, reason) => {
-        console.log(`WebSocket connection closed with code: ${code}`);
-        console.log(`Close reason: ${reason || "No reason provided"}`);
+        console.log(`WebSocket connection closed: ${code} - ${reason}`);
         event.sender.send("ws-disconnected");
         activeSocket = null;
       });
 
-      socket.on("unexpected-response", (request, response) => {
-        console.error(`Unexpected WebSocket response: ${response.statusCode}`);
-        console.log("Response headers:", response.headers);
-        event.sender.send(
-          "ws-error",
-          `Unexpected response: ${response.statusCode}`
-        );
-      });
-
       activeSocket = socket;
     } catch (error) {
-      console.error("Failed to create WebSocket connection:", error);
-      console.log("Error stack:", error.stack);
+      console.error("Failed to create WebSocket:", error);
       event.sender.send("ws-error", error.message);
     }
   });
@@ -75,11 +62,8 @@ export function setupWebSocketHandlers() {
   // Handle disconnect request from renderer
   ipcMain.on("ws-disconnect", () => {
     if (activeSocket) {
-      console.log("Manually disconnecting WebSocket");
       activeSocket.close();
       activeSocket = null;
-    } else {
-      console.log("No active WebSocket connection to disconnect");
     }
   });
 }

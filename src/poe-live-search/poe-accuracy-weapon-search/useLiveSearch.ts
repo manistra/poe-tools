@@ -34,12 +34,14 @@ interface UseLiveSearchReturn {
 
 export const useLiveSearch = (): UseLiveSearchReturn => {
   const [searchUrl, setSearchUrl] = useState(
-    window.localStorage.getItem("searchUrl") || ""
+    "https://www.pathofexile.com/trade2/search/poe2/Dawn%20of%20the%20Hunt/neo0a8Mt0/live"
   );
   const [isConnected, setIsConnected] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<{ time: string; items: string[] }[]>(
+    []
+  );
   const [sessionId, setSessionId] = useState(
-    window.localStorage.getItem("poeSessionId") || ""
+    "b3d08bb568a0c48c7a5cd08f681cd73a"
   );
   const [error, setError] = useState<string | null>(null);
 
