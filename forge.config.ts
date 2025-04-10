@@ -33,7 +33,7 @@ const config: ForgeConfig = {
     new PublisherGithub({
       repository: {
         owner: "manistra", // Replace with your GitHub username
-        name: "my-new-app", // Replace with your repository name
+        name: "poe-tools", // Replace with your repository name
       },
       prerelease: false,
       draft: true, // Creates a draft release you can review before publishing
