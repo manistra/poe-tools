@@ -36,7 +36,7 @@ const QueryWeaponsWithAmazonAccuracy = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-4 w-full px-10 pb-5">
       {/* Floating dropdown button */}
       <div className="fixed top-4 right-4 z-10" ref={dropdownRef}>
         <button
