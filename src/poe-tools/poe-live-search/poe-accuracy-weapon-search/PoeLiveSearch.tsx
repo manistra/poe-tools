@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import Button from "src/components/Button";
+import CollapsibleItem from "src/components/CollapsibleItem";
+import Input from "src/components/Input";
+import useLogs from "src/helpers/useLogs";
+import { result } from "src/mockData";
+import Items from "src/poe-tools/components/Items";
+import { calculateTotalAccuracy } from "src/poe-tools/utils/calculateAccuracy";
+import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
 import { useLiveSearch } from "./useLiveSearch";
-import { fetchItemDetails } from "../../utils/fetchItemDetails";
-import { result } from "../../../mockData";
-import Form from "../../components/Form";
-import Items from "../../components/Items";
-import { calculateTotalAccuracy } from "../../utils/calculateAccuracy";
-import CollapsibleItem from "../../../components/CollapsibleItem";
-import useLogs from "../../../helpers/useLogs";
+import clsx from "clsx";
 
 const PoELiveSearch = () => {
   const {
     sessionId,
-    setSessionId,
     setSearchUrl,
     searchUrl,
     isConnected,
     messages,
     error,
-
     connect,
     disconnect,
   } = useLiveSearch();
@@ -25,7 +25,7 @@ const PoELiveSearch = () => {
   const [itemDetails, setItemDetails] = useState<any[]>(result);
   const [isLoading, setIsLoading] = useState(false);
   const [minimumTotalDpsWithAccuracy, setMinimumTotalDpsWithAccuracy] =
-    useState(400);
+    useState(window.localStorage.getItem("minimumTotalDpsWithAccuracy") || 400);
 
   const { logs, addLog } = useLogs();
 
@@ -56,12 +56,18 @@ const PoELiveSearch = () => {
               searchUrl,
             });
 
-            const filteredDetails = details.filter(
-              (detail) =>
+            const filteredDetails = details.filter((detail) => {
+              const exceedsDamage =
                 detail.item.extended.dps +
                   calculateTotalAccuracy(detail.item) / 4 >=
-                minimumTotalDpsWithAccuracy
-            );
+                minimumTotalDpsWithAccuracy;
+
+              // if (exceedsDamage){
+
+              // }
+
+              return exceedsDamage;
+            });
 
             setItemDetails((prev) => [
               ...filteredDetails.map((detail) => ({
@@ -106,56 +112,56 @@ const PoELiveSearch = () => {
   };
 
   return (
-    <div className="w-full overflow-hidden flex flex-col gap-5">
-      <div className="flex gap-2 items-center">
-        <div className="mr-auto flex flex-col gap-1">
-          <label className="text-xs">Status: </label>
-
-          {isConnected ? (
-            <span className="text-green-500 animate-pulse">
-              Connected, searching for items...
-            </span>
-          ) : (
-            <span className="text-red-500">Disconnected</span>
-          )}
-          <span
-            className={`${isConnected ? "text-green-500" : "text-red-500"}`}
-          ></span>
-          {error && <p style={{ color: "red" }}>Error: {error}</p>}
+    <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">
+      <div className="flex gap-2 items-end justify-between">
+        <div>
+          <h1 className="text-2xl text-gray-200 font-bold">
+            Wepon with Accuracy
+          </h1>
+          <h2 className="text-gray-600">Live Search</h2>
+        </div>
+        <div className="w-1/2 ml-auto">
+          <Input
+            className=""
+            type="text"
+            label="Search URL:"
+            value={searchUrl}
+            onChange={setSearchUrl}
+            placeholder="https://www.pathofexile.com/trade/search/League/SearchID"
+          />
         </div>
 
-        {!isConnected ? (
-          <button
-            className="bg-green-800 text-white px-4 py-2 rounded-md"
-            onClick={connect}
-            disabled={isConnected || !searchUrl || !sessionId}
-          >
-            Start Live Search
-          </button>
-        ) : (
-          <button
-            className="bg-red-900 text-white px-4 py-2 rounded-md"
-            onClick={disconnect}
-            disabled={!isConnected}
-          >
-            Stop Live Search
-          </button>
-        )}
+        <div className="flex flex-col gap-1">
+          <div className="flex flex-col">
+            <span
+              className={clsx(
+                "text-green-500 text-[10px]",
+                isConnected ? "text-green-900 animate-pulse" : "text-red-900"
+              )}
+            >
+              {isConnected ? "Searching for items..." : "Disconnected"}
+            </span>
+            {error && <p style={{ color: "red" }}>Error: {error}</p>}
+          </div>
+          {!isConnected ? (
+            <Button
+              variant="success"
+              onClick={connect}
+              disabled={isConnected || !searchUrl || !sessionId}
+            >
+              Start Live Search
+            </Button>
+          ) : (
+            <Button
+              variant="danger"
+              onClick={disconnect}
+              disabled={!isConnected}
+            >
+              Stop Live Search
+            </Button>
+          )}
+        </div>
       </div>
-
-      <CollapsibleItem title="Connection Settings">
-        <Form
-          sessionId={sessionId}
-          searchUrl={searchUrl}
-          isConnected={isConnected}
-          error={error}
-          messages={messages}
-          setSessionId={setSessionId}
-          setSearchUrl={setSearchUrl}
-          connect={connect}
-          disconnect={disconnect}
-        />
-      </CollapsibleItem>
 
       <CollapsibleItem title="Logs:">
         <div className="max-h-[300px] overflow-y-auto">
@@ -173,14 +179,17 @@ const PoELiveSearch = () => {
 
       <CollapsibleItem title="Search Settings" className="flex-wrap flex gap-2">
         <div className="flex flex-col gap-2">
-          <label className="text-xs">Minimum Total DPS with Accuracy:</label>
-          <input
+          <Input
             type="number"
-            className="bg-slate-700 p-2 rounded-md w-fit"
+            label="Minimum Total DPS with Accuracy:"
             value={minimumTotalDpsWithAccuracy}
-            onChange={(e) =>
-              setMinimumTotalDpsWithAccuracy(Number(e.target.value))
-            }
+            onChange={(value) => {
+              setMinimumTotalDpsWithAccuracy(Number(value));
+              window.localStorage.setItem(
+                "minimumTotalDpsWithAccuracy",
+                String(value)
+              );
+            }}
             placeholder="400"
           />
         </div>

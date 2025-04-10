@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 
 declare global {
   interface Window {
@@ -33,7 +34,6 @@ interface UseLiveSearchReturn {
   searchUrl: string;
   setSearchUrl: (url: string) => void;
   sessionId: string;
-  setSessionId: (id: string) => void;
   isConnected: boolean;
   messages: Message[];
   error: string | null;
@@ -49,10 +49,9 @@ export const useLiveSearch = (): UseLiveSearchReturn => {
   const [messages, setMessages] = useState<{ time: string; items: string[] }[]>(
     []
   );
-  const [sessionId, setSessionId] = useState(
-    window.localStorage.getItem("poeSessionId") || ""
-  );
   const [error, setError] = useState<string | null>(null);
+
+  const sessionId = getPoeSessionId();
 
   // Extract WebSocket URI from trade URL
   const getWebSocketUri = (url: string) => {
@@ -142,10 +141,6 @@ export const useLiveSearch = (): UseLiveSearchReturn => {
       setSearchUrl(url);
     },
     sessionId,
-    setSessionId: (id: string) => {
-      window.localStorage.setItem("poeSessionId", id);
-      setSessionId(id);
-    },
     isConnected,
     messages,
     error,

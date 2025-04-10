@@ -20,13 +20,8 @@ interface FormProps {
 const Form: React.FC<FormProps> = ({
   sessionId,
   searchUrl,
-  isConnected,
-  error,
-  messages,
   setSessionId,
   setSearchUrl,
-  connect,
-  disconnect,
 }) => {
   return (
     <div className="flex flex-col gap-2 rounded-md p-2">
@@ -38,16 +33,6 @@ const Form: React.FC<FormProps> = ({
           value={sessionId}
           onChange={(e) => setSessionId(e.target.value)}
           placeholder="Your PoE Session ID"
-        />
-      </div>
-      <div className="flex flex-col gap-2">
-        <label className="text-xs">Trade URL:</label>
-        <input
-          className="bg-slate-700 p-2 rounded-md"
-          type="text"
-          value={searchUrl}
-          onChange={(e) => setSearchUrl(e.target.value)}
-          placeholder="https://www.pathofexile.com/trade/search/League/SearchID"
         />
       </div>
     </div>

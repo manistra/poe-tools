@@ -1,4 +1,5 @@
 import type { Configuration } from "webpack";
+import path from "path";
 
 import { rules } from "./webpack.rules";
 import { plugins } from "./webpack.plugins";
@@ -8,7 +9,7 @@ rules.push({
   use: [
     { loader: "style-loader" },
     { loader: "css-loader" },
-    { loader: "postcss-loader" }, // <== add this
+    { loader: "postcss-loader" },
   ],
 });
 
@@ -19,5 +20,8 @@ export const rendererConfig: Configuration = {
   plugins,
   resolve: {
     extensions: [".js", ".ts", ".jsx", ".tsx", ".css"],
+    alias: {
+      src: path.resolve(__dirname, "src"),
+    },
   },
 };

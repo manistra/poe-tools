@@ -2,13 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
-  margin: auto;
+@layer components {
+  .card {
+    @apply border border-slate-800 rounded-md backdrop-blur-md p-8 bg-black bg-opacity-50;
+  }
+}
 
-  padding: 2rem;
-  background-color: #111827;
-  color: #c7c7c7;
-  font-size: 14px;
+:root {
+  background-image: url("./assets/background.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  background-blend-mode: overlay;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #d1d5db;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Add a container class for content with proper contrast against the background */
+.content-container {
+  background-color: rgba(15, 23, 42, 0.8); /* Tailwind slate-900 with opacity */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
 }

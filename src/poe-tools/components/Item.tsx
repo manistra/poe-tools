@@ -2,6 +2,7 @@ import React from "react";
 import { copyToClipboard } from "../utils/clipboard";
 import { calculateTotalAccuracy } from "../utils/calculateAccuracy";
 import CollapsibleItem from "../../components/CollapsibleItem";
+import Button from "src/components/Button";
 const WhisperButton = ({ whisper }: { whisper: string }) => {
   const handleCopyWhisper = async () => {
     await copyToClipboard(whisper);
@@ -9,12 +10,9 @@ const WhisperButton = ({ whisper }: { whisper: string }) => {
   };
 
   return (
-    <button
-      onClick={handleCopyWhisper}
-      className="px-2 py-3 bg-blue-900 text-white rounded hover:bg-blue-700 transition-colors text-xs text-nowrap"
-    >
+    <Button size="small" onClick={handleCopyWhisper}>
       Copy Whisper
-    </button>
+    </Button>
   );
 };
 interface ItemProperty {
@@ -94,7 +92,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
   const totalAccuracy = calculateTotalAccuracy(item.item);
 
   return (
-    <div className="border border-gray-700 rounded-md p-2 bg-gray-800">
+    <div className="border border-gray-700 rounded-md p-2 bg-gray-950">
       <div className="flex flex-col gap-2">
         <div className="flex flex-row gap-16 justify-between">
           <div className="flex justify-between text-xs w-1/2 max-w-[300px] flex-col">
