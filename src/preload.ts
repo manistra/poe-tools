@@ -51,4 +51,14 @@ contextBridge.exposeInMainWorld("electron", {
       return ipcRenderer.invoke("api-request", options);
     },
   },
+  updates: {
+    getAppVersion: () => ipcRenderer.invoke("get-app-version"),
+    onUpdateStatus: (callback: (status: string) => void) => {
+      const wrappedCallback = (_event: any, status: string) => callback(status);
+      ipcRenderer.on("update-status", wrappedCallback);
+      return () => {
+        ipcRenderer.removeListener("update-status", wrappedCallback);
+      };
+    },
+  },
 });

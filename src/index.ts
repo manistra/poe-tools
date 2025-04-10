@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu, ipcMain } from "electron";
 import { setupWebSocketHandlers } from "./websocketHandler";
 import { setupApiHandler } from "./apiHandler";
 import { setupAutoUpdater } from "./autoUpdater";
@@ -23,13 +23,18 @@ const createWindow = (): void => {
       nodeIntegration: false,
       contextIsolation: true,
     },
+    frame: true,
+    autoHideMenuBar: true,
   });
+
+  Menu.setApplicationMenu(null);
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // Comment this out for production
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

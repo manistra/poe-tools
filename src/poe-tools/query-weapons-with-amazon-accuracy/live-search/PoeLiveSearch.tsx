@@ -10,7 +10,10 @@ import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
 import { useLiveSearch } from "./useLiveSearch";
 import clsx from "clsx";
 import { sendNotification } from "src/poe-tools/utils/useNotification";
-import { transformItemData } from "src/poe-tools/utils/transformItemData";
+import {
+  TransformedItemData,
+  transformItemData,
+} from "src/poe-tools/utils/transformItemData";
 
 const PoELiveSearch = () => {
   const {
@@ -24,7 +27,8 @@ const PoELiveSearch = () => {
     disconnect,
   } = useLiveSearch();
 
-  const [itemDetails, setItemDetails] = useState<any[]>(result);
+  const [itemDetails, setItemDetails] = useState<TransformedItemData[]>([]);
+  const [itemsToShow, setItemsToShow] = useState<TransformedItemData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [minimumTotalDpsWithAccuracy, setMinimumTotalDpsWithAccuracy] =
     useState(
@@ -197,7 +201,7 @@ const PoELiveSearch = () => {
             onChange={(value) => {
               setMinimumTotalDpsWithAccuracy(Number(value));
               window.localStorage.setItem(
-                "minimumTotalDpsWithAccuracy",
+                "live-minimumTotalDpsWithAccuracy",
                 String(value)
               );
             }}

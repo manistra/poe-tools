@@ -1,30 +1,6 @@
 import { useState, useEffect } from "react";
 import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 
-declare global {
-  interface Window {
-    electron: {
-      api: {
-        request: (options: {
-          url: string;
-          method: string;
-          headers?: Record<string, string>;
-          data?: any;
-          params?: Record<string, string>;
-        }) => Promise<any>;
-      };
-      websocket: {
-        connect: (wsUri: string, sessionId: string) => void;
-        disconnect: () => void;
-        onConnected: (callback: () => void) => () => void;
-        onDisconnected: (callback: () => void) => () => void;
-        onMessage: (callback: (data: any) => void) => () => void;
-        onError: (callback: (error: string) => void) => () => void;
-      };
-    };
-  }
-}
-
 interface Message {
   time: string;
   items: string[];
@@ -137,7 +113,7 @@ export const useLiveSearch = (): UseLiveSearchReturn => {
   return {
     searchUrl,
     setSearchUrl: (url: string) => {
-      window.localStorage.setItem("searchUrl", url);
+      window.localStorage.setItem("live-searchUrl", url);
       setSearchUrl(url);
     },
     sessionId,
