@@ -35,7 +35,6 @@ const PoEManualSearch = () => {
   const { performSearch, isLoading, logs, clearListings } = useManualSearch({
     minimumTotalDpsWithAccuracy: Number(minimumTotalDpsWithAccuracy),
     setItemDetails,
-    itemDetails,
     delay,
   });
 
