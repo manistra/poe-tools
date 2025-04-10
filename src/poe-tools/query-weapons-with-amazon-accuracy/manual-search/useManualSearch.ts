@@ -6,7 +6,6 @@ import {
   transformItemData,
 } from "src/poe-tools/utils/transformItemData";
 import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
-import { extractSearchQueryId } from "src/poe-tools/utils/extractSearchQueryId";
 import useLogs from "src/helpers/useLogs";
 
 // Function to create headers with the provided POESESSID
@@ -43,8 +42,6 @@ export const useManualSearch = ({
 
   const { addLog, logs } = useLogs();
 
-  const poesessid = getPoeSessionId();
-
   const clearListings = useCallback(() => {
     setItemDetails([]);
   }, []);
@@ -60,7 +57,7 @@ export const useManualSearch = ({
         const response = await window.electron.api.request({
           url: searchUrl,
           method: "POST",
-          headers: createHeaders(poesessid),
+          headers: createHeaders(getPoeSessionId()),
           data: queryData,
         });
 
@@ -76,7 +73,7 @@ export const useManualSearch = ({
         return null;
       }
     },
-    [addLog, minimumTotalDpsWithAccuracy, poesessid]
+    [addLog, minimumTotalDpsWithAccuracy]
   );
 
   // Function to fetch item details
@@ -109,7 +106,7 @@ export const useManualSearch = ({
         try {
           const batchItems = await fetchItemDetails({
             itemIds: batchIds,
-            sessionId: poesessid,
+            sessionId: getPoeSessionId(),
             isPoe2,
             searchUrl,
           });
@@ -150,7 +147,7 @@ export const useManualSearch = ({
 
       return allItems;
     },
-    [addLog, poesessid]
+    [addLog]
   );
 
   // Main search function

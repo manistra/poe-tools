@@ -26,7 +26,8 @@ const PoEManualSearch = () => {
   );
 
   const [searchUrl, setSearchUrl] = useState(
-    window.localStorage.getItem("manual-searchUrl") || ""
+    window.localStorage.getItem("manual-searchUrl") ||
+      "https://www.pathofexile.com/trade2/search/poe2/Dawn%20of%20the%20Hunt"
   );
   const [body, setBody] = useState(
     window.localStorage.getItem("manual-body") || ""
@@ -127,7 +128,7 @@ const PoEManualSearch = () => {
         />
         <Input
           type="number"
-          label="Delay:"
+          label="Delay between requests (miliseconds, min 200 but watch out its easy to get rate limited):"
           value={delay}
           min={200}
           onChange={(value) => {

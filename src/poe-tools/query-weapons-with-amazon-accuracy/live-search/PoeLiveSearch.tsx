@@ -1,139 +1,80 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "src/components/Button";
 import CollapsibleItem from "src/components/CollapsibleItem";
 import Input from "src/components/Input";
-import useLogs from "src/helpers/useLogs";
-import { result } from "src/mockData";
+
 import Items from "src/poe-tools/components/Items";
 
-import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
-import { useLiveSearch } from "./useLiveSearch";
 import clsx from "clsx";
+import { usePoeLiveSearch } from "./usePoeLiveSearch";
+import { TransformedItemData } from "src/poe-tools/utils/transformItemData";
 import { sendNotification } from "src/poe-tools/utils/useNotification";
-import {
-  TransformedItemData,
-  transformItemData,
-} from "src/poe-tools/utils/transformItemData";
+import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 
 const PoELiveSearch = () => {
-  const {
-    sessionId,
-    setSearchUrl,
-    searchUrl,
-    isConnected,
-    messages,
-    error,
-    connect,
-    disconnect,
-  } = useLiveSearch();
-
-  const [itemDetails, setItemDetails] = useState<TransformedItemData[]>([]);
-  const [itemsToShow, setItemsToShow] = useState<TransformedItemData[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [minimumTotalDpsWithAccuracy, setMinimumTotalDpsWithAccuracy] =
     useState(
-      window.localStorage.getItem("live-minimumTotalDpsWithAccuracy") || 400
+      Number(window.localStorage.getItem("live-minimumTotalDpsWithAccuracy")) ||
+        400
     );
 
-  const { logs, addLog } = useLogs();
+  const [itemsToShow, setItemsToShow] = useState<TransformedItemData[]>([]);
 
-  // Function to fetch item details when new messages arrive
+  const {
+    searchUrl,
+    setSearchUrl,
+    isConnected,
+    connect,
+    disconnect,
+    error,
+    logs,
+    itemDetails,
+    isLoading,
+    clearListings,
+  } = usePoeLiveSearch();
+
   useEffect(() => {
-    if (messages.length > 0) {
-      const latestMessage = messages[messages.length - 1];
-      if (latestMessage.items && latestMessage.items.length > 0) {
-        addLog(`New items found: ${latestMessage.items.length} items`);
-      }
-    }
+    if (itemDetails.length > 0) {
+      const filteredDetails = itemDetails.filter((transformedItem) => {
+        const exceedsDamage =
+          transformedItem.dpsWithAccuracy >=
+          Number(minimumTotalDpsWithAccuracy);
 
-    const fetchDetails = async () => {
-      if (messages.length > 0) {
-        const latestMessage = messages[messages.length - 1];
-        if (latestMessage.items.length > 0) {
-          setIsLoading(true);
-          try {
-            // Extract the search URL to determine if it's PoE2
-            const isPoe2 = searchUrl.includes("poe2");
-            addLog(
-              `Fetching item details for ${latestMessage.items.length} items`
-            );
-            const details = await fetchItemDetails({
-              itemIds: latestMessage.items,
-              sessionId,
-              isPoe2,
-              searchUrl,
-            });
-
-            const filteredDetails = details.filter((detail) => {
-              // Transform the data for easier access
-              const transformedItem = transformItemData(detail);
-
-              // Check if the item meets our DPS threshold
-              const exceedsDamage =
-                transformedItem.dpsWithAccuracy >=
-                Number(minimumTotalDpsWithAccuracy);
-
-              if (exceedsDamage) {
-                sendNotification(
-                  `${transformedItem.dpsWithAccuracy} DPS (crit: ${transformedItem.criticalChance}) for ${transformedItem.price?.amount} ${transformedItem.price?.currency}`,
-                  `${transformedItem.name} exceeds ${minimumTotalDpsWithAccuracy} DPS with Accuracy`
-                );
-              }
-
-              return exceedsDamage;
-            });
-
-            setItemDetails((prev) => [
-              ...filteredDetails.map((detail) => ({
-                time: new Date().toLocaleTimeString(),
-                ...detail,
-              })),
-              ...prev,
-            ]);
-          } catch (error) {
-            // Handle rate limit errors
-            disconnect();
-            addLog(`🛑 Search automatically stopped due to an error!`);
-
-            if (
-              error instanceof Error &&
-              error.message.startsWith("RATE_LIMIT_EXCEEDED")
-            ) {
-              const waitTime = error.message.split(":")[1];
-              addLog(
-                `⚠️ Rate limit exceeded! Need to wait ${waitTime} seconds before trying again.`
-              );
-            } else {
-              console.error("Failed to fetch item details:", error);
-              addLog(
-                `Error fetching item details: ${
-                  error instanceof Error ? error.message : String(error)
-                }`
-              );
-            }
-          } finally {
-            setIsLoading(false);
-          }
+        if (exceedsDamage) {
+          sendNotification(
+            `${transformedItem.dpsWithAccuracy} DPS (crit: ${transformedItem.criticalChance}) for ${transformedItem.price?.amount} ${transformedItem.price?.currency}`,
+            `${transformedItem.name} exceeds ${minimumTotalDpsWithAccuracy} DPS with Accuracy`
+          );
         }
-      }
-    };
 
-    fetchDetails();
-  }, [messages]);
+        return exceedsDamage;
+      });
 
-  const clearListings = () => {
-    setItemDetails([]);
-  };
+      setItemsToShow(filteredDetails);
+    }
+  }, [itemDetails]);
+
+  useEffect(() => {
+    if (itemDetails.length > 0) {
+      const filteredDetails = itemDetails.filter((transformedItem) => {
+        const exceedsDamage =
+          transformedItem.dpsWithAccuracy >=
+          Number(minimumTotalDpsWithAccuracy);
+
+        return exceedsDamage;
+      });
+
+      setItemsToShow(filteredDetails);
+    }
+  }, [minimumTotalDpsWithAccuracy]);
 
   return (
     <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">
       <div className="flex gap-2 items-end justify-between">
         <div>
-          <h1 className="text-2xl text-gray-200 font-bold">
-            Wepon with Accuracy
-          </h1>
+          <h1 className="text-2xl text-gray-200 font-bold">Live Search</h1>
 
-          <h2 className="text-gray-600">Live Search</h2>
+          <h2 className="text-gray-300">Weapon with Accuracy</h2>
         </div>
         <div className="w-1/2 ml-auto">
           <Input
@@ -162,7 +103,7 @@ const PoELiveSearch = () => {
             <Button
               variant="success"
               onClick={connect}
-              disabled={isConnected || !searchUrl || !sessionId}
+              disabled={isConnected || !searchUrl || !getPoeSessionId()}
             >
               Start Live Search
             </Button>
@@ -227,7 +168,7 @@ const PoELiveSearch = () => {
             Clear Listings
           </button>
         </div>
-        <Items items={itemDetails} />
+        <Items items={itemsToShow} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-export const result = [
+export const mockData = [
   {
     id: "80f37f6d4cdd0187da1a5b179c6615d446fe630fff1c352971784af801987365",
     listing: {

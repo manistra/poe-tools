@@ -9,7 +9,6 @@ interface Message {
 interface UseLiveSearchReturn {
   searchUrl: string;
   setSearchUrl: (url: string) => void;
-  sessionId: string;
   isConnected: boolean;
   messages: Message[];
   error: string | null;
@@ -17,7 +16,7 @@ interface UseLiveSearchReturn {
   disconnect: () => void;
 }
 
-export const useLiveSearch = (): UseLiveSearchReturn => {
+export const useWebSocketConnection = (): UseLiveSearchReturn => {
   const [searchUrl, setSearchUrl] = useState(
     window.localStorage.getItem("live-searchUrl") || ""
   );
@@ -26,8 +25,6 @@ export const useLiveSearch = (): UseLiveSearchReturn => {
     []
   );
   const [error, setError] = useState<string | null>(null);
-
-  const sessionId = getPoeSessionId();
 
   // Extract WebSocket URI from trade URL
   const getWebSocketUri = (url: string) => {
@@ -54,7 +51,7 @@ export const useLiveSearch = (): UseLiveSearchReturn => {
     }
 
     setError(null);
-    window.electron.websocket.connect(wsUri, sessionId);
+    window.electron.websocket.connect(wsUri, getPoeSessionId());
   };
 
   const disconnect = () => {
@@ -116,7 +113,6 @@ export const useLiveSearch = (): UseLiveSearchReturn => {
       window.localStorage.setItem("live-searchUrl", url);
       setSearchUrl(url);
     },
-    sessionId,
     isConnected,
     messages,
     error,

@@ -1,13 +1,9 @@
 import React from "react";
 import Item from "./Item";
-import {
-  transformItemData,
-  TransformedItemData,
-  ItemData,
-} from "../utils/transformItemData";
+import { TransformedItemData } from "../utils/transformItemData";
 
 interface ItemsProps {
-  items: ItemData[];
+  items: TransformedItemData[];
 }
 
 const Items: React.FC<ItemsProps> = ({ items }) => {
@@ -16,11 +12,10 @@ const Items: React.FC<ItemsProps> = ({ items }) => {
   }
 
   // Transform the raw items into our cleaner structure
-  const transformedItems: TransformedItemData[] = items.map(transformItemData);
 
   return (
     <ul className="space-y-4">
-      {transformedItems.map((item, index) => (
+      {items.map((item, index) => (
         <li key={index}>
           <Item item={item} />
         </li>
