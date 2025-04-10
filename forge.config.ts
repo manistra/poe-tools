@@ -23,7 +23,7 @@ const config: ForgeConfig = {
       setupIcon: "./src/assets/icon.ico", // Add an icon file
       loadingGif: "./src/assets/loading.gif", // Optional loading GIF
       // The URLs below are for update.electronjs.org
-      remoteReleases: `https://github.com/manistra/my-new-app`, // Replace with your repo
+      remoteReleases: `https://github.com/manistra/poe-tools`, // Replace with your repo
     }),
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({}),
