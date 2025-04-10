@@ -1,4 +1,4 @@
-import { extractSearchQueryId } from "../../utils/extractSearchQueryId";
+import { extractSearchQueryId } from "./extractSearchQueryId";
 
 export const fetchItemDetails = async ({
   itemIds,
