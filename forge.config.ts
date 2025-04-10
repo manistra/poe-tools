@@ -21,7 +21,6 @@ const config: ForgeConfig = {
     new MakerSquirrel({
       // Configure auto-updates
       setupIcon: "./src/assets/icon.ico", // Add an icon file
-      loadingGif: "./src/assets/loading.gif", // Optional loading GIF
       // The URLs below are for update.electronjs.org
       remoteReleases: `https://github.com/manistra/poe-tools`, // Replace with your repo
     }),
