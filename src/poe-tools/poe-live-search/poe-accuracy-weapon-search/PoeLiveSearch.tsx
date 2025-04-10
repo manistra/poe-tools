@@ -9,6 +9,7 @@ import { calculateTotalAccuracy } from "src/poe-tools/utils/calculateAccuracy";
 import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
 import { useLiveSearch } from "./useLiveSearch";
 import clsx from "clsx";
+import { sendNotification } from "src/poe-tools/utils/useNotification";
 
 const PoELiveSearch = () => {
   const {
@@ -57,14 +58,26 @@ const PoELiveSearch = () => {
             });
 
             const filteredDetails = details.filter((detail) => {
-              const exceedsDamage =
+              const damageWithAccuracy =
                 detail.item.extended.dps +
-                  calculateTotalAccuracy(detail.item) / 4 >=
-                minimumTotalDpsWithAccuracy;
+                calculateTotalAccuracy(detail.item) / 4;
 
-              // if (exceedsDamage){
+              const exceedsDamage =
+                damageWithAccuracy >= minimumTotalDpsWithAccuracy;
 
-              // }
+              if (exceedsDamage) {
+                sendNotification(
+                  `${damageWithAccuracy} DPS (crit: ${
+                    detail.item.properties.find(
+                      (property: any) =>
+                        property.name === "[Critical|Critical Hit] Chance"
+                    )?.values[0][0]
+                  }) for ${detail.listing?.price?.amount} ${
+                    detail.listing?.price?.currency
+                  }`,
+                  `${detail.item.name} exceeds ${minimumTotalDpsWithAccuracy} DPS with Accuracy`
+                );
+              }
 
               return exceedsDamage;
             });
@@ -118,6 +131,7 @@ const PoELiveSearch = () => {
           <h1 className="text-2xl text-gray-200 font-bold">
             Wepon with Accuracy
           </h1>
+
           <h2 className="text-gray-600">Live Search</h2>
         </div>
         <div className="w-1/2 ml-auto">
