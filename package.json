@@ -1,6 +1,6 @@
 {
-  "name": "my-new-app",
-  "productName": "my-new-app",
+  "name": "poe-tools",
+  "productName": "PoE Tools",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".webpack/main",
@@ -26,6 +26,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.8.0",
     "@electron-forge/plugin-fuses": "^7.8.0",
     "@electron-forge/plugin-webpack": "^7.8.0",
+    "@electron-forge/publisher-github": "^7.8.0",
     "@electron/fuses": "^1.8.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.2",
@@ -56,6 +57,7 @@
     "postcss-loader": "^8.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "update-electron-app": "^3.1.1",
     "ws": "^8.18.1"
   }
 }
