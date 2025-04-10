@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import WeaponAccuracySeach from "./poe-tools/poe-live-search/WeaponAccuracySeach";
+import QueryWeaponsWithAmazonAccuracy from "./poe-tools/query-weapons-with-amazon-accuracy/QueryWeaponsWithAmazonAccuracy";
 import ModalBase from "src/components/Modal";
 import Input from "./components/Input";
 import Button from "./components/Button";
@@ -32,7 +32,7 @@ export default function App() {
         </svg>
       </button>
 
-      <WeaponAccuracySeach />
+      <QueryWeaponsWithAmazonAccuracy />
 
       <ModalBase
         onClose={() =>

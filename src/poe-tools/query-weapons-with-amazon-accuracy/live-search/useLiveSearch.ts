@@ -43,7 +43,7 @@ interface UseLiveSearchReturn {
 
 export const useLiveSearch = (): UseLiveSearchReturn => {
   const [searchUrl, setSearchUrl] = useState(
-    window.localStorage.getItem("searchUrl") || ""
+    window.localStorage.getItem("live-searchUrl") || ""
   );
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState<{ time: string; items: string[] }[]>(

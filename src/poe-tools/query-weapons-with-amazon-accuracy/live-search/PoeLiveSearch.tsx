@@ -27,7 +27,9 @@ const PoELiveSearch = () => {
   const [itemDetails, setItemDetails] = useState<any[]>(result);
   const [isLoading, setIsLoading] = useState(false);
   const [minimumTotalDpsWithAccuracy, setMinimumTotalDpsWithAccuracy] =
-    useState(window.localStorage.getItem("minimumTotalDpsWithAccuracy") || 400);
+    useState(
+      window.localStorage.getItem("live-minimumTotalDpsWithAccuracy") || 400
+    );
 
   const { logs, addLog } = useLogs();
 

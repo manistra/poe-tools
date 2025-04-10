@@ -8,34 +8,29 @@ interface InputProps {
   onChange: (value: string | number) => void;
   placeholder?: string;
   type?: "text" | "password" | "email" | "number";
+  wrapperClassName?: string;
   className?: string;
   disabled?: boolean;
   required?: boolean;
   label?: string;
   error?: string;
-  min?: number;
 }
 
-const Input: React.FC<InputProps> = ({
+const TextArea: React.FC<InputProps> = ({
   id,
   name,
   value,
   onChange,
+  wrapperClassName,
   placeholder = "",
-  type = "text",
   className = "",
   disabled = false,
   required = false,
   label,
   error,
-  min,
 }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
-  };
-
   return (
-    <div className="flex flex-col w-full">
+    <div className={clsx("flex flex-col w-full", wrapperClassName)}>
       {label && (
         <label
           htmlFor={id}
@@ -45,13 +40,13 @@ const Input: React.FC<InputProps> = ({
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      <input
+      <textarea
         id={id}
         name={name}
-        min={min}
-        type={type}
         value={value}
-        onChange={handleChange}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+          onChange(e.target.value)
+        }
         placeholder={placeholder}
         disabled={disabled}
         required={required}
@@ -66,6 +61,8 @@ const Input: React.FC<InputProps> = ({
           "focus:border-gray-700",
           "disabled:opacity-50",
           "disabled:cursor-not-allowed",
+          "resize-y", // Allow vertical resizing
+          "min-h-[100px]", // Set a minimum height
           error && "border-red-500 focus:ring-red-500",
           className
         )}
@@ -75,4 +72,4 @@ const Input: React.FC<InputProps> = ({
   );
 };
 
-export default Input;
+export default TextArea;

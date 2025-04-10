@@ -1,10 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
-import PoeLiveSearch from "./poe-accuracy-weapon-search/PoeLiveSearch";
+import PoeLiveSearch from "./live-search/PoeLiveSearch";
+import PoEManualSearch from "./manual-search/PoeManualSearch";
+import clsx from "clsx";
 
-const WeaponAccuracySeach = () => {
+const QueryWeaponsWithAmazonAccuracy = () => {
   const [selectedOption, setSelectedOption] = useState<
     "left" | "both" | "right"
-  >("left");
+  >(
+    (window.localStorage.getItem(
+      "poe-query-weapons-with-amazon-accuracy-selected-option"
+    ) as "left" | "both" | "right") || "left"
+  );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -48,6 +54,10 @@ const WeaponAccuracySeach = () => {
               }`}
               onClick={() => {
                 setSelectedOption("left");
+                window.localStorage.setItem(
+                  "poe-query-weapons-with-amazon-accuracy-selected-option",
+                  "left"
+                );
                 setIsDropdownOpen(false);
               }}
             >
@@ -59,6 +69,10 @@ const WeaponAccuracySeach = () => {
               }`}
               onClick={() => {
                 setSelectedOption("both");
+                window.localStorage.setItem(
+                  "poe-query-weapons-with-amazon-accuracy-selected-option",
+                  "both"
+                );
                 setIsDropdownOpen(false);
               }}
             >
@@ -70,6 +84,10 @@ const WeaponAccuracySeach = () => {
               }`}
               onClick={() => {
                 setSelectedOption("right");
+                window.localStorage.setItem(
+                  "poe-query-weapons-with-amazon-accuracy-selected-option",
+                  "right"
+                );
                 setIsDropdownOpen(false);
               }}
             >
@@ -81,6 +99,7 @@ const WeaponAccuracySeach = () => {
 
       <div className="flex flex-row w-full gap-4 mt-16">
         <div
+          className={clsx(selectedOption === "right" && "hidden")}
           style={{
             width:
               selectedOption === "left"
@@ -94,20 +113,19 @@ const WeaponAccuracySeach = () => {
         </div>
 
         <div
+          className={clsx(selectedOption === "left" && "hidden")}
           style={{
             width:
               selectedOption === "right"
                 ? "100%"
-                : selectedOption === "both"
-                ? "50%"
-                : "0%",
+                : selectedOption === "both" && "50%",
           }}
         >
-          <div className="bg-slate-800 h-full w-full"></div>
+          <PoEManualSearch />
         </div>
       </div>
     </div>
   );
 };
 
-export default WeaponAccuracySeach;
+export default QueryWeaponsWithAmazonAccuracy;

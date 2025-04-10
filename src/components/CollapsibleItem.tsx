@@ -5,16 +5,16 @@ interface CollapsibleItemProps {
   className?: string;
   title: string;
   children: React.ReactNode;
-  defaultCollapsed?: boolean;
+  defaultOpen?: boolean;
 }
 
 const CollapsibleItem: React.FC<CollapsibleItemProps> = ({
-  defaultCollapsed = true,
+  defaultOpen = false,
   title,
   children,
   className,
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+  const [isCollapsed, setIsCollapsed] = useState(!defaultOpen);
   const handleCollapsible = () => {
     setIsCollapsed(!isCollapsed);
   };
