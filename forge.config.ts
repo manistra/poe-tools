@@ -35,7 +35,7 @@ const config: ForgeConfig = {
         name: "poe-tools", // Replace with your repository name
       },
       prerelease: false,
-      draft: true, // Creates a draft release you can review before publishing
+      draft: false, // Creates a draft release you can review before publishing
     }),
   ],
   plugins: [
