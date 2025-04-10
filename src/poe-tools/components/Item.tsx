@@ -1,8 +1,9 @@
 import React from "react";
 import { copyToClipboard } from "../utils/clipboard";
-import { calculateTotalAccuracy } from "../utils/calculateAccuracy";
 import CollapsibleItem from "../../components/CollapsibleItem";
 import Button from "src/components/Button";
+import { TransformedItemData } from "../utils/transformItemData";
+
 const WhisperButton = ({ whisper }: { whisper: string }) => {
   const handleCopyWhisper = async () => {
     await copyToClipboard(whisper);
@@ -15,82 +16,12 @@ const WhisperButton = ({ whisper }: { whisper: string }) => {
     </Button>
   );
 };
-interface ItemProperty {
-  name: string;
-  values: [string, number][];
-  displayMode: number;
-  type?: number;
-}
-
-interface ItemListing {
-  account: {
-    name: string;
-  };
-  price: {
-    amount: number;
-    currency: string;
-  };
-  whisper?: string;
-}
-
-interface ItemData {
-  time: string;
-  item: {
-    properties: ItemProperty[];
-    explicitMods?: string[];
-    runeMods?: string[];
-    fracturedMods?: string[];
-    extended: {
-      pdps: number;
-      edps: number;
-      dps: number;
-    };
-  };
-  listing?: ItemListing;
-}
 
 interface ItemProps {
-  item: ItemData;
+  item: TransformedItemData;
 }
 
 const Item: React.FC<ItemProps> = ({ item }) => {
-  const attackSpeed = item.item.properties.find(
-    (property) => property.name === "Attacks per Second"
-  );
-
-  const physicalDamage = item.item.properties.find(
-    (property) => property.name === "[Physical] Damage"
-  );
-
-  const fireDamage = item.item.properties.find(
-    (property) => property.name === "[Fire] Damage"
-  );
-
-  const coldDamage = item.item.properties.find(
-    (property) => property.name === "[Cold] Damage"
-  );
-
-  const lightningDamage = item.item.properties.find(
-    (property) => property.name === "[Lightning] Damage"
-  );
-
-  const elementalDamageFind = item.item.properties.find(
-    (property: any) => property.name === "[ElementalDamage|Elemental] Damage"
-  );
-  const elementalDamageValues = {
-    fire: elementalDamageFind?.values.find(
-      (val: [string, number]) => val[1] === 4
-    )?.[0],
-    cold: elementalDamageFind?.values.find(
-      (val: [string, number]) => val[1] === 5
-    )?.[0],
-    lightning: elementalDamageFind?.values.find(
-      (val: [string, number]) => val[1] === 6
-    )?.[0],
-  };
-
-  const totalAccuracy = calculateTotalAccuracy(item.item);
-
   return (
     <div className="border border-gray-700 rounded-md p-2 bg-gray-950">
       <div className="flex flex-col gap-2">
@@ -98,67 +29,55 @@ const Item: React.FC<ItemProps> = ({ item }) => {
           <div className="flex justify-between text-xs w-1/2 max-w-[300px] flex-col">
             <h3 className="font-medium flex flex-row w-full justify-between text-white">
               <span className="text-gray-400 ">Crit Chance:</span>
-              {
-                item.item.properties.find(
-                  (property: any) =>
-                    property.name === "[Critical|Critical Hit] Chance"
-                )?.values[0][0]
-              }
+              {item.criticalChance}
             </h3>
             <h3 className="font-medium flex flex-row w-full justify-between text-white">
               <span className="text-gray-400 ">Attacks per Second:</span>
-              {attackSpeed?.values[0][0]}
+              {item.attacksPerSecond}
             </h3>
             <h3 className="font-medium flex flex-row w-full justify-between text-white">
               <span className="text-gray-400 ">Physical Damage:</span>
-              <span className="text-white">{physicalDamage?.values[0][0]}</span>
+              <span className="text-white">{item.physicalDamage}</span>
             </h3>
             <h3 className="font-medium flex flex-row w-full justify-between text-white">
               <span className="text-gray-400 ">Elemental Damage:</span>
-              <span className="text-red-500">{elementalDamageValues.fire}</span>
-              <span className="text-blue-400">
-                {elementalDamageValues.cold}
-              </span>
+              <span className="text-red-500">{item.elementalDamage.fire}</span>
+              <span className="text-blue-400">{item.elementalDamage.cold}</span>
               <span className="text-yellow-400">
-                {elementalDamageValues.lightning}
+                {item.elementalDamage.lightning}
               </span>
             </h3>
 
-            {fireDamage && (
+            {item.fireDamage && (
               <h3 className="font-medium flex flex-row w-full justify-between text-white">
                 <span className="text-gray-400 ">Fire Damage:</span>
-                <span className="text-red-800">{fireDamage?.values[0][0]}</span>
+                <span className="text-red-800">{item.fireDamage}</span>
               </h3>
             )}
-            {coldDamage && (
+            {item.coldDamage && (
               <h3 className="font-medium flex flex-row w-full justify-between text-white">
                 <span className="text-gray-400 ">Cold Damage:</span>
-                <span className="text-blue-400">
-                  {coldDamage?.values[0][0]}
-                </span>
+                <span className="text-blue-400">{item.coldDamage}</span>
               </h3>
             )}
-            {lightningDamage && (
+            {item.lightningDamage && (
               <h3 className="font-medium flex flex-row w-full justify-between text-white">
                 <span className="text-gray-400 ">Lightning Damage:</span>
-                <span className="text-purple-500">
-                  {lightningDamage?.values[0][0]}
-                </span>
+                <span className="text-purple-500">{item.lightningDamage}</span>
               </h3>
             )}
 
-            {totalAccuracy > 0 && (
+            {item.totalAccuracy > 0 && (
               <h3 className="font-medium flex flex-row w-full justify-between text-white">
                 <span className="text-gray-400 ">Total Accuracy:</span>
-                {totalAccuracy}
+                {item.totalAccuracy}
               </h3>
             )}
           </div>
 
           <div className="flex flex-col text-xs self-end w-1/2 max-w-[200px]">
             <h3 className="font-medium flex flex-row w-full justify-between text-white">
-              <span className="text-gray-400">pDPS:</span>{" "}
-              {item.item.extended.pdps}
+              <span className="text-gray-400">pDPS:</span> {item.pdps}
             </h3>
             <h3 className="font-medium flex flex-row w-full justify-between text-white">
               <span className="">
@@ -166,18 +85,17 @@ const Item: React.FC<ItemProps> = ({ item }) => {
                 <span className="text-blue-400">P</span>
                 <span className="text-purple-400">S</span>:
               </span>{" "}
-              {item.item.extended.edps}
+              {item.edps}
             </h3>
             <h3 className="font-medium flex flex-row w-full justify-between text-white">
-              <span className="text-green-700 ">Total DPS:</span>{" "}
-              {item.item.extended.dps}
+              <span className="text-green-700 ">Total DPS:</span> {item.dps}
             </h3>
-            {totalAccuracy > 0 && (
+            {item.totalAccuracy > 0 && (
               <h3 className="font-medium text-sm flex flex-row justify-between">
                 <span className="text-green-500 text-xs">
                   Total DPS with Accuracy:
                 </span>{" "}
-                {Math.round(item.item.extended.dps + totalAccuracy / 4)}
+                {item.dpsWithAccuracy}
               </h3>
             )}
           </div>
@@ -185,11 +103,11 @@ const Item: React.FC<ItemProps> = ({ item }) => {
 
         <CollapsibleItem title="Mods">
           <div className="flex flex-col gap-1">
-            {item.item.runeMods && (
+            {item.runeMods && item.runeMods.length > 0 && (
               <>
                 <h4 className="text-sm text-gray-400">Rune Mods:</h4>
                 <div className="bg-gray-900 p-2 rounded">
-                  {item.item.runeMods?.map((mod: string, i: number) => (
+                  {item.runeMods.map((mod: string, i: number) => (
                     <div key={i} className="text-sm">
                       {mod}
                     </div>
@@ -197,11 +115,11 @@ const Item: React.FC<ItemProps> = ({ item }) => {
                 </div>
               </>
             )}
-            {item.item.fracturedMods && (
+            {item.fracturedMods && item.fracturedMods.length > 0 && (
               <>
                 <h4 className="text-sm text-gray-400">Fractured Mods:</h4>
                 <div className="bg-gray-900 p-2 rounded">
-                  {item.item.fracturedMods?.map((mod: string, i: number) => (
+                  {item.fracturedMods.map((mod: string, i: number) => (
                     <div key={i} className="text-sm">
                       {mod}
                     </div>
@@ -211,7 +129,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
             )}
             <h4 className="text-sm text-gray-400">Mods:</h4>
             <div className="bg-gray-900 p-2 rounded">
-              {item.item.explicitMods?.map((mod: string, i: number) => (
+              {item.explicitMods?.map((mod: string, i: number) => (
                 <div key={i} className="text-sm">
                   {mod}
                 </div>
@@ -225,7 +143,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
         <div className="flex justify-between w-full">
           <div className="text-sm text-gray-200 mr-2 flex flex-col">
             <label className="text-xs text-gray-400">Seller:</label>
-            <span className="text-gray-200">{item.listing?.account?.name}</span>
+            <span className="text-gray-200">{item.seller}</span>
           </div>
 
           <div className="text-sm text-gray-200 mr-2 flex flex-col">
@@ -236,14 +154,14 @@ const Item: React.FC<ItemProps> = ({ item }) => {
           <div className="text-sm text-gray-200 mr-2 flex flex-col">
             <label className="text-xs text-gray-400">Price:</label>
             <span className="text-yellow-500 text-md">
-              {item.listing?.price?.amount} {item.listing?.price?.currency}
+              {item.price?.amount} {item.price?.currency}
             </span>
           </div>
         </div>
 
-        {item.listing?.whisper && (
+        {item.whisper && (
           <div className="mt-2">
-            <WhisperButton whisper={item.listing?.whisper} />
+            <WhisperButton whisper={item.whisper} />
           </div>
         )}
       </div>

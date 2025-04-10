@@ -5,11 +5,12 @@ import Input from "src/components/Input";
 import useLogs from "src/helpers/useLogs";
 import { result } from "src/mockData";
 import Items from "src/poe-tools/components/Items";
-import { calculateTotalAccuracy } from "src/poe-tools/utils/calculateAccuracy";
+
 import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
 import { useLiveSearch } from "./useLiveSearch";
 import clsx from "clsx";
 import { sendNotification } from "src/poe-tools/utils/useNotification";
+import { transformItemData } from "src/poe-tools/utils/transformItemData";
 
 const PoELiveSearch = () => {
   const {
@@ -58,24 +59,18 @@ const PoELiveSearch = () => {
             });
 
             const filteredDetails = details.filter((detail) => {
-              const damageWithAccuracy =
-                detail.item.extended.dps +
-                calculateTotalAccuracy(detail.item) / 4;
+              // Transform the data for easier access
+              const transformedItem = transformItemData(detail);
 
+              // Check if the item meets our DPS threshold
               const exceedsDamage =
-                damageWithAccuracy >= minimumTotalDpsWithAccuracy;
+                transformedItem.dpsWithAccuracy >=
+                Number(minimumTotalDpsWithAccuracy);
 
               if (exceedsDamage) {
                 sendNotification(
-                  `${damageWithAccuracy} DPS (crit: ${
-                    detail.item.properties.find(
-                      (property: any) =>
-                        property.name === "[Critical|Critical Hit] Chance"
-                    )?.values[0][0]
-                  }) for ${detail.listing?.price?.amount} ${
-                    detail.listing?.price?.currency
-                  }`,
-                  `${detail.item.name} exceeds ${minimumTotalDpsWithAccuracy} DPS with Accuracy`
+                  `${transformedItem.dpsWithAccuracy} DPS (crit: ${transformedItem.criticalChance}) for ${transformedItem.price?.amount} ${transformedItem.price?.currency}`,
+                  `${transformedItem.name} exceeds ${minimumTotalDpsWithAccuracy} DPS with Accuracy`
                 );
               }
 
