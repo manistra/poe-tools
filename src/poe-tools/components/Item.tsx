@@ -3,6 +3,7 @@ import { copyToClipboard } from "../utils/clipboard";
 import CollapsibleItem from "../../components/CollapsibleItem";
 import Button from "src/components/Button";
 import { TransformedItemData } from "../utils/transformItemData";
+import DamageStat from "./DamageStat";
 
 const WhisperButton = ({ whisper }: { whisper: string }) => {
   const handleCopyWhisper = async () => {
@@ -19,85 +20,126 @@ const WhisperButton = ({ whisper }: { whisper: string }) => {
 
 interface ItemProps {
   item: TransformedItemData;
+  calculateForAmazonAscendancy?: boolean;
 }
 
-const Item: React.FC<ItemProps> = ({ item }) => {
+const Item: React.FC<ItemProps> = ({
+  item,
+  calculateForAmazonAscendancy = false,
+}) => {
   return (
     <div className="border border-gray-700 rounded-md p-2 bg-gray-950">
       <div className="flex flex-col gap-2">
         <div className="flex flex-row gap-16 justify-between">
-          <div className="flex justify-between text-xs w-1/2 max-w-[300px] flex-col">
-            <h3 className="font-medium flex flex-row w-full justify-between text-white">
-              <span className="text-gray-400 ">Crit Chance:</span>
-              {item.criticalChance}
-            </h3>
-            <h3 className="font-medium flex flex-row w-full justify-between text-white">
-              <span className="text-gray-400 ">Attacks per Second:</span>
-              {item.attacksPerSecond}
-            </h3>
-            <h3 className="font-medium flex flex-row w-full justify-between text-white">
-              <span className="text-gray-400 ">Physical Damage:</span>
-              <span className="text-white">{item.physicalDamage}</span>
-            </h3>
-            <h3 className="font-medium flex flex-row w-full justify-between text-white">
-              <span className="text-gray-400 ">Elemental Damage:</span>
-              <span className="text-red-500">{item.elementalDamage.fire}</span>
-              <span className="text-blue-400">{item.elementalDamage.cold}</span>
-              <span className="text-yellow-400">
-                {item.elementalDamage.lightning}
-              </span>
-            </h3>
+          <div className="flex text-xs w-1/2 max-w-[350px] flex-col">
+            <h2 className="text-gray-200 text-base ">Base Item Stats: </h2>
 
+            <hr className="border-gray-700 mt-1 mb-3" />
+
+            <DamageStat label="Crit Chance">{item.criticalChance}</DamageStat>
+            <DamageStat label="Attacks per Second">
+              {item.attacksPerSecond}
+            </DamageStat>
+            {!!item.elementalDamage.cold ||
+              ((!!item.elementalDamage.fire ||
+                !!item.elementalDamage.lightning) && (
+                <DamageStat label="Elemental Damage">
+                  <>
+                    <span className="text-red-500">
+                      {item.elementalDamage.fire}
+                    </span>
+                    <span className="text-blue-400">
+                      {item.elementalDamage.cold}
+                    </span>
+                    <span className="text-yellow-400">
+                      {item.elementalDamage.lightning}
+                    </span>
+                  </>
+                </DamageStat>
+              ))}
             {item.fireDamage && (
-              <h3 className="font-medium flex flex-row w-full justify-between text-white">
-                <span className="text-gray-400 ">Fire Damage:</span>
-                <span className="text-red-800">{item.fireDamage}</span>
-              </h3>
+              <DamageStat label="Fire Damage">
+                <span className="text-red-500">{item.fireDamage}</span>
+              </DamageStat>
             )}
             {item.coldDamage && (
-              <h3 className="font-medium flex flex-row w-full justify-between text-white">
-                <span className="text-gray-400 ">Cold Damage:</span>
+              <DamageStat label="Cold Damage">
                 <span className="text-blue-400">{item.coldDamage}</span>
-              </h3>
+              </DamageStat>
             )}
             {item.lightningDamage && (
-              <h3 className="font-medium flex flex-row w-full justify-between text-white">
-                <span className="text-gray-400 ">Lightning Damage:</span>
+              <DamageStat label="Lightning Damage">
                 <span className="text-purple-500">{item.lightningDamage}</span>
-              </h3>
+              </DamageStat>
+            )}
+            {item.totalAccuracy && (
+              <DamageStat label="Total Accuracy">
+                {item.totalAccuracy}
+              </DamageStat>
             )}
 
-            {item.totalAccuracy > 0 && (
-              <h3 className="font-medium flex flex-row w-full justify-between text-white">
-                <span className="text-gray-400 ">Total Accuracy:</span>
-                {item.totalAccuracy}
-              </h3>
-            )}
+            <DamageStat label="pDPS">{item.calculatedDamage.pdps}</DamageStat>
+            <DamageStat label="eDPS">{item.calculatedDamage.edps}</DamageStat>
+            <DamageStat label="Total DPS">
+              {item.calculatedDamage.dps}
+            </DamageStat>
           </div>
 
-          <div className="flex flex-col text-xs self-end w-1/2 max-w-[200px]">
-            <h3 className="font-medium flex flex-row w-full justify-between text-white">
-              <span className="text-gray-400">pDPS:</span> {item.pdps}
-            </h3>
-            <h3 className="font-medium flex flex-row w-full justify-between text-white">
-              <span className="">
-                e<span className="text-orange-700">D</span>
-                <span className="text-blue-400">P</span>
-                <span className="text-purple-400">S</span>:
-              </span>{" "}
-              {item.edps}
-            </h3>
-            <h3 className="font-medium flex flex-row w-full justify-between text-white">
-              <span className="text-green-700 ">Total DPS:</span> {item.dps}
-            </h3>
-            {item.totalAccuracy > 0 && (
-              <h3 className="font-medium text-sm flex flex-row justify-between">
-                <span className="text-green-500 text-xs">
-                  Total DPS with Accuracy:
-                </span>{" "}
-                {item.dpsWithAccuracy}
-              </h3>
+          <div className="flex text-xs w-1/2 max-w-[350px] flex-col">
+            <h2 className="text-gray-200 text-base ">Calculated DPS: </h2>
+
+            <hr className="border-gray-700 my-1" />
+
+            <DamageStat label="Damage Without Runes">
+              {item.calculatedDamage.totalDamageWithoutRuneMods.dps}
+            </DamageStat>
+
+            <DamageStat label="Physical Rune DPS">
+              {
+                item.calculatedDamage.runePotentialDpsValues
+                  .potentialPhysRuneDps
+              }
+            </DamageStat>
+            <DamageStat label="Elemental Rune DPS">
+              {item.calculatedDamage.runePotentialDpsValues.potentialEleRuneDps}
+            </DamageStat>
+
+            {calculateForAmazonAscendancy && (
+              <DamageStat label="Accuracy Rune DPS">
+                {
+                  item.calculatedDamage.runePotentialDpsValues
+                    .potentialAccuracyRuneDps
+                }
+              </DamageStat>
             )}
+            <DamageStat label="Attack Speed Rune DPS">
+              {
+                item.calculatedDamage.runePotentialDpsValues
+                  .potentialAttackSpeedRuneDps
+              }
+            </DamageStat>
+
+            <div className="mt-2">
+              <label className="text-[10px] text-orange-500">
+                Calculated higest overall highest DPS:{" "}
+              </label>
+              <h3 className="font-medium flex flex-row w-full justify-between text-white border p-1 my-1 rounded border-orange-500 pt-2 items-center">
+                <span className="text-gray-200 ">
+                  With{" "}
+                  {
+                    item.calculatedDamage.highestPotentialDpsValue
+                      ?.numberOfRuneSockets
+                  }{" "}
+                  {item.calculatedDamage.highestPotentialDpsValue?.name}
+                  {item.calculatedDamage.highestPotentialDpsValue
+                    ?.numberOfRuneSockets > 1 && "s"}
+                  :
+                </span>
+                <span className="text-base font-bold">
+                  {item.calculatedDamage.highestPotentialDpsValue?.value}
+                </span>
+              </h3>
+            </div>
           </div>
         </div>
 

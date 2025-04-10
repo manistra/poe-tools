@@ -4,9 +4,13 @@ import { TransformedItemData } from "../utils/transformItemData";
 
 interface ItemsProps {
   items: TransformedItemData[];
+  calculateForAmazonAscendancy?: boolean;
 }
 
-const Items: React.FC<ItemsProps> = ({ items }) => {
+const Items: React.FC<ItemsProps> = ({
+  items,
+  calculateForAmazonAscendancy,
+}) => {
   if (!items || items.length === 0) {
     return <p>No item details available</p>;
   }
@@ -17,7 +21,10 @@ const Items: React.FC<ItemsProps> = ({ items }) => {
     <ul className="space-y-4">
       {items.map((item, index) => (
         <li key={index}>
-          <Item item={item} />
+          <Item
+            item={item}
+            calculateForAmazonAscendancy={calculateForAmazonAscendancy}
+          />
         </li>
       ))}
     </ul>

@@ -7,16 +7,22 @@ import Items from "src/poe-tools/components/Items";
 
 import clsx from "clsx";
 import { usePoeLiveSearch } from "./usePoeLiveSearch";
-import { TransformedItemData } from "src/poe-tools/utils/transformItemData";
+import {
+  TransformedItemData,
+  transformItemData,
+} from "src/poe-tools/utils/transformItemData";
 import { sendNotification } from "src/poe-tools/utils/useNotification";
 import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 
 const PoELiveSearch = () => {
-  const [minimumTotalDpsWithAccuracy, setMinimumTotalDpsWithAccuracy] =
+  const [calculateForAmazonAscendancy, setCalculateForAmazonAscendancy] =
     useState(
-      Number(window.localStorage.getItem("live-minimumTotalDpsWithAccuracy")) ||
-        400
+      window.localStorage.getItem("live-calculateForAmazonAscendancy") ===
+        "true"
     );
+  const [minDps, setMinDps] = useState(
+    Number(window.localStorage.getItem("live-minDps")) || 400
+  );
 
   const [itemsToShow, setItemsToShow] = useState<TransformedItemData[]>([]);
 
@@ -35,15 +41,19 @@ const PoELiveSearch = () => {
 
   useEffect(() => {
     if (itemDetails.length > 0) {
-      const filteredDetails = itemDetails.filter((transformedItem) => {
+      const transformedDetails = itemDetails.map((itemData) =>
+        transformItemData(itemData, calculateForAmazonAscendancy)
+      );
+
+      const filteredDetails = transformedDetails.filter((transformedItem) => {
         const exceedsDamage =
-          transformedItem.dpsWithAccuracy >=
-          Number(minimumTotalDpsWithAccuracy);
+          transformedItem.calculatedDamage.highestPotentialDpsValue?.value >=
+          Number(minDps);
 
         if (exceedsDamage) {
           sendNotification(
-            `${transformedItem.dpsWithAccuracy} DPS (crit: ${transformedItem.criticalChance}) for ${transformedItem.price?.amount} ${transformedItem.price?.currency}`,
-            `${transformedItem.name} exceeds ${minimumTotalDpsWithAccuracy} DPS with Accuracy`
+            `${transformedItem.calculatedDamage.highestPotentialDpsValue?.value} DPS (crit: ${transformedItem.criticalChance}) for ${transformedItem.price?.amount} ${transformedItem.price?.currency}`,
+            `${transformedItem.name} exceeds ${minDps} DPS with Accuracy`
           );
         }
 
@@ -56,17 +66,21 @@ const PoELiveSearch = () => {
 
   useEffect(() => {
     if (itemDetails.length > 0) {
-      const filteredDetails = itemDetails.filter((transformedItem) => {
+      const transformedDetails = itemDetails.map((itemData) =>
+        transformItemData(itemData, calculateForAmazonAscendancy)
+      );
+
+      const filteredDetails = transformedDetails.filter((transformedItem) => {
         const exceedsDamage =
-          transformedItem.dpsWithAccuracy >=
-          Number(minimumTotalDpsWithAccuracy);
+          transformedItem.calculatedDamage.highestPotentialDpsValue?.value >=
+          Number(minDps);
 
         return exceedsDamage;
       });
 
       setItemsToShow(filteredDetails);
     }
-  }, [minimumTotalDpsWithAccuracy]);
+  }, [minDps, calculateForAmazonAscendancy]);
 
   return (
     <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">
@@ -133,20 +147,37 @@ const PoELiveSearch = () => {
         </div>
       </CollapsibleItem>
 
-      <CollapsibleItem title="Search Settings" className="flex-wrap flex gap-2">
+      <CollapsibleItem
+        title="Search Settings"
+        className="flex-row justify-between flex gap-2"
+      >
         <div className="flex flex-col gap-2">
           <Input
             type="number"
-            label="Minimum Total DPS with Accuracy:"
-            value={minimumTotalDpsWithAccuracy}
+            label="Minimum Dps (Always takes the Calculated higest overall highest DPS for comparison):"
+            value={minDps}
             onChange={(value) => {
-              setMinimumTotalDpsWithAccuracy(Number(value));
-              window.localStorage.setItem(
-                "live-minimumTotalDpsWithAccuracy",
-                String(value)
-              );
+              setMinDps(Number(value));
+              window.localStorage.setItem("live-minDps", String(value));
             }}
             placeholder="400"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="mb-1 text-[12px] font-medium text-gray-500">
+            Calculate for Amazon Ascendancy:
+          </label>
+          <input
+            type="checkbox"
+            className="w-6 h-6"
+            checked={calculateForAmazonAscendancy}
+            onChange={(e) => {
+              setCalculateForAmazonAscendancy(e.target.checked);
+              window.localStorage.setItem(
+                "live-calculateForAmazonAscendancy",
+                String(e.target.checked)
+              );
+            }}
           />
         </div>
       </CollapsibleItem>
@@ -168,7 +199,10 @@ const PoELiveSearch = () => {
             Clear Listings
           </button>
         </div>
-        <Items items={itemsToShow} />
+        <Items
+          items={itemsToShow}
+          calculateForAmazonAscendancy={calculateForAmazonAscendancy}
+        />
       </div>
     </div>
   );

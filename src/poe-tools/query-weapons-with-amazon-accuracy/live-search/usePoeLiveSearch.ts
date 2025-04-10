@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useWebSocketConnection } from "./useWebSocketConnection";
 import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
 import {
+  ItemData,
   TransformedItemData,
-  transformItemData,
 } from "src/poe-tools/utils/transformItemData";
 
 import useLogs from "src/helpers/useLogs";
@@ -18,7 +18,7 @@ interface UsePoeLiveSearchReturn {
   disconnect: () => void;
   error: string | null;
   logs: string[];
-  itemDetails: TransformedItemData[];
+  itemDetails: ItemData[];
   isLoading: boolean;
   clearListings: () => void;
 }
@@ -66,17 +66,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
               searchUrl,
             });
 
-            const transformedDetails = details.map((detail) =>
-              transformItemData(detail)
-            );
-
-            setItemDetails((prev) => [
-              ...transformedDetails.map((detail) => ({
-                time: new Date().toLocaleTimeString(),
-                ...detail,
-              })),
-              ...prev,
-            ]);
+            setItemDetails((prev) => [...details, ...prev]);
           } catch (error) {
             // Handle rate limit errors
             disconnect();

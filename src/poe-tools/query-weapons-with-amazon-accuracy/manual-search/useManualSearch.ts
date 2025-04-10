@@ -2,8 +2,8 @@ import { useState, useCallback } from "react";
 import { sleep } from "src/poe-tools/utils/sleep";
 import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 import {
+  ItemData,
   TransformedItemData,
-  transformItemData,
 } from "src/poe-tools/utils/transformItemData";
 import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
 import useLogs from "src/helpers/useLogs";
@@ -28,15 +28,13 @@ const createHeaders = (poesessid: string) => {
 };
 
 interface UseManualSearchProps {
-  setItemDetails: (items: TransformedItemData[]) => void;
+  setItemDetails: (items: ItemData[]) => void;
   delay?: number;
-  minimumTotalDpsWithAccuracy: number;
 }
 
 export const useManualSearch = ({
   setItemDetails,
   delay = 400,
-  minimumTotalDpsWithAccuracy,
 }: UseManualSearchProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -50,9 +48,7 @@ export const useManualSearch = ({
   const searchItems = useCallback(
     async (searchUrl: string, queryData: any) => {
       try {
-        addLog(
-          `Searching for items with minimum DPS+Accuracy: ${minimumTotalDpsWithAccuracy}`
-        );
+        addLog("Searching for items ");
 
         const response = await window.electron.api.request({
           url: searchUrl,
@@ -73,7 +69,7 @@ export const useManualSearch = ({
         return null;
       }
     },
-    [addLog, minimumTotalDpsWithAccuracy]
+    [addLog]
   );
 
   // Function to fetch item details
@@ -182,20 +178,7 @@ export const useManualSearch = ({
         if (searchResponse.result.length > 0) {
           const items = await fetchItems(searchResponse, searchUrl);
 
-          const transformedItems = items.map(transformItemData);
-
-          const filteredItems = transformedItems.filter(
-            (item: TransformedItemData) =>
-              Number(item.dpsWithAccuracy) >=
-              Number(minimumTotalDpsWithAccuracy)
-          );
-
-          addLog(
-            `Found ${filteredItems.length} items meeting the minimum DPS+Accuracy requirement.`
-          );
-          setItemDetails(
-            filteredItems.sort((a, b) => b.dpsWithAccuracy - a.dpsWithAccuracy)
-          );
+          setItemDetails(items);
         } else {
           addLog("No items found matching your criteria.");
         }
@@ -205,13 +188,7 @@ export const useManualSearch = ({
         setIsLoading(false);
       }
     },
-    [
-      addLog,
-      clearListings,
-      fetchItems,
-      minimumTotalDpsWithAccuracy,
-      searchItems,
-    ]
+    [addLog, clearListings, fetchItems, searchItems]
   );
 
   return {

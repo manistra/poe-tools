@@ -6,49 +6,61 @@ import Input from "src/components/Input";
 import TextArea from "src/components/TextArea";
 import { useManualSearch } from "./useManualSearch";
 import Item from "src/poe-tools/components/Item";
-import { TransformedItemData } from "src/poe-tools/utils/transformItemData";
+import {
+  ItemData,
+  TransformedItemData,
+  transformItemData,
+} from "src/poe-tools/utils/transformItemData";
 
 const PoEManualSearch = () => {
-  const [itemDetails, setItemDetails] = useState<TransformedItemData[]>([]);
+  const [itemDetails, setItemDetails] = useState<ItemData[]>([]);
   const [itemsToShow, setItemsToShow] = useState<TransformedItemData[]>([]);
+  const [calculateForAmazonAscendancy, setCalculateForAmazonAscendancy] =
+    useState(
+      window.localStorage.getItem("manual-calculateForAmazonAscendancy") ===
+        "true"
+    );
 
   const [delay, setDelay] = useState<number>(
     Number(window.localStorage.getItem("manual-delay")) || 400
   );
 
-  const [minimumTotalDpsWithAccuracy, setMinimumTotalDpsWithAccuracy] =
-    useState(
-      window.localStorage.getItem("manual-minimumTotalDpsWithAccuracy") || 400
-    );
-
-  useState(
-    window.localStorage.getItem("manual-minimumTotalDpsWithAccuracy") || 400
+  const [minDps, setMinDps] = useState(
+    window.localStorage.getItem("manual-minDps") || 400
   );
 
-  const [searchUrl, setSearchUrl] = useState(
-    window.localStorage.getItem("manual-searchUrl") ||
-      "https://www.pathofexile.com/trade2/search/poe2/Dawn%20of%20the%20Hunt"
-  );
+  useState(window.localStorage.getItem("manual-minDps") || 400);
+
+  const searchUrl =
+    "https://www.pathofexile.com/api/trade2/search/poe2/Dawn%20of%20the%20Hunt";
   const [body, setBody] = useState(
     window.localStorage.getItem("manual-body") || ""
   );
 
   const { performSearch, isLoading, logs, clearListings } = useManualSearch({
-    minimumTotalDpsWithAccuracy: Number(minimumTotalDpsWithAccuracy),
     setItemDetails,
     delay,
   });
 
   useEffect(() => {
+    const transformedItems = itemDetails.map((item) =>
+      transformItemData(item, calculateForAmazonAscendancy)
+    );
+
     setItemsToShow(
-      itemDetails
+      transformedItems
         .filter(
           (item) =>
-            Number(item.dpsWithAccuracy) >= Number(minimumTotalDpsWithAccuracy)
+            Number(item.calculatedDamage.highestPotentialDpsValue?.value) >=
+            Number(minDps)
         )
-        .sort((a, b) => b.dpsWithAccuracy - a.dpsWithAccuracy)
+        .sort(
+          (a, b) =>
+            b.calculatedDamage.highestPotentialDpsValue?.value -
+            a.calculatedDamage.highestPotentialDpsValue?.value
+        )
     );
-  }, [itemDetails]);
+  }, [itemDetails, calculateForAmazonAscendancy, minDps]);
 
   return (
     <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">
@@ -88,19 +100,8 @@ const PoEManualSearch = () => {
       <CollapsibleItem
         title="Search Settings"
         className="grid grid-cols-2 gap-2"
-        defaultOpen={true}
+        defaultOpen={false}
       >
-        <Input
-          type="text"
-          label="Search URL:"
-          value={searchUrl}
-          onChange={(value) => {
-            setSearchUrl(String(value));
-            window.localStorage.setItem("manual-searchUrl", String(value));
-          }}
-          placeholder="https://www.pathofexile.com/trade/search/League/SearchID"
-        />
-
         <TextArea
           wrapperClassName="row-span-2"
           placeholder="{}"
@@ -115,14 +116,11 @@ const PoEManualSearch = () => {
         />
         <Input
           type="number"
-          label="Minimum Total DPS with Accuracy:"
-          value={minimumTotalDpsWithAccuracy}
+          label="Minimum Dps (Always takes the Calculated higest overall highest DPS for comparison):"
+          value={minDps}
           onChange={(value) => {
-            setMinimumTotalDpsWithAccuracy(Number(value));
-            window.localStorage.setItem(
-              "manual-minimumTotalDpsWithAccuracy",
-              String(value)
-            );
+            setMinDps(Number(value));
+            window.localStorage.setItem("manual-minDps", String(value));
           }}
           placeholder="400"
         />
@@ -137,6 +135,23 @@ const PoEManualSearch = () => {
           }}
           placeholder="500"
         />
+        <div className="flex flex-col gap-2">
+          <label className="mb-1 text-[12px] font-medium text-gray-500">
+            Calculate for Amazon Ascendancy:
+          </label>
+          <input
+            type="checkbox"
+            className="w-6 h-6"
+            checked={calculateForAmazonAscendancy}
+            onChange={(e) => {
+              setCalculateForAmazonAscendancy(e.target.checked);
+              window.localStorage.setItem(
+                "manual-calculateForAmazonAscendancy",
+                String(e.target.checked)
+              );
+            }}
+          />
+        </div>
       </CollapsibleItem>
 
       <div>

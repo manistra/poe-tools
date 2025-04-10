@@ -25,13 +25,6 @@ export const calculateTotalAccuracy = (item: any): number => {
 
   let totalAccuracy = 0;
 
-  // Check runeMods
-  if (item.runeMods && Array.isArray(item.runeMods)) {
-    item.runeMods.forEach((mod: string) => {
-      totalAccuracy += extractAccuracyValue(mod);
-    });
-  }
-
   // Check fracturedMods
   if (item.fracturedMods && Array.isArray(item.fracturedMods)) {
     item.fracturedMods.forEach((mod: string) => {
