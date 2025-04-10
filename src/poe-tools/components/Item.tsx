@@ -36,6 +36,7 @@ interface ItemListing {
 }
 
 interface ItemData {
+  time: string;
   item: {
     properties: ItemProperty[];
     explicitMods?: string[];
@@ -96,7 +97,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
     <div className="border border-gray-700 rounded-md p-2 bg-gray-800">
       <div className="flex flex-col gap-2">
         <div className="flex flex-row gap-16 justify-between">
-          <div className="flex justify-between text-xs w-1/2 flex-col">
+          <div className="flex justify-between text-xs w-1/2 max-w-[300px] flex-col">
             <h3 className="font-medium flex flex-row w-full justify-between text-white">
               <span className="text-gray-400 ">Crit Chance:</span>
               {
@@ -156,7 +157,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
             )}
           </div>
 
-          <div className="flex flex-col text-xs self-end w-1/2">
+          <div className="flex flex-col text-xs self-end w-1/2 max-w-[200px]">
             <h3 className="font-medium flex flex-row w-full justify-between text-white">
               <span className="text-gray-400">pDPS:</span>{" "}
               {item.item.extended.pdps}
@@ -178,7 +179,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
                 <span className="text-green-500 text-xs">
                   Total DPS with Accuracy:
                 </span>{" "}
-                {item.item.extended.dps + totalAccuracy / 4}
+                {Math.round(item.item.extended.dps + totalAccuracy / 4)}
               </h3>
             )}
           </div>
@@ -228,6 +229,12 @@ const Item: React.FC<ItemProps> = ({ item }) => {
             <label className="text-xs text-gray-400">Seller:</label>
             <span className="text-gray-200">{item.listing?.account?.name}</span>
           </div>
+
+          <div className="text-sm text-gray-200 mr-2 flex flex-col">
+            <label className="text-xs text-gray-400">Time:</label>
+            <span className="text-gray-200">{item.time}</span>
+          </div>
+
           <div className="text-sm text-gray-200 mr-2 flex flex-col">
             <label className="text-xs text-gray-400">Price:</label>
             <span className="text-yellow-500 text-md">

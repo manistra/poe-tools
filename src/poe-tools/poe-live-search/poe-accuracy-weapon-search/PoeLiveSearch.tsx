@@ -6,6 +6,7 @@ import Form from "../../components/Form";
 import Items from "../../components/Items";
 import { calculateTotalAccuracy } from "../../utils/calculateAccuracy";
 import CollapsibleItem from "../../../components/CollapsibleItem";
+import useLogs from "../../../helpers/useLogs";
 
 const PoELiveSearch = () => {
   const {
@@ -26,8 +27,17 @@ const PoELiveSearch = () => {
   const [minimumTotalDpsWithAccuracy, setMinimumTotalDpsWithAccuracy] =
     useState(400);
 
+  const { logs, addLog } = useLogs();
+
   // Function to fetch item details when new messages arrive
   useEffect(() => {
+    if (messages.length > 0) {
+      const latestMessage = messages[messages.length - 1];
+      if (latestMessage.items && latestMessage.items.length > 0) {
+        addLog(`New items found: ${latestMessage.items.length} items`);
+      }
+    }
+
     const fetchDetails = async () => {
       if (messages.length > 0) {
         const latestMessage = messages[messages.length - 1];
@@ -36,7 +46,9 @@ const PoELiveSearch = () => {
           try {
             // Extract the search URL to determine if it's PoE2
             const isPoe2 = searchUrl.includes("poe2");
-
+            addLog(
+              `Fetching item details for ${latestMessage.items.length} items`
+            );
             const details = await fetchItemDetails({
               itemIds: latestMessage.items,
               sessionId,
@@ -51,9 +63,34 @@ const PoELiveSearch = () => {
                 minimumTotalDpsWithAccuracy
             );
 
-            setItemDetails((prev) => [...filteredDetails, ...prev]);
+            setItemDetails((prev) => [
+              ...filteredDetails.map((detail) => ({
+                time: new Date().toLocaleTimeString(),
+                ...detail,
+              })),
+              ...prev,
+            ]);
           } catch (error) {
-            console.error("Failed to fetch item details:", error);
+            // Handle rate limit errors
+            disconnect();
+            addLog(`🛑 Search automatically stopped due to an error!`);
+
+            if (
+              error instanceof Error &&
+              error.message.startsWith("RATE_LIMIT_EXCEEDED")
+            ) {
+              const waitTime = error.message.split(":")[1];
+              addLog(
+                `⚠️ Rate limit exceeded! Need to wait ${waitTime} seconds before trying again.`
+              );
+            } else {
+              console.error("Failed to fetch item details:", error);
+              addLog(
+                `Error fetching item details: ${
+                  error instanceof Error ? error.message : String(error)
+                }`
+              );
+            }
           } finally {
             setIsLoading(false);
           }
@@ -120,16 +157,14 @@ const PoELiveSearch = () => {
         />
       </CollapsibleItem>
 
-      <CollapsibleItem title="Messages:">
-        <div>
-          {messages.length === 0 ? (
+      <CollapsibleItem title="Logs:">
+        <div className="max-h-[300px] overflow-y-auto">
+          {logs.length === 0 ? (
             <p>No messages received yet</p>
           ) : (
-            <ul>
-              {messages.map((msg, index) => (
-                <li key={index}>
-                  {msg.time}: {msg.items.length} new items
-                </li>
+            <ul className="flex flex-col-reverse gap-2">
+              {logs.map((log, index) => (
+                <li key={index}>{log}</li>
               ))}
             </ul>
           )}
@@ -153,7 +188,14 @@ const PoELiveSearch = () => {
 
       <div>
         <div className="flex justify-between items-center">
-          <h3 className="text-xl font-semibold mb-2">Listings:</h3>
+          <h3 className="text-xl font-semibold mb-2">
+            Listings:
+            {isLoading && (
+              <span className="text-gray-400 text-xs px-4 animate-pulse">
+                Loading items...
+              </span>
+            )}
+          </h3>
           <button
             className="hover:text-gray-400 rounded-md w-fit px-2 py-1 ml-auto text-gray-600"
             onClick={clearListings}
@@ -161,7 +203,7 @@ const PoELiveSearch = () => {
             Clear Listings
           </button>
         </div>
-        <Items items={itemDetails} isLoading={isLoading} />
+        <Items items={itemDetails} />
       </div>
     </div>
   );

@@ -3,14 +3,9 @@ import Item from "./Item";
 
 interface ItemProps {
   items: any[];
-  isLoading: boolean;
 }
 
-const Items: React.FC<ItemProps> = ({ items, isLoading }) => {
-  if (isLoading) {
-    return <p>Loading item details...</p>;
-  }
-
+const Items: React.FC<ItemProps> = ({ items }) => {
   if (!items || items.length === 0) {
     return <p>No item details available</p>;
   }
