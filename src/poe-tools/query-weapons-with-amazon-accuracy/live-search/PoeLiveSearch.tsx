@@ -43,6 +43,7 @@ const PoELiveSearch = () => {
   const handleClearListings = () => {
     clearListings();
     setItemsToShow([]);
+    localStorage.setItem("pinged-items", "[]");
   };
 
   useEffect(() => {
@@ -88,7 +89,7 @@ const PoELiveSearch = () => {
 
       setItemsToShow(filteredDetails);
     }
-  }, [itemDetails, minDps, calculateForAmazonAscendancy]);
+  }, [itemDetails, minDps]);
 
   return (
     <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">
@@ -217,7 +218,11 @@ const PoELiveSearch = () => {
         </div>
         <Items
           automaticallyCheckPrice={autoCheckItemPrice}
-          items={itemsToShow}
+          items={itemsToShow.sort((a, b) => {
+            return (
+              new Date(b.pingedAt).getTime() - new Date(a.pingedAt).getTime()
+            );
+          })}
           calculateForAmazonAscendancy={calculateForAmazonAscendancy}
           showSaveButton={true}
         />

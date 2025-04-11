@@ -63,7 +63,13 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
             });
             addLog(`Fetched item details for ${details.length} items`);
 
-            setItemDetails((prev) => [...details, ...prev]);
+            setItemDetails((prev) => [
+              ...details.map((detail) => ({
+                pingedAt: new Date().toISOString(),
+                ...detail,
+              })),
+              ...prev,
+            ]);
           } catch (error) {
             // Handle rate limit errors
             disconnect();

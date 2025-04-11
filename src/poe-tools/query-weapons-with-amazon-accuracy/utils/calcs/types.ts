@@ -23,6 +23,7 @@ export interface ItemData {
       dps: number;
     };
   };
+  pingedAt: string;
   listing?: {
     indexed: any;
     account: {
@@ -50,6 +51,7 @@ export interface CalculatedDamage {
 }
 
 export interface TransformedItemData {
+  pingedAt: string;
   id: string;
   name: string;
   typeLine: string;

@@ -112,6 +112,17 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
         <DamageStat label="Total DPS">{calculatedDamage.dps}</DamageStat>
 
         <div className="py-2 mt-3 border-y">
+          <DamageStat
+            className="text-base !text-gray-400"
+            label={`pDPS (${totalDpsNoAmazonScalingLabel}):`}
+          >
+            {(
+              (calculatedDamage.totalDamageWithoutRuneMods.pdps /
+                (1 + (item.increasedPhysicalDamage || 0.001) / 100)) *
+              (1 + (25 + item.increasedPhysicalDamage || 0.001) / 100)
+            ).toFixed(2)}
+          </DamageStat>
+
           {!!item.totalAccuracy && (
             <DamageStat
               label="Total Accuracy"
@@ -120,6 +131,7 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
               {item.totalAccuracy}
             </DamageStat>
           )}
+
           <DamageStat
             className="text-base !text-blue-400"
             label={`Total DPS Raw (${totalDpsNoAmazonScalingLabel}):`}

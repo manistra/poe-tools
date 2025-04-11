@@ -117,6 +117,8 @@ export function transformItemData(rawItem: ItemData): TransformedItemData {
     );
   // Create transformed object
   const transformedItem: TransformedItemData = {
+    pingedAt: rawItem?.pingedAt || new Date().toISOString(),
+
     id: rawItem?.id || "",
     name: rawItem?.item?.name || "",
     typeLine: rawItem?.item?.typeLine || "",

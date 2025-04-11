@@ -32,7 +32,7 @@ interface ItemProps {
 
 const Item: React.FC<ItemProps> = ({
   item,
-  calculateForAmazonAscendancy,
+  calculateForAmazonAscendancy = true,
   showSaveButton,
   automaticallyCheckPrice = false,
 }) => {
