@@ -21,7 +21,7 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
       <div className="flex text-xs w-1/2 max-w-[350px] flex-col">
         <h2 className="text-gray-200 text-base ">Base Item Stats: </h2>
 
-        <hr className="border-gray-700 mt-1 mb-3" />
+        <hr className="border-gray-700 my-1" />
 
         <DamageStat label="Crit Chance">{item.criticalChance}</DamageStat>
         <DamageStat label="Attacks per Second">
@@ -54,16 +54,22 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
         )}
         {item.lightningDamage && (
           <DamageStat label="Lightning Damage">
-            <span className="text-purple-500">{item.lightningDamage}</span>
+            <span className="text-yellow-400">{item.lightningDamage}</span>
           </DamageStat>
-        )}
-        {!!item.totalAccuracy && (
-          <DamageStat label="Total Accuracy">{item.totalAccuracy}</DamageStat>
         )}
 
         <DamageStat label="pDPS">{calculatedDamage.pdps}</DamageStat>
         <DamageStat label="eDPS">{calculatedDamage.edps}</DamageStat>
         <DamageStat label="Total DPS">{calculatedDamage.dps}</DamageStat>
+
+        {!!item.totalAccuracy && (
+          <DamageStat
+            label="Total Accuracy"
+            className="text-base !text-blue-400"
+          >
+            {item.totalAccuracy}
+          </DamageStat>
+        )}
       </div>
 
       <div className="flex text-xs w-1/2 max-w-[350px] flex-col">

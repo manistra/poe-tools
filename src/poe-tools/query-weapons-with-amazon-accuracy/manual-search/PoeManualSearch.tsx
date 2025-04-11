@@ -46,9 +46,7 @@ const PoEManualSearch = () => {
   };
 
   useEffect(() => {
-    const transformedItems = itemDetails.map((item) =>
-      transformItemData(item, calculateForAmazonAscendancy)
-    );
+    const transformedItems = itemDetails.map((item) => transformItemData(item));
 
     const filteredDetails = transformedItems.filter((transformedItem) => {
       const damageToCompare = calculateForAmazonAscendancy

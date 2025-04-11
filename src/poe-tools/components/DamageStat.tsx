@@ -15,7 +15,7 @@ const DamageStat: React.FC<DamageStatProps> = ({
     <h3
       className={`mb-1 font-medium flex flex-row w-full justify-between text-white border-b border-dotted border-gray-700 ${className}`}
     >
-      <span className="text-gray-400">{label}:</span>
+      <span className="text-gray-400 text-sm">{label}:</span>
       <span>{children}</span>
     </h3>
   );

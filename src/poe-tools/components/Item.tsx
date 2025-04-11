@@ -90,12 +90,12 @@ const Item: React.FC<ItemProps> = ({
   useEffect(() => {
     if (
       automaticallyCheckPrice &&
-      !checkedPrices.prices.length &&
+      !checkedPrices?.prices?.length &&
       !isPriceChecking
     ) {
       handleCheckPrice();
     }
-  }, [automaticallyCheckPrice, item.id, checkedPrices.prices.length]);
+  }, [automaticallyCheckPrice, item.id, checkedPrices?.prices?.length]);
 
   const handleSaveItem = () => {
     const savedItems = JSON.parse(
@@ -254,7 +254,7 @@ const Item: React.FC<ItemProps> = ({
                 ></path>
               </svg>
             </div>
-          ) : checkedPrices.prices.length ? (
+          ) : checkedPrices?.prices?.length ? (
             <div>
               <span className="text-[9px] text-gray-300">
                 Showing first 4 compared prices:

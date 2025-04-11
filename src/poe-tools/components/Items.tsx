@@ -23,9 +23,10 @@ const Items: React.FC<ItemsProps> = ({
 
   return (
     <ul className="space-y-4">
-      {items.map((item, index) => (
-        <li key={index}>
+      {items.map((item) => (
+        <li key={item.id}>
           <Item
+            key={item.id}
             item={item}
             automaticallyCheckPrice={automaticallyCheckPrice}
             calculateForAmazonAscendancy={calculateForAmazonAscendancy}

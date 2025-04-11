@@ -54,10 +54,7 @@ const findHighestPotentialDpsValue = ({
  * @param rawItem The raw item data from the API
  * @returns A transformed item object with direct access to commonly used properties
  */
-export function transformItemData(
-  rawItem: ItemData,
-  calculateForAmazonAscendancy = false
-): TransformedItemData {
+export function transformItemData(rawItem: ItemData): TransformedItemData {
   // Find properties
   const attackSpeed = rawItem?.item?.properties?.find(
     (property: any) => property?.name === "Attacks per Second"
@@ -66,13 +63,13 @@ export function transformItemData(
     (property: any) => property?.name === "[Physical] Damage"
   );
   const fireDamage = rawItem?.item?.properties?.find(
-    (property: any) => property?.name === "[Fire] Damage"
+    (property: any) => property?.name === "Fire Damage"
   );
   const coldDamage = rawItem?.item?.properties?.find(
-    (property: any) => property?.name === "[Cold] Damage"
+    (property: any) => property?.name === "Cold Damage"
   );
   const lightningDamage = rawItem?.item?.properties?.find(
-    (property: any) => property?.name === "[Lightning] Damage"
+    (property: any) => property?.name === "Lightning Damage"
   );
   const criticalChance = rawItem?.item?.properties?.find(
     (property: any) => property?.name === "[Critical|Critical Hit] Chance"

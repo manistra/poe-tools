@@ -23,6 +23,7 @@ const PoELiveSearch = () => {
   const [minDps, setMinDps] = useState(
     Number(window.localStorage.getItem("live-minDps")) || 400
   );
+  const [autoCheckItemPrice, setAutoCheckItemPrice] = useState(false);
 
   const [itemsToShow, setItemsToShow] = useState<TransformedItemData[]>([]);
 
@@ -47,7 +48,7 @@ const PoELiveSearch = () => {
   useEffect(() => {
     if (itemDetails.length > 0) {
       const transformedDetails = itemDetails.map((itemData) =>
-        transformItemData(itemData, calculateForAmazonAscendancy)
+        transformItemData(itemData)
       );
 
       const filteredDetails = transformedDetails.filter((transformedItem) => {
@@ -188,6 +189,13 @@ const PoELiveSearch = () => {
             );
           }}
         />
+        <Checkbox
+          label="Auto Check Item Price:"
+          checked={autoCheckItemPrice}
+          onChange={(value: boolean) => {
+            setAutoCheckItemPrice(value);
+          }}
+        />
       </CollapsibleItem>
 
       <div>
@@ -208,7 +216,7 @@ const PoELiveSearch = () => {
           </button>
         </div>
         <Items
-          automaticallyCheckPrice={false}
+          automaticallyCheckPrice={autoCheckItemPrice}
           items={itemsToShow}
           calculateForAmazonAscendancy={calculateForAmazonAscendancy}
           showSaveButton={true}
