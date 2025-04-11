@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
 import { useWebSocketConnection } from "./useWebSocketConnection";
 import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
-import {
-  ItemData,
-  TransformedItemData,
-} from "src/poe-tools/utils/transformItemData";
 
 import useLogs from "src/helpers/useLogs";
 import { mockData } from "src/mockData";
 import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
+import { ItemData } from "../utils/calcs/types";
 
 interface UsePoeLiveSearchReturn {
   searchUrl: string;
@@ -65,6 +62,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
               isPoe2,
               searchUrl,
             });
+            addLog(`Fetched item details for ${details.length} items`);
 
             setItemDetails((prev) => [...details, ...prev]);
           } catch (error) {

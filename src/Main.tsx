@@ -4,6 +4,7 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import UpdateIndicator from "./components/UpdateIndicator";
+import Toast from "./components/Toast";
 
 declare global {
   interface Window {
@@ -37,6 +38,7 @@ const root = createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
     <App />
+    <Toast />
     <UpdateIndicator />
   </React.StrictMode>
 );

@@ -1,9 +1,10 @@
 import { useState, useCallback, useRef } from "react";
 import { sleep } from "src/poe-tools/utils/sleep";
 import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
-import { ItemData } from "src/poe-tools/utils/transformItemData";
+
 import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
 import useLogs from "src/helpers/useLogs";
+import { ItemData } from "../utils/calcs/types";
 
 // Function to create headers with the provided POESESSID
 const createHeaders = (poesessid: string) => {

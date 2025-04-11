@@ -1,15 +1,17 @@
 import React from "react";
 import Item from "./Item";
-import { TransformedItemData } from "../utils/transformItemData";
+import { TransformedItemData } from "../query-weapons-with-amazon-accuracy/utils/calcs/types";
 
 interface ItemsProps {
   items: TransformedItemData[];
   calculateForAmazonAscendancy?: boolean;
+  showSaveButton?: boolean;
 }
 
 const Items: React.FC<ItemsProps> = ({
   items,
   calculateForAmazonAscendancy,
+  showSaveButton,
 }) => {
   if (!items || items.length === 0) {
     return <p>No item details available</p>;
@@ -24,6 +26,7 @@ const Items: React.FC<ItemsProps> = ({
           <Item
             item={item}
             calculateForAmazonAscendancy={calculateForAmazonAscendancy}
+            showSaveButton={showSaveButton}
           />
         </li>
       ))}

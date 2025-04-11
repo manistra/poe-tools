@@ -5,13 +5,11 @@ import CollapsibleItem from "src/components/CollapsibleItem";
 import Input from "src/components/Input";
 import TextArea from "src/components/TextArea";
 import { useManualSearch } from "./useManualSearch";
-import {
-  ItemData,
-  TransformedItemData,
-  transformItemData,
-} from "src/poe-tools/utils/transformItemData";
+import { transformItemData } from "src/poe-tools/query-weapons-with-amazon-accuracy/utils/calcs/transformItemData";
 import { defaultBodyData } from "./defaultBodyData";
 import Items from "src/poe-tools/components/Items";
+import { ItemData, TransformedItemData } from "../utils/calcs/types";
+import Checkbox from "src/components/Checkbox";
 
 const searchUrl =
   "https://www.pathofexile.com/api/trade2/search/poe2/Dawn%20of%20the%20Hunt";
@@ -152,23 +150,17 @@ const PoEManualSearch = () => {
           }}
           placeholder="500"
         />
-        <div className="flex flex-col gap-2">
-          <label className="mb-1 text-[12px] font-medium text-gray-500">
-            Calculate for Amazon Ascendancy:
-          </label>
-          <input
-            type="checkbox"
-            className="w-6 h-6"
-            checked={calculateForAmazonAscendancy}
-            onChange={(e) => {
-              setCalculateForAmazonAscendancy(e.target.checked);
-              window.localStorage.setItem(
-                "manual-calculateForAmazonAscendancy",
-                String(e.target.checked)
-              );
-            }}
-          />
-        </div>
+        <Checkbox
+          label="Calculate for Amazon Ascendancy:"
+          checked={calculateForAmazonAscendancy}
+          onChange={(value: boolean) => {
+            setCalculateForAmazonAscendancy(value);
+            window.localStorage.setItem(
+              "manual-calculateForAmazonAscendancy",
+              String(value)
+            );
+          }}
+        />
       </CollapsibleItem>
 
       <div>
@@ -192,6 +184,7 @@ const PoEManualSearch = () => {
         <Items
           items={itemsToShow}
           calculateForAmazonAscendancy={calculateForAmazonAscendancy}
+          showSaveButton={true}
         />
       </div>
     </div>
