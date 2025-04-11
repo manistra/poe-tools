@@ -40,23 +40,23 @@ const Item: React.FC<ItemProps> = ({ item, calculateForAmazonAscendancy }) => {
             <DamageStat label="Attacks per Second">
               {item.attacksPerSecond}
             </DamageStat>
-            {!!item.elementalDamage.cold ||
-              ((!!item.elementalDamage.fire ||
-                !!item.elementalDamage.lightning) && (
-                <DamageStat label="Elemental Damage">
-                  <>
-                    <span className="text-red-500">
-                      {item.elementalDamage.fire}
-                    </span>
-                    <span className="text-blue-400">
-                      {item.elementalDamage.cold}
-                    </span>
-                    <span className="text-yellow-400">
-                      {item.elementalDamage.lightning}
-                    </span>
-                  </>
-                </DamageStat>
-              ))}
+            {(!!item.elementalDamage.cold ||
+              !!item.elementalDamage.fire ||
+              !!item.elementalDamage.lightning) && (
+              <DamageStat label="Elemental Damage">
+                <>
+                  <span className="text-red-500">
+                    {item.elementalDamage.fire}
+                  </span>
+                  <span className="text-blue-400">
+                    {item.elementalDamage.cold}
+                  </span>
+                  <span className="text-yellow-400">
+                    {item.elementalDamage.lightning}
+                  </span>
+                </>
+              </DamageStat>
+            )}
             {item.fireDamage && (
               <DamageStat label="Fire Damage">
                 <span className="text-red-500">{item.fireDamage}</span>
