@@ -7,6 +7,7 @@ import { TransformedItemData } from "../query-weapons-with-amazon-accuracy/utils
 import ItemCalculatedDamage from "./ItemDamageStates";
 import Checkbox from "src/components/Checkbox";
 import toast from "react-hot-toast";
+import { checkItemPrice } from "../api/checkItemPrice";
 
 const WhisperButton = ({ whisper }: { whisper: string }) => {
   const handleCopyWhisper = async () => {
@@ -26,15 +27,22 @@ interface ItemProps {
   item: TransformedItemData;
   calculateForAmazonAscendancy?: boolean;
   showSaveButton?: boolean;
+  automaticallyCheckPrice?: boolean;
 }
 
 const Item: React.FC<ItemProps> = ({
   item,
   calculateForAmazonAscendancy,
   showSaveButton,
+  automaticallyCheckPrice = false,
 }) => {
   const [amazonLocal, setAmazonLocal] = useState(calculateForAmazonAscendancy);
   const [listedAgo, setListedAgo] = useState<string>("");
+  const [checkedPrices, setCheckedPrices] = useState<{
+    url: string;
+    prices: string[];
+  }>({ url: "", prices: [] });
+  const [isPriceChecking, setIsPriceChecking] = useState(false);
 
   // Calculate and format the time difference
   const calculateTimeDifference = () => {
@@ -78,6 +86,17 @@ const Item: React.FC<ItemProps> = ({
     setAmazonLocal(calculateForAmazonAscendancy);
   }, [calculateForAmazonAscendancy]);
 
+  // Auto price check effect
+  useEffect(() => {
+    if (
+      automaticallyCheckPrice &&
+      !checkedPrices.prices.length &&
+      !isPriceChecking
+    ) {
+      handleCheckPrice();
+    }
+  }, [automaticallyCheckPrice, item.id, checkedPrices.prices.length]);
+
   const handleSaveItem = () => {
     const savedItems = JSON.parse(
       window.localStorage.getItem("savedItems") || "[]"
@@ -95,6 +114,19 @@ const Item: React.FC<ItemProps> = ({
     window.localStorage.setItem("savedItems", JSON.stringify(newSavedItems));
     console.log("Saving item");
     toast.success("Item saved");
+  };
+
+  const handleCheckPrice = async () => {
+    try {
+      setIsPriceChecking(true);
+      const prices = await checkItemPrice(item);
+      setCheckedPrices(prices);
+    } catch (error) {
+      console.error("Error checking price:", error);
+      toast.error("Failed to check price");
+    } finally {
+      setIsPriceChecking(false);
+    }
   };
 
   return (
@@ -185,31 +217,90 @@ const Item: React.FC<ItemProps> = ({
         </CollapsibleItem>
       </div>
 
-      <div className="flex justify-between items-center mt-2 p-2">
-        <div className="flex justify-between w-full">
-          <div className="text-sm text-gray-200 mr-2 flex flex-col">
-            <label className="text-xs text-gray-400">Seller:</label>
+      <div className="flex justify-between items-end gap-4 p-2 pt-0">
+        <div className="flex flex-col">
+          <div className="text-[12px] text-gray-200 gap-2 flex items-center flex-row">
+            <label className="text-gray-400">Seller:</label>
             <span className="text-gray-200">{item.seller}</span>
           </div>
 
-          <div className="text-sm text-gray-200 mr-2 flex flex-col">
-            <label className="text-xs text-gray-400">Listed ago:</label>
+          <div className="text-[12px] text-gray-200 gap-2 flex items-center flex-row">
+            <label className="text-gray-400">Listed:</label>
             <span className="text-gray-200">{listedAgo} </span>
-          </div>
-
-          <div className="text-sm text-gray-200 mr-2 flex flex-col">
-            <label className="text-xs text-gray-400">Price:</label>
-            <span className="text-yellow-500 text-md">
-              {item.price?.amount} {item.price?.currency}
-            </span>
           </div>
         </div>
 
-        {item.whisper && (
-          <div className="mt-2">
+        <div className="flex flex-row items-end gap-2">
+          {isPriceChecking ? (
+            <div className="flex items-center justify-center p-2">
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            </div>
+          ) : checkedPrices.prices.length ? (
+            <div>
+              <span className="text-[9px] text-gray-300">
+                Showing first 4 compared prices:
+              </span>
+              <div className="flex flex-col gap-1 border-gray-700 border-t">
+                <div className="flex flex-wrap">
+                  <span className="text-gray-200 text-[11px]">
+                    <span className="text-purple-400 mr-[2px]">[</span>
+                    {checkedPrices.prices.join(", ")}
+                    <span className="text-purple-400 ml-[2px]">]</span>
+                  </span>
+                </div>
+                <Button
+                  className="bg-gradient-to-r from-purple-950 to-gray-900 mt-auto"
+                  size="small"
+                  onClick={() =>
+                    window.open(
+                      checkedPrices.url || "https://www.pathofexile.com/trade",
+                      "_blank"
+                    )
+                  }
+                >
+                  Open on Poe Trade
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              size="small"
+              onClick={handleCheckPrice}
+              className="bg-gradient-to-r from-purple-950 to-gray-900"
+            >
+              Check Price
+            </Button>
+          )}
+
+          <div className="flex flex-col items-center gap-2">
+            <div className="text-sm text-gray-200 mr-2 flex flex-row items-center gap-2">
+              <label className="text-xs text-gray-400">Price:</label>
+              <span className="text-yellow-500 text-md text-nowrap">
+                {item.price?.amount} {item.price?.currency}
+              </span>
+            </div>
             <WhisperButton whisper={item.whisper} />
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

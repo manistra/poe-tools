@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { useWebSocketConnection } from "./useWebSocketConnection";
-import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
+import { fetchItemDetails } from "src/poe-tools/api/fetchItemDetails";
 
 import useLogs from "src/helpers/useLogs";
 import { mockData } from "src/mockData";
-import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 import { ItemData } from "../utils/calcs/types";
 import { toast } from "react-hot-toast";
 
@@ -59,9 +58,8 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
             );
             const details = await fetchItemDetails({
               itemIds: latestMessage.items,
-              sessionId: getPoeSessionId(),
-              isPoe2,
               searchUrl,
+              isPoe2,
             });
             addLog(`Fetched item details for ${details.length} items`);
 

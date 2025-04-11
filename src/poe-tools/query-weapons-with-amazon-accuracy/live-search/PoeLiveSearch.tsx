@@ -58,10 +58,22 @@ const PoELiveSearch = () => {
 
         const exceedsDamage = damageToCompare >= Number(minDps);
 
-        if (
-          exceedsDamage &&
-          !itemsToShow.some((item) => item.id === transformedItem.id)
-        ) {
+        // Check if this item has already been pinged
+        const pingedItems = JSON.parse(
+          localStorage.getItem("pinged-items") || "[]"
+        );
+        const hasBeenPinged = pingedItems.includes(transformedItem.id);
+
+        if (!hasBeenPinged && exceedsDamage) {
+          // Add to pinged items
+          const updatedPingedItems = [...pingedItems, transformedItem.id];
+          localStorage.setItem(
+            "pinged-items",
+            JSON.stringify(updatedPingedItems)
+          );
+
+          // Only send notification for items we haven't pinged before
+
           sendNotification(
             `${transformedItem.price?.amount} ${transformedItem.price?.currency} - ${transformedItem.name}`,
             `DPS: ${damageToCompare}, crit: ${transformedItem.criticalChance}`
@@ -196,6 +208,7 @@ const PoELiveSearch = () => {
           </button>
         </div>
         <Items
+          automaticallyCheckPrice={true}
           items={itemsToShow}
           calculateForAmazonAscendancy={calculateForAmazonAscendancy}
           showSaveButton={true}

@@ -5,12 +5,14 @@ import { TransformedItemData } from "../query-weapons-with-amazon-accuracy/utils
 interface ItemsProps {
   items: TransformedItemData[];
   calculateForAmazonAscendancy?: boolean;
+  automaticallyCheckPrice?: boolean;
   showSaveButton?: boolean;
 }
 
 const Items: React.FC<ItemsProps> = ({
   items,
   calculateForAmazonAscendancy,
+  automaticallyCheckPrice,
   showSaveButton,
 }) => {
   if (!items || items.length === 0) {
@@ -25,6 +27,7 @@ const Items: React.FC<ItemsProps> = ({
         <li key={index}>
           <Item
             item={item}
+            automaticallyCheckPrice={automaticallyCheckPrice}
             calculateForAmazonAscendancy={calculateForAmazonAscendancy}
             showSaveButton={showSaveButton}
           />

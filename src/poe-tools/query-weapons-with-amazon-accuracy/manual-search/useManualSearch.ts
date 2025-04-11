@@ -1,30 +1,11 @@
 import { useState, useCallback, useRef } from "react";
 import { sleep } from "src/poe-tools/utils/sleep";
-import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 
-import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
+import { fetchItemDetails } from "src/poe-tools/api/fetchItemDetails";
 import useLogs from "src/helpers/useLogs";
 import { ItemData } from "../utils/calcs/types";
 import { toast } from "react-hot-toast";
-
-// Function to create headers with the provided POESESSID
-const createHeaders = (poesessid: string) => {
-  return {
-    "Content-Type": "application/json",
-    "User-Agent": "anything",
-    Cookie: `POESESSID=${poesessid}`,
-    Accept: "*/*",
-    "Accept-Language": "en-GB,en;q=0.9",
-    Connection: "keep-alive",
-    Origin: "https://www.pathofexile.com",
-    Referer: "https://www.pathofexile.com/trade",
-    "X-Requested-With": "XMLHttpRequest",
-    Host: "www.pathofexile.com",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-origin",
-  };
-};
+import { fetchItemIds } from "src/poe-tools/api/fetchItemIds";
 
 interface UseManualSearchProps {
   setItemDetails: (items: ItemData[]) => void;
@@ -63,17 +44,12 @@ export const useManualSearch = ({
   }, [addLog]);
 
   // Function to search for items directly
-  const searchItems = useCallback(
-    async (searchUrl: string, queryData: any) => {
+  const getItemIds = useCallback(
+    async (queryData: any) => {
       try {
         addLog("Searching for items ");
 
-        const response = await window.electron.api.request({
-          url: searchUrl,
-          method: "POST",
-          headers: createHeaders(getPoeSessionId()),
-          data: queryData,
-        });
+        const response = await fetchItemIds(queryData);
 
         if (response.error) {
           const errorMessage = `Error Response: ${response.message}`;
@@ -96,7 +72,7 @@ export const useManualSearch = ({
 
   // Function to fetch item details
   const fetchItems = useCallback(
-    async (searchResponse: any, searchUrl: string) => {
+    async (searchResponse: any) => {
       if (
         !searchResponse ||
         !searchResponse.result ||
@@ -110,7 +86,6 @@ export const useManualSearch = ({
 
       const allResults = searchResponse.result;
       const allItems: any[] = [];
-      const isPoe2 = searchUrl.includes("trade2") || searchUrl.includes("poe2");
 
       // Process items in batches of 10
       for (let i = 0; i < allResults.length; i += 10) {
@@ -132,9 +107,7 @@ export const useManualSearch = ({
         try {
           const batchItems = await fetchItemDetails({
             itemIds: batchIds,
-            sessionId: getPoeSessionId(),
-            isPoe2,
-            searchUrl,
+            isPoe2: true,
           });
 
           if (batchItems && batchItems.length) {
@@ -196,7 +169,7 @@ export const useManualSearch = ({
 
   // Main search function
   const performSearch = useCallback(
-    async (searchUrl: string, bodyData: string) => {
+    async (bodyData: string) => {
       // Reset cancel flag at the start of a new search
       cancelRef.current = false;
       setIsLoading(true);
@@ -215,9 +188,9 @@ export const useManualSearch = ({
         }
 
         addLog("Starting search...");
-        const searchResponse = await searchItems(searchUrl, queryData);
+        const searchResponse = await getItemIds(queryData);
 
-        if (!searchResponse) {
+        if (!searchResponse.result.length) {
           const message = "Search failed or returned no results";
           addLog(message);
           toast.error(message);
@@ -231,7 +204,7 @@ export const useManualSearch = ({
         toast.success(`Found ${searchResponse.result.length} items!`);
 
         if (searchResponse.result.length > 0) {
-          const items = await fetchItems(searchResponse, searchUrl);
+          const items = await fetchItems(searchResponse);
 
           setItemDetails(items);
           if (items.length > 0) {
@@ -258,7 +231,7 @@ export const useManualSearch = ({
         setIsLoading(false);
       }
     },
-    [addLog, clearListings, fetchItems, searchItems]
+    [addLog, clearListings, fetchItems, getItemIds]
   );
 
   return {

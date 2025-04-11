@@ -1,21 +1,12 @@
 import React, { useState } from "react";
 import QueryWeaponsWithAmazonAccuracy from "./poe-tools/query-weapons-with-amazon-accuracy/QueryWeaponsWithAmazonAccuracy";
-import ModalBase from "src/components/Modal";
-import Input from "./components/Input";
-import Button from "./components/Button";
+
 import SavedItemsModal from "./poe-tools/components/SavedItemsModal";
+import SettingsModal from "./poe-tools/components/SettingsModal";
 
 export default function App() {
   const [isSavedItemsOpen, setIsSavedItemsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [sessionId, setSessionId] = useState(
-    window.localStorage.getItem("poeSessionId") || ""
-  );
-
-  const handleSessionIdSet = (id: string) => {
-    window.localStorage.setItem("poeSessionId", id);
-    setIsSettingsOpen(false);
-  };
 
   return (
     <div>
@@ -54,41 +45,10 @@ export default function App() {
 
       <QueryWeaponsWithAmazonAccuracy />
 
-      <ModalBase
-        onClose={() =>
-          setSessionId(window.localStorage.getItem("poeSessionId") || "")
-        }
+      <SettingsModal
         isOpen={isSettingsOpen}
-        setIsOpen={setIsSettingsOpen}
-        className="card max-w-md w-full"
-      >
-        <div className="flex flex-col gap-2">
-          <Input
-            label="POESESSIONID:"
-            value={sessionId}
-            onChange={(value) => setSessionId(value.toString())}
-          />
-
-          <div className="ml-auto flex gap-2">
-            <Button
-              size="small"
-              variant="outline"
-              className="ml-auto"
-              onClick={() => handleSessionIdSet(sessionId)}
-            >
-              Close
-            </Button>
-            <Button
-              size="small"
-              variant="success"
-              className="ml-auto"
-              onClick={() => handleSessionIdSet(sessionId)}
-            >
-              Save
-            </Button>
-          </div>
-        </div>
-      </ModalBase>
+        setIsSettingsOpen={setIsSettingsOpen}
+      />
 
       <SavedItemsModal
         isOpen={isSavedItemsOpen}

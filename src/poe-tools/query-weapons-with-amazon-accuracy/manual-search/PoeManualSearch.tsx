@@ -11,9 +11,6 @@ import Items from "src/poe-tools/components/Items";
 import { ItemData, TransformedItemData } from "../utils/calcs/types";
 import Checkbox from "src/components/Checkbox";
 
-const searchUrl =
-  "https://www.pathofexile.com/api/trade2/search/poe2/Dawn%20of%20the%20Hunt";
-
 const PoEManualSearch = () => {
   const [itemDetails, setItemDetails] = useState<ItemData[]>([]);
   const [itemsToShow, setItemsToShow] = useState<TransformedItemData[]>([]);
@@ -100,7 +97,7 @@ const PoEManualSearch = () => {
           )}
           <Button
             variant="success"
-            onClick={() => performSearch(searchUrl, body)}
+            onClick={() => performSearch(body)}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
