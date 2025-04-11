@@ -92,10 +92,10 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
         </DamageStat>
 
         <div className="mt-2">
-          <label className="text-[10px] text-orange-500">
+          <label className="text-[10px] text-orange-700">
             Calculated higest overall highest DPS:{" "}
           </label>
-          <h3 className="font-medium flex flex-row w-full justify-between text-white border p-1 my-1 rounded border-orange-500 pt-2 items-center">
+          <h3 className="font-medium flex flex-row w-full justify-between text-white border px-2 py-1 my-1 rounded border-orange-700 pt-2 items-center">
             <span className="text-gray-200 ">
               With{" "}
               {calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets}{" "}

@@ -64,7 +64,19 @@ const PoEManualSearch = () => {
       return exceedsDamage;
     });
 
-    setItemsToShow(filteredDetails);
+    setItemsToShow(
+      filteredDetails.sort((a, b) => {
+        const damageToCompareA = calculateForAmazonAscendancy
+          ? a.calculatedDamageAmazonScaling.highestPotentialDpsValue?.value
+          : a.calculatedDamage.highestPotentialDpsValue?.value;
+
+        const damageToCompareB = calculateForAmazonAscendancy
+          ? b.calculatedDamageAmazonScaling.highestPotentialDpsValue?.value
+          : b.calculatedDamage.highestPotentialDpsValue?.value;
+
+        return damageToCompareB - damageToCompareA;
+      })
+    );
   }, [itemDetails, calculateForAmazonAscendancy, minDps]);
 
   return (

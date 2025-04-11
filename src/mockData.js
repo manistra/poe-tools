@@ -43,7 +43,7 @@ export const mockData = [
           item: "rune",
         },
       ],
-      name: "Cataclysm Edge",
+      name: "Test Spear",
       typeLine: "Spiked Spear",
       baseType: "Spiked Spear",
       rarity: "Rare",

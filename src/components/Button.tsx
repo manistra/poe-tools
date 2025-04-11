@@ -40,7 +40,7 @@ const Button: React.FC<ButtonProps> = ({
 
         // Color variants
         {
-          "bg-blue-950 border border-blue-900 hover:bg-blue-700 text-white":
+          "bg-gradient-to-r from-orange-950 to-orange-800 border border-gray-700 hover:to-orange-600 transition-colors duration-200 text-white":
             variant === "default",
           "border-red-900 border bg-red-950 hover:bg-red-800 text-white":
             variant === "danger",

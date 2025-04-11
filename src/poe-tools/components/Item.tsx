@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 const WhisperButton = ({ whisper }: { whisper: string }) => {
   const handleCopyWhisper = async () => {
     await copyToClipboard(whisper);
+    toast.success("Whisper copied to clipboard");
     // Optional: Add some visual feedback that the whisper was copied
   };
 
@@ -98,7 +99,7 @@ const Item: React.FC<ItemProps> = ({
 
   return (
     <div className="border border-gray-700 rounded-md  bg-gray-950 overflow-hidden">
-      <div className=" w-full border-b border-gray-700 bg-blue-950 p-2 flex-row flex justify-between">
+      <div className=" w-full border-b border-gray-700 bg-gradient-to-r from-gray-950 to-orange-950 p-2 flex-row flex justify-between">
         <div className="flex flex-row gap-2 items-center">
           {showSaveButton && (
             <button
