@@ -5,6 +5,7 @@ import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
 import useLogs from "src/helpers/useLogs";
 import { ItemData } from "../utils/calcs/types";
+import { toast } from "react-hot-toast";
 
 // Function to create headers with the provided POESESSID
 const createHeaders = (poesessid: string) => {
@@ -58,6 +59,7 @@ export const useManualSearch = ({
 
     setIsLoading(false);
     addLog("Search cancelled by user");
+    toast.success("Search cancelled successfully");
   }, [addLog]);
 
   // Function to search for items directly
@@ -74,14 +76,18 @@ export const useManualSearch = ({
         });
 
         if (response.error) {
-          addLog(`Error Response: ${response.message}`);
+          const errorMessage = `Error Response: ${response.message}`;
+          addLog(errorMessage);
+          toast.error(errorMessage);
           return null;
         }
 
         addLog(`Search successful`);
         return response;
       } catch (e) {
-        addLog(`Search error: ${e}`);
+        const errorMessage = `Search error: ${e}`;
+        addLog(errorMessage);
+        toast.error(errorMessage);
         return null;
       }
     },
@@ -96,7 +102,9 @@ export const useManualSearch = ({
         !searchResponse.result ||
         !searchResponse.result.length
       ) {
-        addLog("No items found in search response.");
+        const message = "No items found in search response.";
+        addLog(message);
+        toast.error(message);
         return [];
       }
 
@@ -133,7 +141,9 @@ export const useManualSearch = ({
             allItems.push(...batchItems);
             addLog(`Successfully fetched batch ${i / 10 + 1}`);
           } else {
-            addLog(`No items returned in batch ${i / 10 + 1}`);
+            const message = `No items returned in batch ${i / 10 + 1}`;
+            addLog(message);
+            toast.error(message);
           }
         } catch (e) {
           // Check if it's a rate limit error
@@ -146,14 +156,18 @@ export const useManualSearch = ({
               ? parseInt(waitTimeMatch[1], 10)
               : 60;
 
-            addLog(`Rate limit exceeded. Waiting ${waitTime} seconds...`);
+            const message = `Rate limit exceeded. Waiting ${waitTime} seconds...`;
+            addLog(message);
+            toast.error(message);
             await sleep(waitTime * 1000);
             // Retry this batch
             i -= 10;
             continue;
           }
 
-          addLog(`Error fetching batch ${i / 10 + 1}: ${e}`);
+          const errorMessage = `Error fetching batch ${i / 10 + 1}: ${e}`;
+          addLog(errorMessage);
+          toast.error(errorMessage);
         }
 
         // Add delay between batches to prevent rate limiting
@@ -193,7 +207,9 @@ export const useManualSearch = ({
         try {
           queryData = JSON.parse(bodyData);
         } catch (e) {
-          addLog(`Error parsing JSON data: ${e}`);
+          const errorMessage = `Error parsing JSON data: ${e}`;
+          addLog(errorMessage);
+          toast.error(errorMessage);
           setIsLoading(false);
           return;
         }
@@ -202,7 +218,9 @@ export const useManualSearch = ({
         const searchResponse = await searchItems(searchUrl, queryData);
 
         if (!searchResponse) {
-          addLog("Search failed or returned no results");
+          const message = "Search failed or returned no results";
+          addLog(message);
+          toast.error(message);
           setIsLoading(false);
           return;
         }
@@ -210,13 +228,21 @@ export const useManualSearch = ({
         addLog(
           `Search successful! Found ${searchResponse.result.length} items.`
         );
+        toast.success(`Found ${searchResponse.result.length} items!`);
 
         if (searchResponse.result.length > 0) {
           const items = await fetchItems(searchResponse, searchUrl);
 
           setItemDetails(items);
+          if (items.length > 0) {
+            toast.success(`Successfully fetched ${items.length} items`);
+          } else {
+            toast.error("No items could be fetched");
+          }
         } else {
-          addLog("No items found matching your criteria.");
+          const message = "No items found matching your criteria.";
+          addLog(message);
+          toast.error(message);
         }
 
         // Check if search was cancelled
@@ -225,7 +251,9 @@ export const useManualSearch = ({
           return;
         }
       } catch (error) {
-        addLog(`Error during search: ${error}`);
+        const errorMessage = `Error during search: ${error}`;
+        addLog(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setIsLoading(false);
       }

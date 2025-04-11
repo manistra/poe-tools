@@ -6,6 +6,7 @@ import useLogs from "src/helpers/useLogs";
 import { mockData } from "src/mockData";
 import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 import { ItemData } from "../utils/calcs/types";
+import { toast } from "react-hot-toast";
 
 interface UsePoeLiveSearchReturn {
   searchUrl: string;
@@ -42,6 +43,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
       const latestMessage = messages[messages.length - 1];
       if (latestMessage.items && latestMessage.items.length > 0) {
         addLog(`New items found: ${latestMessage.items.length} items`);
+        toast.success(`New items found: ${latestMessage.items.length} items`);
       }
     }
 
@@ -63,28 +65,31 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
               searchUrl,
             });
             addLog(`Fetched item details for ${details.length} items`);
+            toast.success(`Fetched ${details.length} new items`);
 
             setItemDetails((prev) => [...details, ...prev]);
           } catch (error) {
             // Handle rate limit errors
             disconnect();
-            addLog(`🛑 Search automatically stopped due to an error!`);
+            const errorMessage = `🛑 Search automatically stopped due to an error!`;
+            addLog(errorMessage);
+            toast.error(errorMessage);
 
             if (
               error instanceof Error &&
               error.message.startsWith("RATE_LIMIT_EXCEEDED")
             ) {
               const waitTime = error.message.split(":")[1];
-              addLog(
-                `⚠️ Rate limit exceeded! Need to wait ${waitTime} seconds before trying again.`
-              );
+              const rateMessage = `⚠️ Rate limit exceeded! Need to wait ${waitTime} seconds before trying again.`;
+              addLog(rateMessage);
+              toast.error(rateMessage);
             } else {
               console.error("Failed to fetch item details:", error);
-              addLog(
-                `Error fetching item details: ${
-                  error instanceof Error ? error.message : String(error)
-                }`
-              );
+              const fetchErrorMessage = `Error fetching item details: ${
+                error instanceof Error ? error.message : String(error)
+              }`;
+              addLog(fetchErrorMessage);
+              toast.error(fetchErrorMessage);
             }
           } finally {
             setIsLoading(false);
@@ -98,6 +103,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
 
   const clearListings = () => {
     setItemDetails([]);
+    toast.success("Listings cleared");
   };
   return {
     searchUrl,

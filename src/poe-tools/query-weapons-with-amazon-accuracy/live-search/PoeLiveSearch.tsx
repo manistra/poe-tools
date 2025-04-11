@@ -12,6 +12,7 @@ import { sendNotification } from "src/poe-tools/utils/useNotification";
 import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 import { TransformedItemData } from "../utils/calcs/types";
 import Checkbox from "src/components/Checkbox";
+import { copyToClipboard } from "src/poe-tools/utils/clipboard";
 
 const PoELiveSearch = () => {
   const [calculateForAmazonAscendancy, setCalculateForAmazonAscendancy] =
@@ -60,8 +61,10 @@ const PoELiveSearch = () => {
         ) {
           sendNotification(
             `${transformedItem.calculatedDamage.highestPotentialDpsValue?.value} DPS (crit: ${transformedItem.criticalChance}) for ${transformedItem.price?.amount} ${transformedItem.price?.currency}`,
-            `${transformedItem.name} exceeds ${minDps} DPS with Accuracy`
+            `Whisper Copied to Clipboard`
           );
+
+          copyToClipboard(transformedItem.whisper);
         }
 
         return exceedsDamage;
@@ -140,7 +143,14 @@ const PoELiveSearch = () => {
         </div>
       </div>
 
-      <CollapsibleItem title="Logs:" specialTitle={logs[logs.length - 1]}>
+      <CollapsibleItem
+        title="Logs:"
+        specialTitle={
+          logs[logs.length - 1]
+            ? `Last log - ${logs[logs.length - 1]}`
+            : undefined
+        }
+      >
         <div className="max-h-[300px] overflow-y-auto">
           {logs.length === 0 ? (
             <p>No messages received yet</p>

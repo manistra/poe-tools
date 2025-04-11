@@ -98,7 +98,14 @@ const PoEManualSearch = () => {
         </div>
       </div>
 
-      <CollapsibleItem title="Logs:" specialTitle={logs[logs.length - 1]}>
+      <CollapsibleItem
+        title="Logs:"
+        specialTitle={
+          logs[logs.length - 1]
+            ? `Last log - ${logs[logs.length - 1]}`
+            : undefined
+        }
+      >
         <div className="max-h-[300px] overflow-y-auto">
           {logs.length === 0 ? (
             <p>No messages received yet</p>
