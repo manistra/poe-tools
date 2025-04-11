@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, ipcMain } from "electron";
+import { app, BrowserWindow, Menu, ipcMain, shell } from "electron";
 import { setupWebSocketHandlers } from "./websocketHandler";
 import { setupApiHandler } from "./apiHandler";
 import { setupAutoUpdater } from "./autoUpdater";
@@ -66,3 +66,15 @@ app.on("activate", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+// Add this with your other ipcMain handlers
+ipcMain.handle("shell-open-external", async (_, url) => {
+  if (
+    typeof url === "string" &&
+    (url.startsWith("https://") || url.startsWith("http://"))
+  ) {
+    await shell.openExternal(url);
+    return true;
+  }
+  return false;
+});

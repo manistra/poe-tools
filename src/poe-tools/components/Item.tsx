@@ -270,12 +270,11 @@ const Item: React.FC<ItemProps> = ({
                 <Button
                   className="bg-gradient-to-r from-purple-950 to-gray-900 mt-auto"
                   size="small"
-                  onClick={() =>
-                    window.open(
-                      checkedPrices.url || "https://www.pathofexile.com/trade",
-                      "_blank"
-                    )
-                  }
+                  onClick={() => {
+                    const url =
+                      checkedPrices.url || "https://www.pathofexile.com/trade";
+                    window.electron.shell.openExternal(url);
+                  }}
                 >
                   Open on Poe Trade
                 </Button>

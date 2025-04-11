@@ -61,4 +61,8 @@ contextBridge.exposeInMainWorld("electron", {
       };
     },
   },
+  shell: {
+    openExternal: (url: string) =>
+      ipcRenderer.invoke("shell-open-external", url),
+  },
 });

@@ -28,7 +28,15 @@ declare global {
       };
       updates: {
         getAppVersion: () => Promise<string>;
+        checkForUpdates: () => Promise<{
+          success: boolean;
+          message: string;
+          version?: string;
+        }>;
         onUpdateStatus: (callback: (status: string) => void) => () => void;
+      };
+      shell: {
+        openExternal: (url: string) => Promise<boolean>;
       };
     };
   }
