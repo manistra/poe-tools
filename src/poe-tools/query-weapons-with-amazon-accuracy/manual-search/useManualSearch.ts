@@ -1,10 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { sleep } from "src/poe-tools/utils/sleep";
 import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
-import {
-  ItemData,
-  TransformedItemData,
-} from "src/poe-tools/utils/transformItemData";
+import { ItemData } from "src/poe-tools/utils/transformItemData";
 import { fetchItemDetails } from "src/poe-tools/utils/fetchItemDetails";
 import useLogs from "src/helpers/useLogs";
 
@@ -37,12 +34,30 @@ export const useManualSearch = ({
   delay = 400,
 }: UseManualSearchProps) => {
   const [isLoading, setIsLoading] = useState(false);
-
   const { addLog, logs } = useLogs();
+
+  // Add a ref to track if search should be cancelled
+  const cancelRef = useRef(false);
+  // Add a ref to store any timeout IDs that need to be cleared
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const clearListings = useCallback(() => {
     setItemDetails([]);
   }, []);
+
+  // Add a function to cancel ongoing searches
+  const cancelSearch = useCallback(() => {
+    cancelRef.current = true;
+
+    // Clear any pending timeouts
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    setIsLoading(false);
+    addLog("Search cancelled by user");
+  }, [addLog]);
 
   // Function to search for items directly
   const searchItems = useCallback(
@@ -90,6 +105,12 @@ export const useManualSearch = ({
 
       // Process items in batches of 10
       for (let i = 0; i < allResults.length; i += 10) {
+        // Check if search was cancelled
+        if (cancelRef.current) {
+          addLog("Search cancelled, stopping item fetch");
+          return allItems;
+        }
+
         const batchIds = allResults.slice(i, i + 10);
         if (batchIds.length === 0) break;
 
@@ -137,18 +158,32 @@ export const useManualSearch = ({
         // Add delay between batches to prevent rate limiting
         if (i + 10 < allResults.length) {
           addLog("Waiting 1 second before next batch...");
-          await sleep(delay);
+          // Use a custom sleep that can be cancelled
+          await new Promise<void>((resolve) => {
+            timeoutRef.current = setTimeout(() => {
+              timeoutRef.current = null;
+              resolve();
+            }, delay);
+          });
+
+          // Check again if cancelled after the delay
+          if (cancelRef.current) {
+            addLog("Search cancelled during delay");
+            return allItems;
+          }
         }
       }
 
       return allItems;
     },
-    [addLog]
+    [addLog, delay]
   );
 
   // Main search function
   const performSearch = useCallback(
     async (searchUrl: string, bodyData: string) => {
+      // Reset cancel flag at the start of a new search
+      cancelRef.current = false;
       setIsLoading(true);
       clearListings();
 
@@ -182,6 +217,12 @@ export const useManualSearch = ({
         } else {
           addLog("No items found matching your criteria.");
         }
+
+        // Check if search was cancelled
+        if (cancelRef.current) {
+          addLog("Search cancelled");
+          return;
+        }
       } catch (error) {
         addLog(`Error during search: ${error}`);
       } finally {
@@ -196,5 +237,6 @@ export const useManualSearch = ({
     performSearch,
     isLoading,
     logs,
+    cancelSearch,
   };
 };

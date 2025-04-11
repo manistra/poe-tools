@@ -39,6 +39,11 @@ const PoELiveSearch = () => {
     clearListings,
   } = usePoeLiveSearch();
 
+  const handleClearListings = () => {
+    clearListings();
+    setItemsToShow([]);
+  };
+
   useEffect(() => {
     if (itemDetails.length > 0) {
       const transformedDetails = itemDetails.map((itemData) =>
@@ -50,7 +55,10 @@ const PoELiveSearch = () => {
           transformedItem.calculatedDamage.highestPotentialDpsValue?.value >=
           Number(minDps);
 
-        if (exceedsDamage) {
+        if (
+          exceedsDamage &&
+          !itemsToShow.some((item) => item.id === transformedItem.id)
+        ) {
           sendNotification(
             `${transformedItem.calculatedDamage.highestPotentialDpsValue?.value} DPS (crit: ${transformedItem.criticalChance}) for ${transformedItem.price?.amount} ${transformedItem.price?.currency}`,
             `${transformedItem.name} exceeds ${minDps} DPS with Accuracy`
@@ -133,7 +141,7 @@ const PoELiveSearch = () => {
         </div>
       </div>
 
-      <CollapsibleItem title="Logs:">
+      <CollapsibleItem title="Logs:" specialTitle={logs[logs.length - 1]}>
         <div className="max-h-[300px] overflow-y-auto">
           {logs.length === 0 ? (
             <p>No messages received yet</p>
@@ -194,7 +202,7 @@ const PoELiveSearch = () => {
           </h3>
           <button
             className="hover:text-gray-400 rounded-md w-fit px-2 py-1 ml-auto text-gray-600"
-            onClick={clearListings}
+            onClick={handleClearListings}
           >
             Clear Listings
           </button>

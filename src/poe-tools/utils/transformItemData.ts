@@ -7,6 +7,7 @@ interface ItemProperty {
 }
 
 interface ItemListing {
+  indexed: any;
   account: {
     name: string;
   };
@@ -52,6 +53,7 @@ export interface TransformedItemData {
   name: string;
   typeLine: string;
   time: string;
+  listedAgo: string;
   criticalChance: string;
   attacksPerSecond: string;
   physicalDamage: string;
@@ -371,7 +373,23 @@ export function transformItemData(
         }
       : undefined,
     whisper: rawItem?.listing?.whisper,
+    listedAgo: rawItem?.listing?.indexed
+      ? (() => {
+          const indexedDate = new Date(rawItem.listing.indexed);
+          const now = new Date();
+          const diffMs = now.getTime() - indexedDate.getTime();
 
+          const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+          const hours = Math.floor(
+            (diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          );
+          const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+          return `${days > 0 ? `${days}d ` : ""}${
+            hours > 0 ? `${hours}h ` : ""
+          }${minutes}m`;
+        })()
+      : "",
     calculatedDamage: {
       highestPotentialDpsValue: findHighestPotentialDpsValue({
         runePotentialDpsValues: runePotentialDpsValues,

@@ -6,6 +6,7 @@ interface CollapsibleItemProps {
   title: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  specialTitle?: string;
 }
 
 const CollapsibleItem: React.FC<CollapsibleItemProps> = ({
@@ -13,6 +14,7 @@ const CollapsibleItem: React.FC<CollapsibleItemProps> = ({
   title,
   children,
   className,
+  specialTitle,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(!defaultOpen);
   const handleCollapsible = () => {
@@ -26,6 +28,10 @@ const CollapsibleItem: React.FC<CollapsibleItemProps> = ({
         onClick={handleCollapsible}
       >
         <span>{title}</span>
+
+        {!!specialTitle && isCollapsed && (
+          <span className="text-gray-400 text-xs">{specialTitle}</span>
+        )}
 
         <svg
           className={`transition-transform duration-200 ${

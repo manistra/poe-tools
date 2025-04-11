@@ -23,13 +23,13 @@ interface ItemProps {
   calculateForAmazonAscendancy?: boolean;
 }
 
-const Item: React.FC<ItemProps> = ({
-  item,
-  calculateForAmazonAscendancy = false,
-}) => {
+const Item: React.FC<ItemProps> = ({ item, calculateForAmazonAscendancy }) => {
   return (
-    <div className="border border-gray-700 rounded-md p-2 bg-gray-950">
-      <div className="flex flex-col gap-2">
+    <div className="border border-gray-700 rounded-md  bg-gray-950 overflow-hidden">
+      <div className="text-gray-200 text-base font-bold w-full text-center border-b border-gray-700 bg-blue-950 p-2">
+        {item.name}
+      </div>
+      <div className="flex flex-col gap-2 p-2">
         <div className="flex flex-row gap-16 justify-between">
           <div className="flex text-xs w-1/2 max-w-[350px] flex-col">
             <h2 className="text-gray-200 text-base ">Base Item Stats: </h2>
@@ -72,7 +72,7 @@ const Item: React.FC<ItemProps> = ({
                 <span className="text-purple-500">{item.lightningDamage}</span>
               </DamageStat>
             )}
-            {item.totalAccuracy && (
+            {!!item.totalAccuracy && (
               <DamageStat label="Total Accuracy">
                 {item.totalAccuracy}
               </DamageStat>
@@ -104,7 +104,7 @@ const Item: React.FC<ItemProps> = ({
               {item.calculatedDamage.runePotentialDpsValues.potentialEleRuneDps}
             </DamageStat>
 
-            {calculateForAmazonAscendancy && (
+            {!!calculateForAmazonAscendancy && (
               <DamageStat label="Accuracy Rune DPS">
                 {
                   item.calculatedDamage.runePotentialDpsValues
@@ -181,7 +181,7 @@ const Item: React.FC<ItemProps> = ({
         </CollapsibleItem>
       </div>
 
-      <div className="flex justify-between items-center mt-2">
+      <div className="flex justify-between items-center mt-2 p-2">
         <div className="flex justify-between w-full">
           <div className="text-sm text-gray-200 mr-2 flex flex-col">
             <label className="text-xs text-gray-400">Seller:</label>
@@ -189,8 +189,8 @@ const Item: React.FC<ItemProps> = ({
           </div>
 
           <div className="text-sm text-gray-200 mr-2 flex flex-col">
-            <label className="text-xs text-gray-400">Time:</label>
-            <span className="text-gray-200">{item.time}</span>
+            <label className="text-xs text-gray-400">Listed ago:</label>
+            <span className="text-gray-200">{item.listedAgo} </span>
           </div>
 
           <div className="text-sm text-gray-200 mr-2 flex flex-col">

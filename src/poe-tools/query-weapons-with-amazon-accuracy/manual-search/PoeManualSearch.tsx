@@ -5,42 +5,50 @@ import CollapsibleItem from "src/components/CollapsibleItem";
 import Input from "src/components/Input";
 import TextArea from "src/components/TextArea";
 import { useManualSearch } from "./useManualSearch";
-import Item from "src/poe-tools/components/Item";
 import {
   ItemData,
   TransformedItemData,
   transformItemData,
 } from "src/poe-tools/utils/transformItemData";
+import { defaultBodyData } from "./defaultBodyData";
+import Items from "src/poe-tools/components/Items";
+
+const searchUrl =
+  "https://www.pathofexile.com/api/trade2/search/poe2/Dawn%20of%20the%20Hunt";
 
 const PoEManualSearch = () => {
   const [itemDetails, setItemDetails] = useState<ItemData[]>([]);
   const [itemsToShow, setItemsToShow] = useState<TransformedItemData[]>([]);
+  const [delay, setDelay] = useState<number>(
+    Number(window.localStorage.getItem("manual-delay")) || 400
+  );
+  const [minDps, setMinDps] = useState(
+    window.localStorage.getItem("manual-minDps") || 400
+  );
+  const [body, setBody] = useState(
+    window.localStorage.getItem("manual-body") ||
+      JSON.stringify(defaultBodyData)
+  );
   const [calculateForAmazonAscendancy, setCalculateForAmazonAscendancy] =
     useState(
       window.localStorage.getItem("manual-calculateForAmazonAscendancy") ===
         "true"
     );
 
-  const [delay, setDelay] = useState<number>(
-    Number(window.localStorage.getItem("manual-delay")) || 400
-  );
+  const { performSearch, isLoading, logs, clearListings, cancelSearch } =
+    useManualSearch({
+      setItemDetails,
+      delay,
+    });
 
-  const [minDps, setMinDps] = useState(
-    window.localStorage.getItem("manual-minDps") || 400
-  );
+  const handleClearListings = () => {
+    clearListings();
+    setItemsToShow([]);
+  };
 
-  useState(window.localStorage.getItem("manual-minDps") || 400);
-
-  const searchUrl =
-    "https://www.pathofexile.com/api/trade2/search/poe2/Dawn%20of%20the%20Hunt";
-  const [body, setBody] = useState(
-    window.localStorage.getItem("manual-body") || ""
-  );
-
-  const { performSearch, isLoading, logs, clearListings } = useManualSearch({
-    setItemDetails,
-    delay,
-  });
+  const handleReset = () => {
+    cancelSearch();
+  };
 
   useEffect(() => {
     const transformedItems = itemDetails.map((item) =>
@@ -66,24 +74,33 @@ const PoEManualSearch = () => {
     <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">
       <div className="flex gap-2 items-end justify-between">
         <div>
-          <h1 className="text-2xl text-gray-200 font-bold">
-            Wepon with Accuracy
-          </h1>
+          <h1 className="text-2xl text-gray-200 font-bold">Manual Search</h1>
 
-          <h2 className="text-gray-600">Manual Search</h2>
+          <h2 className="text-gray-600">Wepon with Accuracy</h2>
         </div>
 
-        <Button
-          variant="success"
-          onClick={() => performSearch(searchUrl, body)}
-          className="disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={isLoading}
-        >
-          {isLoading ? "Searching..." : "Search"}
-        </Button>
+        <div className="flex gap-2">
+          {isLoading && (
+            <Button
+              variant="danger"
+              onClick={handleReset}
+              className="disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Stop Search
+            </Button>
+          )}
+          <Button
+            variant="success"
+            onClick={() => performSearch(searchUrl, body)}
+            className="disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading}
+          >
+            {isLoading ? "Searching..." : "Search"}
+          </Button>
+        </div>
       </div>
 
-      <CollapsibleItem title="Logs:">
+      <CollapsibleItem title="Logs:" specialTitle={logs[logs.length - 1]}>
         <div className="max-h-[300px] overflow-y-auto">
           {logs.length === 0 ? (
             <p>No messages received yet</p>
@@ -103,9 +120,9 @@ const PoEManualSearch = () => {
         defaultOpen={false}
       >
         <TextArea
-          wrapperClassName="row-span-2"
+          wrapperClassName="col-span-2"
           placeholder="{}"
-          className="min-h-[110px]"
+          className="min-h-[280px]"
           type="text"
           label="Data:"
           value={body}
@@ -126,9 +143,9 @@ const PoEManualSearch = () => {
         />
         <Input
           type="number"
-          label="Delay between requests (miliseconds, min 200 but watch out its easy to get rate limited):"
+          label="Delay between requests (miliseconds, min 380 but watch out its easy to get rate limited):"
           value={delay}
-          min={200}
+          min={380}
           onChange={(value) => {
             setDelay(Number(value));
             window.localStorage.setItem("manual-delay", String(value));
@@ -166,19 +183,16 @@ const PoEManualSearch = () => {
           </h3>
           <button
             className="hover:text-gray-400 rounded-md w-fit px-2 py-1 ml-auto text-gray-600"
-            onClick={clearListings}
+            onClick={handleClearListings}
           >
             Clear Listings
           </button>
         </div>
 
-        <ul className="space-y-4">
-          {itemsToShow.map((item, index) => (
-            <li key={index}>
-              <Item item={item} />
-            </li>
-          ))}
-        </ul>
+        <Items
+          items={itemsToShow}
+          calculateForAmazonAscendancy={calculateForAmazonAscendancy}
+        />
       </div>
     </div>
   );
