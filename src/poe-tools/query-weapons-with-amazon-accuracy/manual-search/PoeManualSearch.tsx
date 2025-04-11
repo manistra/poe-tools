@@ -53,19 +53,18 @@ const PoEManualSearch = () => {
       transformItemData(item, calculateForAmazonAscendancy)
     );
 
-    setItemsToShow(
-      transformedItems
-        .filter(
-          (item) =>
-            Number(item.calculatedDamage.highestPotentialDpsValue?.value) >=
-            Number(minDps)
-        )
-        .sort(
-          (a, b) =>
-            b.calculatedDamage.highestPotentialDpsValue?.value -
-            a.calculatedDamage.highestPotentialDpsValue?.value
-        )
-    );
+    const filteredDetails = transformedItems.filter((transformedItem) => {
+      const damageToCompare = calculateForAmazonAscendancy
+        ? transformedItem.calculatedDamageAmazonScaling.highestPotentialDpsValue
+            ?.value
+        : transformedItem.calculatedDamage.highestPotentialDpsValue?.value;
+
+      const exceedsDamage = damageToCompare >= Number(minDps);
+
+      return exceedsDamage;
+    });
+
+    setItemsToShow(filteredDetails);
   }, [itemDetails, calculateForAmazonAscendancy, minDps]);
 
   return (
