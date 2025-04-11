@@ -10,6 +10,7 @@ interface ItemCalculatedDamageProps {
   calculatedDamage: CalculatedDamage;
   calculateForAmazonAscendancy?: boolean;
   totalDpsNoAmazonScaling: number;
+  totalDpsNoAmazonScalingLabel: string;
 }
 
 const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
@@ -17,6 +18,7 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
   calculatedDamage,
   calculateForAmazonAscendancy,
   totalDpsNoAmazonScaling,
+  totalDpsNoAmazonScalingLabel,
 }) => {
   return (
     <div className="flex flex-row gap-16 justify-between">
@@ -120,7 +122,7 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
           )}
           <DamageStat
             className="text-base !text-blue-400"
-            label={`Total DPS Raw (${calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets} ${calculatedDamage.highestPotentialDpsValue?.name}):`}
+            label={`Total DPS Raw (${totalDpsNoAmazonScalingLabel}):`}
           >
             {totalDpsNoAmazonScaling}
           </DamageStat>

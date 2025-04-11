@@ -172,6 +172,7 @@ const Item: React.FC<ItemProps> = ({
         <ItemCalculatedDamage
           item={item}
           calculateForAmazonAscendancy={amazonLocal}
+          totalDpsNoAmazonScalingLabel={`${item.calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets} ${item.calculatedDamage.highestPotentialDpsValue?.name}`}
           totalDpsNoAmazonScaling={
             item.calculatedDamage.highestPotentialDpsValue?.value
           }
