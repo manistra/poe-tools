@@ -51,17 +51,20 @@ const PoELiveSearch = () => {
       );
 
       const filteredDetails = transformedDetails.filter((transformedItem) => {
-        const exceedsDamage =
-          transformedItem.calculatedDamage.highestPotentialDpsValue?.value >=
-          Number(minDps);
+        const damageToCompare = calculateForAmazonAscendancy
+          ? transformedItem.calculatedDamageAmazonScaling
+              .highestPotentialDpsValue?.value
+          : transformedItem.calculatedDamage.highestPotentialDpsValue?.value;
+
+        const exceedsDamage = damageToCompare >= Number(minDps);
 
         if (
           exceedsDamage &&
           !itemsToShow.some((item) => item.id === transformedItem.id)
         ) {
           sendNotification(
-            `${transformedItem.calculatedDamage.highestPotentialDpsValue?.value} DPS (crit: ${transformedItem.criticalChance}) for ${transformedItem.price?.amount} ${transformedItem.price?.currency}`,
-            `Whisper Copied to Clipboard`
+            `${transformedItem.price?.amount} ${transformedItem.price?.currency} - ${transformedItem.name}`,
+            `DPS: ${damageToCompare}, crit: ${transformedItem.criticalChance}`
           );
 
           copyToClipboard(transformedItem.whisper);
@@ -72,25 +75,7 @@ const PoELiveSearch = () => {
 
       setItemsToShow(filteredDetails);
     }
-  }, [itemDetails]);
-
-  useEffect(() => {
-    if (itemDetails.length > 0) {
-      const transformedDetails = itemDetails.map((itemData) =>
-        transformItemData(itemData, calculateForAmazonAscendancy)
-      );
-
-      const filteredDetails = transformedDetails.filter((transformedItem) => {
-        const exceedsDamage =
-          transformedItem.calculatedDamage.highestPotentialDpsValue?.value >=
-          Number(minDps);
-
-        return exceedsDamage;
-      });
-
-      setItemsToShow(filteredDetails);
-    }
-  }, [minDps, calculateForAmazonAscendancy]);
+  }, [itemDetails, minDps, calculateForAmazonAscendancy]);
 
   return (
     <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">

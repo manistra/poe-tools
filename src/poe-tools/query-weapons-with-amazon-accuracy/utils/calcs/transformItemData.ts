@@ -161,7 +161,7 @@ export function transformItemData(
           rawItem?.item?.sockets?.length > 0
             ? rawItem?.item?.sockets?.length
             : 1,
-        amazon: calculateForAmazonAscendancy,
+        amazon: false,
       }),
       pdps: rawItem?.item?.extended?.pdps || 0,
       edps: rawItem?.item?.extended?.edps || 0,

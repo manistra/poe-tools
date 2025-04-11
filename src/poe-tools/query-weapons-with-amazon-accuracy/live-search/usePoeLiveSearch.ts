@@ -43,7 +43,6 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
       const latestMessage = messages[messages.length - 1];
       if (latestMessage.items && latestMessage.items.length > 0) {
         addLog(`New items found: ${latestMessage.items.length} items`);
-        toast.success(`New items found: ${latestMessage.items.length} items`);
       }
     }
 
@@ -65,7 +64,6 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
               searchUrl,
             });
             addLog(`Fetched item details for ${details.length} items`);
-            toast.success(`Fetched ${details.length} new items`);
 
             setItemDetails((prev) => [...details, ...prev]);
           } catch (error) {
