@@ -181,7 +181,9 @@ export function transformItemData(
       }),
       pdps: rawItem?.item?.extended?.pdps || 0,
       edps: rawItem?.item?.extended?.edps || 0,
-      dps: rawItem?.item?.extended?.dps || 0,
+      dps:
+        rawItem?.item?.extended?.dps +
+          calculateTotalAccuracy(rawItem?.item, true) / 4 || 0,
       totalDamageWithoutRuneMods: totalDamageWithoutRuneMods,
       runePotentialDpsValues: runePotentialDpsValuesAmazonScaling,
     },

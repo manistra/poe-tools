@@ -20,11 +20,20 @@ const extractAccuracyValue = (mod: string): number => {
  * @param item The item data containing mods
  * @returns The total accuracy value
  */
-export const calculateTotalAccuracy = (item: any): number => {
+export const calculateTotalAccuracy = (
+  item: any,
+  amazonScaling?: boolean
+): number => {
   if (!item) return 0;
 
   let totalAccuracy = 0;
 
+  // Check runeMods
+  if (amazonScaling && item.runeMods && Array.isArray(item.runeMods)) {
+    item.runeMods.forEach((mod: string) => {
+      totalAccuracy += extractAccuracyValue(mod);
+    });
+  }
   // Check fracturedMods
   if (item.fracturedMods && Array.isArray(item.fracturedMods)) {
     item.fracturedMods.forEach((mod: string) => {

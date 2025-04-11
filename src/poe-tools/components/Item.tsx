@@ -139,7 +139,7 @@ const Item: React.FC<ItemProps> = ({
       <div className="flex flex-col gap-2 p-2">
         <ItemCalculatedDamage
           item={item}
-          calculateForAmazonAscendancy={calculateForAmazonAscendancy}
+          calculateForAmazonAscendancy={amazonLocal}
           calculatedDamage={
             amazonLocal
               ? item.calculatedDamageAmazonScaling
