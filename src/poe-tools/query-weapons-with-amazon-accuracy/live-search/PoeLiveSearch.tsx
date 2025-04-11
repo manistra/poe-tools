@@ -208,7 +208,7 @@ const PoELiveSearch = () => {
           </button>
         </div>
         <Items
-          automaticallyCheckPrice={true}
+          automaticallyCheckPrice={false}
           items={itemsToShow}
           calculateForAmazonAscendancy={calculateForAmazonAscendancy}
           showSaveButton={true}
