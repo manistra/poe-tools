@@ -172,7 +172,9 @@ const Item: React.FC<ItemProps> = ({
         <ItemCalculatedDamage
           item={item}
           calculateForAmazonAscendancy={amazonLocal}
-          totalDpsNoAmazonScaling={item.calculatedDamage.dps}
+          totalDpsNoAmazonScaling={
+            item.calculatedDamage.highestPotentialDpsValue?.value
+          }
           calculatedDamage={
             amazonLocal
               ? item.calculatedDamageAmazonScaling
