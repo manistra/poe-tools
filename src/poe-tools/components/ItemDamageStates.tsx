@@ -33,7 +33,9 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
           <DamageStat label="Elemental Damage">
             <>
               <span className="text-red-500">{item.elementalDamage.fire}</span>
+              {"  "}
               <span className="text-blue-400">{item.elementalDamage.cold}</span>
+              {"  "}
               <span className="text-yellow-400">
                 {item.elementalDamage.lightning}
               </span>
