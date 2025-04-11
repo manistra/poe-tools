@@ -9,15 +9,62 @@ interface ItemCalculatedDamageProps {
   item: TransformedItemData;
   calculatedDamage: CalculatedDamage;
   calculateForAmazonAscendancy?: boolean;
+  totalDpsNoAmazonScaling: number;
 }
 
 const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
   item,
   calculatedDamage,
   calculateForAmazonAscendancy,
+  totalDpsNoAmazonScaling,
 }) => {
   return (
     <div className="flex flex-row gap-16 justify-between">
+      <div className="flex text-xs w-1/2 max-w-[350px] flex-col">
+        <h2 className="text-gray-200 text-base ">Calculated DPS: </h2>
+
+        <hr className="border-gray-700 my-1" />
+
+        <DamageStat label="Damage Without Runes">
+          {calculatedDamage.totalDamageWithoutRuneMods.dps}
+        </DamageStat>
+
+        <DamageStat label="Physical Rune DPS">
+          {calculatedDamage.runePotentialDpsValues.potentialPhysRuneDps}
+        </DamageStat>
+        <DamageStat label="Elemental Rune DPS">
+          {calculatedDamage.runePotentialDpsValues.potentialEleRuneDps}
+        </DamageStat>
+
+        {!!calculateForAmazonAscendancy && (
+          <DamageStat label="Accuracy Rune DPS">
+            {calculatedDamage.runePotentialDpsValues.potentialAccuracyRuneDps}
+          </DamageStat>
+        )}
+        <DamageStat label="Attack Speed Rune DPS">
+          {calculatedDamage.runePotentialDpsValues.potentialAttackSpeedRuneDps}
+        </DamageStat>
+
+        <div className="mt-2">
+          <label className="text-[10px] text-orange-700">
+            Calculated higest overall highest DPS:{" "}
+          </label>
+          <h3 className="font-medium flex flex-row w-full justify-between text-white border px-2 py-1 my-1 rounded border-orange-700 pt-2 items-center">
+            <span className="text-gray-200 ">
+              With{" "}
+              {calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets}{" "}
+              {calculatedDamage.highestPotentialDpsValue?.name}
+              {calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets >
+                1 && "s"}
+              :
+            </span>
+            <span className="text-base font-bold">
+              {calculatedDamage.highestPotentialDpsValue?.value}
+            </span>
+          </h3>
+        </div>
+      </div>
+
       <div className="flex text-xs w-1/2 max-w-[350px] flex-col">
         <h2 className="text-gray-200 text-base ">Base Item Stats: </h2>
 
@@ -62,58 +109,21 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
         <DamageStat label="eDPS">{calculatedDamage.edps}</DamageStat>
         <DamageStat label="Total DPS">{calculatedDamage.dps}</DamageStat>
 
-        {!!item.totalAccuracy && (
+        <div className="py-2 mt-3 border-y">
+          {!!item.totalAccuracy && (
+            <DamageStat
+              label="Total Accuracy"
+              className="text-base !text-blue-400"
+            >
+              {item.totalAccuracy}
+            </DamageStat>
+          )}
           <DamageStat
-            label="Total Accuracy"
             className="text-base !text-blue-400"
+            label={`Total DPS Raw (${calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets} ${calculatedDamage.highestPotentialDpsValue?.name}):`}
           >
-            {item.totalAccuracy}
+            {totalDpsNoAmazonScaling}
           </DamageStat>
-        )}
-      </div>
-
-      <div className="flex text-xs w-1/2 max-w-[350px] flex-col">
-        <h2 className="text-gray-200 text-base ">Calculated DPS: </h2>
-
-        <hr className="border-gray-700 my-1" />
-
-        <DamageStat label="Damage Without Runes">
-          {calculatedDamage.totalDamageWithoutRuneMods.dps}
-        </DamageStat>
-
-        <DamageStat label="Physical Rune DPS">
-          {calculatedDamage.runePotentialDpsValues.potentialPhysRuneDps}
-        </DamageStat>
-        <DamageStat label="Elemental Rune DPS">
-          {calculatedDamage.runePotentialDpsValues.potentialEleRuneDps}
-        </DamageStat>
-
-        {!!calculateForAmazonAscendancy && (
-          <DamageStat label="Accuracy Rune DPS">
-            {calculatedDamage.runePotentialDpsValues.potentialAccuracyRuneDps}
-          </DamageStat>
-        )}
-        <DamageStat label="Attack Speed Rune DPS">
-          {calculatedDamage.runePotentialDpsValues.potentialAttackSpeedRuneDps}
-        </DamageStat>
-
-        <div className="mt-2">
-          <label className="text-[10px] text-orange-700">
-            Calculated higest overall highest DPS:{" "}
-          </label>
-          <h3 className="font-medium flex flex-row w-full justify-between text-white border px-2 py-1 my-1 rounded border-orange-700 pt-2 items-center">
-            <span className="text-gray-200 ">
-              With{" "}
-              {calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets}{" "}
-              {calculatedDamage.highestPotentialDpsValue?.name}
-              {calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets >
-                1 && "s"}
-              :
-            </span>
-            <span className="text-base font-bold">
-              {calculatedDamage.highestPotentialDpsValue?.value}
-            </span>
-          </h3>
         </div>
       </div>
     </div>
