@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { copyToClipboard } from "../utils/clipboard";
-import CollapsibleItem from "../../components/CollapsibleItem";
+
 import Button from "src/components/Button";
 
 import { TransformedItemData } from "../query-weapons-with-amazon-accuracy/utils/calcs/types";
@@ -8,20 +8,7 @@ import ItemCalculatedDamage from "./ItemDamageStates";
 import Checkbox from "src/components/Checkbox";
 import toast from "react-hot-toast";
 import { checkItemPrice } from "../api/checkItemPrice";
-
-const WhisperButton = ({ whisper }: { whisper: string }) => {
-  const handleCopyWhisper = async () => {
-    await copyToClipboard(whisper);
-    toast.success("Whisper copied to clipboard");
-    // Optional: Add some visual feedback that the whisper was copied
-  };
-
-  return (
-    <Button size="small" onClick={handleCopyWhisper}>
-      Copy Whisper
-    </Button>
-  );
-};
+import clsx from "clsx";
 
 interface ItemProps {
   item: TransformedItemData;
@@ -38,6 +25,9 @@ const Item: React.FC<ItemProps> = ({
 }) => {
   const [amazonLocal, setAmazonLocal] = useState(calculateForAmazonAscendancy);
   const [listedAgo, setListedAgo] = useState<string>("");
+
+  const [isWhispered, setIsWhispered] = useState<boolean>(false);
+
   const [checkedPrices, setCheckedPrices] = useState<{
     url: string;
     prices: string[];
@@ -132,8 +122,23 @@ const Item: React.FC<ItemProps> = ({
     [item]
   );
 
+  const handleCopyWhisper = async () => {
+    await copyToClipboard(item.whisper);
+    setIsWhispered(true);
+    toast.success("Whisper copied to clipboard");
+    // Optional: Add some visual feedback that the whisper was copied
+  };
+
   return (
-    <div className="border border-gray-700 rounded-md  bg-gray-950 overflow-hidden">
+    <div
+      className={clsx(
+        "border border-gray-700 rounded-md  bg-gray-950 overflow-hidden",
+        isWhispered && "opacity-40"
+      )}
+      onClick={() => {
+        setIsWhispered(false);
+      }}
+    >
       <div className=" w-full border-b border-gray-700 bg-gradient-to-r from-gray-950 to-orange-950 p-2 flex-row flex justify-between">
         <div className="flex flex-row gap-2 items-center">
           {showSaveButton && (
@@ -178,43 +183,6 @@ const Item: React.FC<ItemProps> = ({
           calculatedDamageAmazonScaling={item.calculatedDamageAmazonScaling}
           calculatedDamage={item.calculatedDamage}
         />
-
-        <CollapsibleItem title="Mods" className="mt-2">
-          <div className="flex flex-col gap-1">
-            {item.runeMods && item.runeMods.length > 0 && (
-              <>
-                <h4 className="text-sm text-gray-400">Rune Mods:</h4>
-                <div className="bg-gray-900 p-2 rounded">
-                  {item.runeMods.map((mod: string, i: number) => (
-                    <div key={i} className="text-sm">
-                      {mod}
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-            {item.fracturedMods && item.fracturedMods.length > 0 && (
-              <>
-                <h4 className="text-sm text-gray-400">Fractured Mods:</h4>
-                <div className="bg-gray-900 p-2 rounded">
-                  {item.fracturedMods.map((mod: string, i: number) => (
-                    <div key={i} className="text-sm">
-                      {mod}
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-            <h4 className="text-sm text-gray-400">Mods:</h4>
-            <div className="bg-gray-900 p-2 rounded">
-              {item.explicitMods?.map((mod: string, i: number) => (
-                <div key={i} className="text-sm">
-                  {mod}
-                </div>
-              ))}
-            </div>
-          </div>
-        </CollapsibleItem>
       </div>
 
       <div className="flex justify-between items-end gap-4 p-2 pt-0">
@@ -306,7 +274,10 @@ const Item: React.FC<ItemProps> = ({
                 {item.price?.amount} {item.price?.currency}
               </span>
             </div>
-            <WhisperButton whisper={item.whisper} />
+
+            <Button size="small" onClick={handleCopyWhisper}>
+              Copy Whisper
+            </Button>
           </div>
         </div>
       </div>
