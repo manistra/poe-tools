@@ -8,18 +8,20 @@ import DamageStat from "./DamageStat";
 interface ItemCalculatedDamageProps {
   item: TransformedItemData;
   calculatedDamage: CalculatedDamage;
+  calculatedDamageAmazonScaling: CalculatedDamage;
   calculateForAmazonAscendancy?: boolean;
-  totalDpsNoAmazonScaling: number;
-  totalDpsNoAmazonScalingLabel: string;
 }
 
 const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
   item,
   calculatedDamage,
+  calculatedDamageAmazonScaling,
   calculateForAmazonAscendancy,
-  totalDpsNoAmazonScaling,
-  totalDpsNoAmazonScalingLabel,
 }) => {
+  const damageStats = calculateForAmazonAscendancy
+    ? calculatedDamageAmazonScaling
+    : calculatedDamage;
+
   return (
     <div className="flex flex-row gap-16 justify-between">
       <div className="flex text-xs w-1/2 max-w-[350px] flex-col">
@@ -28,23 +30,23 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
         <hr className="border-gray-700 my-1" />
 
         <DamageStat label="Damage Without Runes">
-          {calculatedDamage.totalDamageWithoutRuneMods.dps}
+          {damageStats.totalDamageWithoutRuneMods.dps}
         </DamageStat>
 
         <DamageStat label="Physical Rune DPS">
-          {calculatedDamage.runePotentialDpsValues.potentialPhysRuneDps}
+          {damageStats.runePotentialDpsValues.potentialPhysRuneDps}
         </DamageStat>
         <DamageStat label="Elemental Rune DPS">
-          {calculatedDamage.runePotentialDpsValues.potentialEleRuneDps}
+          {damageStats.runePotentialDpsValues.potentialEleRuneDps}
         </DamageStat>
 
         {!!calculateForAmazonAscendancy && (
           <DamageStat label="Accuracy Rune DPS">
-            {calculatedDamage.runePotentialDpsValues.potentialAccuracyRuneDps}
+            {damageStats.runePotentialDpsValues.potentialAccuracyRuneDps}
           </DamageStat>
         )}
         <DamageStat label="Attack Speed Rune DPS">
-          {calculatedDamage.runePotentialDpsValues.potentialAttackSpeedRuneDps}
+          {damageStats.runePotentialDpsValues.potentialAttackSpeedRuneDps}
         </DamageStat>
 
         <div className="mt-2">
@@ -53,15 +55,14 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
           </label>
           <h3 className="font-medium flex flex-row w-full justify-between text-white border px-2 py-1 my-1 rounded border-orange-700 pt-2 items-center">
             <span className="text-gray-200 ">
-              With{" "}
-              {calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets}{" "}
-              {calculatedDamage.highestPotentialDpsValue?.name}
-              {calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets >
-                1 && "s"}
+              With {damageStats.highestPotentialDpsValue?.numberOfRuneSockets}{" "}
+              {damageStats.highestPotentialDpsValue?.name}
+              {damageStats.highestPotentialDpsValue?.numberOfRuneSockets > 1 &&
+                "s"}
               :
             </span>
             <span className="text-base font-bold">
-              {calculatedDamage.highestPotentialDpsValue?.value}
+              {damageStats.highestPotentialDpsValue?.value}
             </span>
           </h3>
         </div>
@@ -114,12 +115,17 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
         <div className="py-2 mt-3 border-y">
           <DamageStat
             className="text-base !text-gray-400"
-            label={`pDPS (${totalDpsNoAmazonScalingLabel}):`}
+            label={`pDPS (${calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets} Physical Runes):`}
           >
             {(
               (calculatedDamage.totalDamageWithoutRuneMods.pdps /
                 (1 + (item.increasedPhysicalDamage || 0.001) / 100)) *
-              (1 + (25 + item.increasedPhysicalDamage || 0.001) / 100)
+              (1 +
+                (calculatedDamage.highestPotentialDpsValue
+                  ?.numberOfRuneSockets *
+                  25 +
+                  item.increasedPhysicalDamage || 0.001) /
+                  100)
             ).toFixed(2)}
           </DamageStat>
 
@@ -134,9 +140,9 @@ const ItemCalculatedDamage: React.FC<ItemCalculatedDamageProps> = ({
 
           <DamageStat
             className="text-base !text-blue-400"
-            label={`Total DPS Raw (${totalDpsNoAmazonScalingLabel}):`}
+            label={`Total DPS Raw (${calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets} ${calculatedDamage.highestPotentialDpsValue?.name}):`}
           >
-            {totalDpsNoAmazonScaling}
+            {calculatedDamage.highestPotentialDpsValue?.value}
           </DamageStat>
         </div>
       </div>

@@ -218,7 +218,7 @@ const PoELiveSearch = () => {
         </div>
         <Items
           automaticallyCheckPrice={autoCheckItemPrice}
-          items={itemsToShow.sort((a, b) => {
+          items={[...itemsToShow].sort((a, b) => {
             return (
               new Date(b.pingedAt).getTime() - new Date(a.pingedAt).getTime()
             );

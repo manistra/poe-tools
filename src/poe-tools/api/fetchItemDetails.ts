@@ -41,5 +41,8 @@ export const fetchItemDetails = async ({
       },
     });
 
-    return data.result;
+    return data.result.map((item: ItemData) => ({
+      ...item,
+      id: `${item.id}-${new Date().toISOString()}`,
+    }));
   });

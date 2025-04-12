@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { copyToClipboard } from "../utils/clipboard";
 import CollapsibleItem from "../../components/CollapsibleItem";
 import Button from "src/components/Button";
@@ -116,18 +116,21 @@ const Item: React.FC<ItemProps> = ({
     toast.success("Item saved");
   };
 
-  const handleCheckPrice = async () => {
-    try {
-      setIsPriceChecking(true);
-      const prices = await checkItemPrice(item);
-      setCheckedPrices(prices);
-    } catch (error) {
-      console.error("Error checking price:", error);
-      toast.error("Failed to check price");
-    } finally {
-      setIsPriceChecking(false);
-    }
-  };
+  const handleCheckPrice = useMemo(
+    () => async () => {
+      try {
+        setIsPriceChecking(true);
+        const prices = await checkItemPrice(item);
+        setCheckedPrices(prices);
+      } catch (error) {
+        console.error("Error checking price:", error);
+        toast.error("Failed to check price");
+      } finally {
+        setIsPriceChecking(false);
+      }
+    },
+    [item]
+  );
 
   return (
     <div className="border border-gray-700 rounded-md  bg-gray-950 overflow-hidden">
@@ -172,18 +175,11 @@ const Item: React.FC<ItemProps> = ({
         <ItemCalculatedDamage
           item={item}
           calculateForAmazonAscendancy={amazonLocal}
-          totalDpsNoAmazonScalingLabel={`${item.calculatedDamage.highestPotentialDpsValue?.numberOfRuneSockets} ${item.calculatedDamage.highestPotentialDpsValue?.name}`}
-          totalDpsNoAmazonScaling={
-            item.calculatedDamage.highestPotentialDpsValue?.value
-          }
-          calculatedDamage={
-            amazonLocal
-              ? item.calculatedDamageAmazonScaling
-              : item.calculatedDamage
-          }
+          calculatedDamageAmazonScaling={item.calculatedDamageAmazonScaling}
+          calculatedDamage={item.calculatedDamage}
         />
 
-        <CollapsibleItem title="Mods">
+        <CollapsibleItem title="Mods" className="mt-2">
           <div className="flex flex-col gap-1">
             {item.runeMods && item.runeMods.length > 0 && (
               <>
@@ -223,6 +219,15 @@ const Item: React.FC<ItemProps> = ({
 
       <div className="flex justify-between items-end gap-4 p-2 pt-0">
         <div className="flex flex-col">
+          <div className="text-[12px] text-gray-200 gap-2 flex items-center flex-row">
+            <label className="text-gray-400">Pinged At:</label>
+            <span className="text-gray-200">
+              {item.pingedAt
+                ? new Date(item.pingedAt).toLocaleTimeString()
+                : "N/A"}
+            </span>
+          </div>
+
           <div className="text-[12px] text-gray-200 gap-2 flex items-center flex-row">
             <label className="text-gray-400">Seller:</label>
             <span className="text-gray-200">{item.seller}</span>

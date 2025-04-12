@@ -7,6 +7,7 @@ interface CollapsibleItemProps {
   children: React.ReactNode;
   defaultOpen?: boolean;
   specialTitle?: string;
+  wrapperClassName?: string;
 }
 
 const CollapsibleItem: React.FC<CollapsibleItemProps> = ({
@@ -15,13 +16,14 @@ const CollapsibleItem: React.FC<CollapsibleItemProps> = ({
   children,
   className,
   specialTitle,
+  wrapperClassName,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(!defaultOpen);
   const handleCollapsible = () => {
     setIsCollapsed(!isCollapsed);
   };
   return (
-    <div className="border-b border-gray-600">
+    <div className={`border-b border-gray-600 ${wrapperClassName}`}>
       <button
         type="button"
         className="flex w-full cursor-pointer items-center justify-between"
