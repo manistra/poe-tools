@@ -13,6 +13,7 @@ import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 import { TransformedItemData } from "../utils/calcs/types";
 import Checkbox from "src/components/Checkbox";
 import { copyToClipboard } from "src/poe-tools/utils/clipboard";
+import toast from "react-hot-toast";
 
 const PoELiveSearch = () => {
   const [calculateForAmazonAscendancy, setCalculateForAmazonAscendancy] =
@@ -191,10 +192,16 @@ const PoELiveSearch = () => {
           }}
         />
         <Checkbox
-          label="Auto Check Item Price:"
+          label="Auto Check Item Price: (listings must be cleared to interact with this)"
           checked={autoCheckItemPrice}
+          disabled={itemDetails.length > 0}
           onChange={(value: boolean) => {
-            setAutoCheckItemPrice(value);
+            if (value && itemDetails.length > 0) {
+              toast.error("Please clear listings first");
+              return;
+            } else {
+              setAutoCheckItemPrice(value);
+            }
           }}
         />
       </CollapsibleItem>
