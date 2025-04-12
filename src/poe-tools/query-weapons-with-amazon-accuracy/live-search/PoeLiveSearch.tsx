@@ -77,8 +77,8 @@ const PoELiveSearch = () => {
           // Only send notification for items we haven't pinged before
 
           sendNotification(
-            `${transformedItem.price?.amount} ${transformedItem.price?.currency} - ${transformedItem.name}`,
-            `DPS: ${damageToCompare}, crit: ${transformedItem.criticalChance}`
+            `Accuracy ${transformedItem.totalAccuracy} DPS: ${transformedItem.calculatedDamage.totalDamageWithoutRuneMods?.dps}, crit: ${transformedItem.criticalChance}`,
+            `${transformedItem.price?.amount} ${transformedItem.price?.currency} - ${transformedItem.name}`
           );
 
           copyToClipboard(transformedItem.whisper);
