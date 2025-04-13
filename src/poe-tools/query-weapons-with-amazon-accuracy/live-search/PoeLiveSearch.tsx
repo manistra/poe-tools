@@ -171,7 +171,12 @@ const PoELiveSearch = () => {
         <div className="flex flex-col gap-2">
           <Input
             type="number"
-            label="Minimum Dps (Always takes the Calculated higest overall highest DPS for comparison):"
+            label={
+              itemDetails.length > 0
+                ? "Minimum Dps (listings must be cleared to interact with this):"
+                : "Minimum Dps (Always takes the Calculated higest overall highest DPS for comparison):"
+            }
+            disabled={itemDetails.length > 0}
             value={minDps}
             onChange={(value) => {
               setMinDps(Number(value));
@@ -192,7 +197,11 @@ const PoELiveSearch = () => {
           }}
         />
         <Checkbox
-          label="Auto Check Item Price: (listings must be cleared to interact with this)"
+          label={
+            itemDetails.length > 0
+              ? "Auto Check Item Price: (listings must be cleared to interact with this)"
+              : "Auto Check Item Price:"
+          }
           checked={autoCheckItemPrice}
           disabled={itemDetails.length > 0}
           onChange={(value: boolean) => {
