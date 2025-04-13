@@ -4,7 +4,7 @@ import { fetchItemIds } from "./fetchItemIds";
 
 const getQueryData = (item: TransformedItemData) => {
   const crit = item?.criticalChance?.replace("%", "");
-  const dps = item?.calculatedDamage?.highestPotentialDpsValue.value;
+  const dps = item?.calculatedDamage?.totalDamageWithoutRuneMods?.dps;
 
   const queryData = {
     query: {
