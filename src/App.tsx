@@ -3,10 +3,13 @@ import React, { useState } from "react";
 import SavedItemsModal from "./poe-tools/components/SavedItemsModal";
 import SettingsModal from "./poe-tools/components/SettingsModal";
 import PoeLiveSearch from "./poe-tools/live-search/PoeLiveSearch";
+import { sendNotification } from "./poe-tools/utils/useNotification";
 
 export default function App() {
   const [isSavedItemsOpen, setIsSavedItemsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  sendNotification("Whisper Sent");
 
   return (
     <div>

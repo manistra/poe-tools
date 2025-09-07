@@ -7,6 +7,7 @@ import { ItemData, SearchConfig } from "./types";
 import { toast } from "react-hot-toast";
 import { useSimpleMultiWebSocket } from "./useSimpleMultiWebSocket";
 import { getActiveSearchConfigs } from "./searchConfigManager";
+import { sendNotification } from "../../utils/useNotification";
 
 interface UsePoeLiveSearchReturn {
   searchUrls: string[];
@@ -149,17 +150,36 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
                 .then(() => {
                   setLastWhisperTime(now);
                   addLog("Auto-whisper sent successfully");
+
+                  // Send notification for successful whisper
+                  sendNotification(
+                    "Whisper Sent",
+                    `Auto-whisper sent for ${firstItem.item.name} from ${currentBatch.searchLabel}`
+                  );
                 })
                 .catch((error: Error) => {
                   addLog(`Auto-whisper failed: ${error.message}`);
+
+                  // Send notification for failed whisper
+                  sendNotification(
+                    "Whisper Failed",
+                    `Failed to send whisper for ${firstItem.item.name}: ${error.message}`
+                  );
                 });
             });
           }
         } else {
+          const remainingCooldown = Math.ceil(
+            (40000 - timeSinceLastWhisper) / 1000
+          );
           addLog(
-            `Auto-whisper blocked - ${Math.ceil(
-              (40000 - timeSinceLastWhisper) / 1000
-            )}s cooldown remaining`
+            `Auto-whisper blocked - ${remainingCooldown}s cooldown remaining`
+          );
+
+          // Send notification for items found during cooldown
+          sendNotification(
+            "Items Found (Cooldown)",
+            `${newItems.length} items found from ${currentBatch.searchLabel} but whisper is on cooldown (${remainingCooldown}s remaining)`
           );
         }
       }
