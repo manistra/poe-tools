@@ -8,6 +8,7 @@ import { toast } from "react-hot-toast";
 import { useSimpleMultiWebSocket } from "./useSimpleMultiWebSocket";
 import { getActiveSearchConfigs } from "./searchConfigManager";
 import { sendNotification } from "../../utils/useNotification";
+import { sendWhisper } from "../../api/sendWhisper";
 
 interface UsePoeLiveSearchReturn {
   searchUrls: string[];
@@ -93,7 +94,46 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
   >([]);
   const [isProcessingQueue, setIsProcessingQueue] = useState(false);
 
-  // Process rate-limited queue
+  // Add this new function for immediate whisper
+  const sendImmediateWhisper = useCallback(
+    async (item: ItemData) => {
+      if (!item.listing?.hideout_token) {
+        addLog(`No hideout token for item ${item.id}`);
+        return;
+      }
+
+      try {
+        console.log("🚀 IMMEDIATE WHISPER - Sending whisper for item:", item);
+        addLog(`Immediate auto-whisper for ${item.item.name}`);
+
+        const response = await sendWhisper({
+          itemId: item.id,
+          hideoutToken: item.listing.hideout_token,
+          searchQueryId: "",
+        });
+
+        setLastWhisperTime(Date.now());
+        addLog("Immediate auto-whisper sent successfully");
+
+        sendNotification(
+          "Porting to Hideout",
+          `Auto-whisper sent for ${item.item.name}`
+        );
+
+        return response;
+      } catch (error: any) {
+        addLog(`Immediate auto-whisper failed: ${error.message}`);
+        sendNotification(
+          "Porting to Hideout Failed",
+          `Failed to send whisper for ${item.item.name}: ${error.message}`
+        );
+        throw error;
+      }
+    },
+    [addLog]
+  );
+
+  // Modify the processQueue function to trigger immediate whisper
   const processQueue = useCallback(async () => {
     if (isProcessingQueue || rateLimitQueue.length === 0) return;
 
@@ -128,45 +168,18 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
 
       setItemDetails((prev) => [...newItems, ...prev]);
 
-      // Auto-whisper logic
+      // IMMEDIATE AUTO-WHISPER - Trigger as soon as we have item details
       if (autoWhisper && newItems.length > 0) {
         const now = Date.now();
         const timeSinceLastWhisper = now - lastWhisperTime;
 
         if (timeSinceLastWhisper >= 40000) {
-          // 40 seconds have passed, send whisper for the first item
           const firstItem = newItems[0];
           if (firstItem.listing?.hideout_token) {
-            console.log("🔧 Auto-whispering for item:", firstItem);
-            addLog(`Auto-whispering for item from ${currentBatch.searchLabel}`);
-
-            // Import sendWhisper dynamically to avoid circular imports
-            import("../../api/sendWhisper").then(({ sendWhisper }) => {
-              sendWhisper({
-                itemId: firstItem.id,
-                hideoutToken: firstItem.listing?.hideout_token,
-                searchQueryId: "",
-              })
-                .then(() => {
-                  setLastWhisperTime(now);
-                  addLog("Auto-whisper sent successfully");
-
-                  // Send notification for successful whisper
-                  sendNotification(
-                    "Porting to Hideout",
-                    `Auto-whisper sent for ${firstItem.item.name} from ${currentBatch.searchLabel}`
-                  );
-                })
-                .catch((error: Error) => {
-                  addLog(`Auto-whisper failed: ${error.message}`);
-
-                  // Send notification for failed whisper
-                  sendNotification(
-                    "Porting to Hideout Failed",
-                    `Failed to send whisper for ${firstItem.item.name}: ${error.message}`
-                  );
-                });
-            });
+            // Send whisper immediately with the actual item data
+            sendImmediateWhisper(firstItem);
+          } else {
+            addLog(`First item ${firstItem.id} has no hideout token`);
           }
         } else {
           const remainingCooldown = Math.ceil(
@@ -176,7 +189,6 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
             `Auto-whisper blocked - ${remainingCooldown}s cooldown remaining`
           );
 
-          // Send notification for items found during cooldown
           sendNotification(
             "Items Found (Porting to Hideout on Cooldown)",
             `${newItems.length} items found from ${currentBatch.searchLabel} but whisper is on cooldown (${remainingCooldown}s remaining)`
@@ -208,14 +220,20 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
     } finally {
       setIsProcessingQueue(false);
     }
-  }, [isProcessingQueue, rateLimitQueue]); // Remove addLog to prevent infinite loop
+  }, [
+    isProcessingQueue,
+    rateLimitQueue,
+    autoWhisper,
+    lastWhisperTime,
+    sendImmediateWhisper,
+    addLog,
+  ]);
 
   // Process queue when it changes
   useEffect(() => {
     if (rateLimitQueue.length > 0 && !isProcessingQueue) {
-      // Add delay between requests to respect rate limits
-      const delay = 1000; // 1 second delay between requests
-      setTimeout(processQueue, delay);
+      // Remove the delay completely - process immediately
+      processQueue();
     }
   }, [rateLimitQueue, isProcessingQueue, processQueue]);
 
