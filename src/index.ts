@@ -1,4 +1,11 @@
-import { app, BrowserWindow, Menu, ipcMain, shell } from "electron";
+import {
+  app,
+  BrowserWindow,
+  Menu,
+  ipcMain,
+  shell,
+  globalShortcut,
+} from "electron";
 import { setupWebSocketHandlers } from "./websocketHandler";
 import { setupApiHandler } from "./apiHandler";
 import { setupAutoUpdater } from "./autoUpdater";
@@ -13,18 +20,56 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
+let mainWindow: BrowserWindow;
+
 const createWindow = (): void => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     height: 600,
     width: 800,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: false,
       contextIsolation: true,
+      webSecurity: true,
     },
     frame: true,
     autoHideMenuBar: true,
+  });
+
+  // Set Content Security Policy to allow WebSocket connections
+  mainWindow.webContents.session.webRequest.onHeadersReceived(
+    (details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          "Content-Security-Policy": [
+            "default-src 'self' 'unsafe-inline' data:; connect-src 'self' wss://www.pathofexile.com https://www.pathofexile.com; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
+          ],
+        },
+      });
+    }
+  );
+
+  // Create context menu for right-click inspect
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Inspect Element",
+      click: () => {
+        mainWindow.webContents.openDevTools();
+      },
+    },
+    {
+      label: "Toggle DevTools",
+      click: () => {
+        mainWindow.webContents.toggleDevTools();
+      },
+    },
+  ]);
+
+  // Set up right-click context menu
+  mainWindow.webContents.on("context-menu", () => {
+    contextMenu.popup();
   });
 
   Menu.setApplicationMenu(null);
@@ -34,7 +79,7 @@ const createWindow = (): void => {
 
   // Open the DevTools.
   // Comment this out for production
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -45,6 +90,15 @@ app.on("ready", () => {
   setupWebSocketHandlers();
   setupApiHandler();
   setupAutoUpdater();
+
+  // Register global shortcuts for DevTools
+  globalShortcut.register("CommandOrControl+Shift+I", () => {
+    mainWindow.webContents.toggleDevTools();
+  });
+
+  globalShortcut.register("F12", () => {
+    mainWindow.webContents.toggleDevTools();
+  });
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -62,6 +116,11 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+// Clean up global shortcuts when the app is about to quit
+app.on("will-quit", () => {
+  globalShortcut.unregisterAll();
 });
 
 // In this file you can include the rest of your app's specific main process

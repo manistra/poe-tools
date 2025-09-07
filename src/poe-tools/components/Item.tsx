@@ -3,7 +3,7 @@ import { copyToClipboard } from "../utils/clipboard";
 
 import Button from "src/components/Button";
 
-import { TransformedItemData } from "../live-search/types";
+import { TransformedItemData } from "../live-search/utils/types";
 
 import toast from "react-hot-toast";
 
@@ -85,9 +85,7 @@ const Item: React.FC<ItemProps> = ({
 
   const handleCopyWhisper = async () => {
     await copyToClipboard(item.whisper);
-    setIsWhispered(true);
     toast.success("Whisper copied to clipboard");
-    // Optional: Add some visual feedback that the whisper was copied
   };
 
   const handleSendWhisper = async () => {
@@ -129,31 +127,6 @@ const Item: React.FC<ItemProps> = ({
       }}
     >
       <div className=" w-full border-b border-gray-700 bg-gradient-to-r from-gray-950 to-orange-950 p-2 flex-row flex justify-between">
-        <div className="flex flex-row gap-2 items-center">
-          {showSaveButton && (
-            <button
-              className="text-xs font-bold text-gray-400"
-              onClick={handleSaveItem}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="size-5 hover:text-gray-200 transition-colors duration-200"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
-                />
-              </svg>
-            </button>
-          )}
-          <span className="text-gray-200 text-base font-bold">{item.name}</span>
-        </div>
-
         <ItemMods item={item} />
       </div>
 
@@ -177,6 +150,15 @@ const Item: React.FC<ItemProps> = ({
             <label className="text-gray-400">Listed:</label>
             <span className="text-gray-200">{listedAgo} </span>
           </div>
+
+          {item.searchLabel && (
+            <div className="text-[12px] text-gray-200 gap-2 flex items-center flex-row">
+              <label className="text-gray-400">Found by:</label>
+              <span className="text-blue-400 text-xs bg-blue-900/30 px-2 py-1 rounded">
+                {item.searchLabel}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-row items-end gap-2">
@@ -196,7 +178,7 @@ const Item: React.FC<ItemProps> = ({
                 <Button
                   size="small"
                   onClick={handleSendWhisper}
-                  disabled={isSendingWhisper || isWhispered}
+                  disabled={isSendingWhisper}
                   className={clsx(
                     isSendingWhisper && "opacity-50 cursor-not-allowed",
                     isWhispered && "bg-green-600 hover:bg-green-700"
@@ -204,9 +186,7 @@ const Item: React.FC<ItemProps> = ({
                 >
                   {isSendingWhisper
                     ? "Sending..."
-                    : isWhispered
-                    ? "Sent"
-                    : "Send Whisper"}
+                    : "Travel to Hideout / Send Whisper"}
                 </Button>
               )}
             </div>

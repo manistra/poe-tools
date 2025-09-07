@@ -7,33 +7,39 @@ import { contextBridge, ipcRenderer } from "electron";
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld("electron", {
   websocket: {
-    connect: (wsUri: string, sessionId: string) => {
-      ipcRenderer.send("ws-connect", { wsUri, sessionId });
+    connect: (wsUri: string, sessionId: string, searchId: string) => {
+      ipcRenderer.send("ws-connect", { wsUri, sessionId, searchId });
     },
-    disconnect: () => {
-      ipcRenderer.send("ws-disconnect");
+    disconnect: (searchId?: string) => {
+      ipcRenderer.send("ws-disconnect", searchId);
     },
-    onConnected: (callback: () => void) => {
-      ipcRenderer.on("ws-connected", callback);
+    onConnected: (callback: (searchId: string) => void) => {
+      const wrappedCallback = (_event: any, searchId: string) =>
+        callback(searchId);
+      ipcRenderer.on("ws-connected", wrappedCallback);
       return () => {
-        ipcRenderer.removeListener("ws-connected", callback);
+        ipcRenderer.removeListener("ws-connected", wrappedCallback);
       };
     },
-    onDisconnected: (callback: () => void) => {
-      ipcRenderer.on("ws-disconnected", callback);
+    onDisconnected: (callback: (searchId: string) => void) => {
+      const wrappedCallback = (_event: any, searchId: string) =>
+        callback(searchId);
+      ipcRenderer.on("ws-disconnected", wrappedCallback);
       return () => {
-        ipcRenderer.removeListener("ws-disconnected", callback);
+        ipcRenderer.removeListener("ws-disconnected", wrappedCallback);
       };
     },
-    onMessage: (callback: (data: any) => void) => {
-      const wrappedCallback = (_event: any, data: any) => callback(data);
+    onMessage: (callback: (searchId: string, data: any) => void) => {
+      const wrappedCallback = (_event: any, searchId: string, data: any) =>
+        callback(searchId, data);
       ipcRenderer.on("ws-message", wrappedCallback);
       return () => {
         ipcRenderer.removeListener("ws-message", wrappedCallback);
       };
     },
-    onError: (callback: (error: string) => void) => {
-      const wrappedCallback = (_event: any, error: string) => callback(error);
+    onError: (callback: (searchId: string, error: string) => void) => {
+      const wrappedCallback = (_event: any, searchId: string, error: string) =>
+        callback(searchId, error);
       ipcRenderer.on("ws-error", wrappedCallback);
       return () => {
         ipcRenderer.removeListener("ws-error", wrappedCallback);
@@ -49,6 +55,9 @@ contextBridge.exposeInMainWorld("electron", {
       params?: Record<string, string>;
     }) => {
       return ipcRenderer.invoke("api-request", options);
+    },
+    getPoeSessionId: () => {
+      return ipcRenderer.invoke("get-poe-session-id");
     },
   },
   updates: {

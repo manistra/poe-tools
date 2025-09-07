@@ -25,6 +25,7 @@ export const sendWhisper = async ({
     const requestBody = {
       item: itemId,
       token: hideoutToken,
+      continue: true,
       ...(searchQueryId && { query: searchQueryId }),
     };
 

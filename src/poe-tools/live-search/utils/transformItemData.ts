@@ -1,4 +1,4 @@
-import { ItemData, TransformedItemData } from "../types";
+import { ItemData, TransformedItemData } from "./types";
 
 export function transformItemData(rawItem: ItemData): TransformedItemData {
   const transformedItem: TransformedItemData = {
@@ -20,6 +20,7 @@ export function transformItemData(rawItem: ItemData): TransformedItemData {
       : undefined,
     whisper: rawItem?.listing?.whisper,
     hideoutToken: rawItem?.listing?.hideout_token,
+    searchLabel: rawItem?.searchLabel,
     listedAt: rawItem?.listing?.indexed,
   };
 
