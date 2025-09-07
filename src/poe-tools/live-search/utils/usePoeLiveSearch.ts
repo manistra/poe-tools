@@ -153,7 +153,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
 
                   // Send notification for successful whisper
                   sendNotification(
-                    "Whisper Sent",
+                    "Porting to Hideout",
                     `Auto-whisper sent for ${firstItem.item.name} from ${currentBatch.searchLabel}`
                   );
                 })
@@ -162,7 +162,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
 
                   // Send notification for failed whisper
                   sendNotification(
-                    "Whisper Failed",
+                    "Porting to Hideout Failed",
                     `Failed to send whisper for ${firstItem.item.name}: ${error.message}`
                   );
                 });
@@ -178,7 +178,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
 
           // Send notification for items found during cooldown
           sendNotification(
-            "Items Found (Cooldown)",
+            "Items Found (Porting to Hideout on Cooldown)",
             `${newItems.length} items found from ${currentBatch.searchLabel} but whisper is on cooldown (${remainingCooldown}s remaining)`
           );
         }
