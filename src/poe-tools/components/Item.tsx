@@ -1,38 +1,30 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { copyToClipboard } from "../utils/clipboard";
 
 import Button from "src/components/Button";
 
-import { TransformedItemData } from "../query-weapons-with-amazon-accuracy/utils/calcs/types";
-import ItemCalculatedDamage from "./ItemDamageStates";
-import Checkbox from "src/components/Checkbox";
+import { TransformedItemData } from "../live-search/types";
+
 import toast from "react-hot-toast";
-import { checkItemPrice } from "../api/checkItemPrice";
+
 import clsx from "clsx";
+import ItemMods from "./ItemMods";
+import { sendWhisper } from "../api/sendWhisper";
 
 interface ItemProps {
   item: TransformedItemData;
-  calculateForAmazonAscendancy?: boolean;
   showSaveButton?: boolean;
-  automaticallyCheckPrice?: boolean;
 }
 
 const Item: React.FC<ItemProps> = ({
   item,
-  calculateForAmazonAscendancy = true,
+
   showSaveButton,
-  automaticallyCheckPrice = false,
 }) => {
-  const [amazonLocal, setAmazonLocal] = useState(calculateForAmazonAscendancy);
   const [listedAgo, setListedAgo] = useState<string>("");
 
   const [isWhispered, setIsWhispered] = useState<boolean>(false);
-
-  const [checkedPrices, setCheckedPrices] = useState<{
-    url: string;
-    prices: string[];
-  }>({ url: "", prices: [] });
-  const [isPriceChecking, setIsPriceChecking] = useState(false);
+  const [isSendingWhisper, setIsSendingWhisper] = useState<boolean>(false);
 
   // Calculate and format the time difference
   const calculateTimeDifference = () => {
@@ -72,21 +64,6 @@ const Item: React.FC<ItemProps> = ({
     return () => clearInterval(intervalId);
   }, [item.listedAt]);
 
-  useEffect(() => {
-    setAmazonLocal(calculateForAmazonAscendancy);
-  }, [calculateForAmazonAscendancy]);
-
-  // Auto price check effect
-  useEffect(() => {
-    if (
-      automaticallyCheckPrice &&
-      !checkedPrices?.prices?.length &&
-      !isPriceChecking
-    ) {
-      handleCheckPrice();
-    }
-  }, [automaticallyCheckPrice, item.id, checkedPrices?.prices?.length]);
-
   const handleSaveItem = () => {
     const savedItems = JSON.parse(
       window.localStorage.getItem("savedItems") || "[]"
@@ -106,27 +83,39 @@ const Item: React.FC<ItemProps> = ({
     toast.success("Item saved");
   };
 
-  const handleCheckPrice = useMemo(
-    () => async () => {
-      try {
-        setIsPriceChecking(true);
-        const prices = await checkItemPrice(item);
-        setCheckedPrices(prices);
-      } catch (error) {
-        console.error("Error checking price:", error);
-        toast.error("Failed to check price");
-      } finally {
-        setIsPriceChecking(false);
-      }
-    },
-    [item]
-  );
-
   const handleCopyWhisper = async () => {
     await copyToClipboard(item.whisper);
     setIsWhispered(true);
     toast.success("Whisper copied to clipboard");
     // Optional: Add some visual feedback that the whisper was copied
+  };
+
+  const handleSendWhisper = async () => {
+    if (!item.hideoutToken) {
+      toast.error("No hideout token available for this item");
+      return;
+    }
+
+    setIsSendingWhisper(true);
+    try {
+      const response = await sendWhisper({
+        itemId: item.id,
+        hideoutToken: item.hideoutToken,
+        searchQueryId: item.searchQueryId,
+      });
+
+      if (response.success) {
+        setIsWhispered(true);
+        toast.success("Whisper sent successfully");
+      } else {
+        toast.error(response.error || "Failed to send whisper");
+      }
+    } catch (error) {
+      console.error("Error sending whisper:", error);
+      toast.error("Failed to send whisper");
+    } finally {
+      setIsSendingWhisper(false);
+    }
   };
 
   return (
@@ -165,24 +154,7 @@ const Item: React.FC<ItemProps> = ({
           <span className="text-gray-200 text-base font-bold">{item.name}</span>
         </div>
 
-        <span className="flex flex-row gap-2 items-center">
-          <label className="text-xs text-gray-400">Amazon Scaling</label>
-          <Checkbox
-            className="w-4 h-4"
-            checked={amazonLocal}
-            onChange={(value: boolean) => {
-              setAmazonLocal(value);
-            }}
-          />
-        </span>
-      </div>
-      <div className="flex flex-col gap-2 p-2">
-        <ItemCalculatedDamage
-          item={item}
-          calculateForAmazonAscendancy={amazonLocal}
-          calculatedDamageAmazonScaling={item.calculatedDamageAmazonScaling}
-          calculatedDamage={item.calculatedDamage}
-        />
+        <ItemMods item={item} />
       </div>
 
       <div className="flex justify-between items-end gap-4 p-2 pt-0">
@@ -208,65 +180,6 @@ const Item: React.FC<ItemProps> = ({
         </div>
 
         <div className="flex flex-row items-end gap-2">
-          {isPriceChecking ? (
-            <div className="flex items-center justify-center p-2">
-              <svg
-                className="animate-spin h-5 w-5 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-            </div>
-          ) : checkedPrices?.prices?.length ? (
-            <div>
-              <span className="text-[9px] text-gray-300">
-                Showing first 4 compared prices:
-              </span>
-              <div className="flex flex-col gap-1 border-gray-700 border-t">
-                <div className="flex flex-wrap">
-                  <span className="text-gray-200 text-[11px]">
-                    <span className="text-purple-400 mr-[2px]">[</span>
-                    {checkedPrices.prices.join(", ")}
-                    <span className="text-purple-400 ml-[2px]">]</span>
-                  </span>
-                </div>
-                <Button
-                  className="bg-gradient-to-r from-purple-950 to-gray-900 mt-auto"
-                  size="small"
-                  onClick={() => {
-                    const url =
-                      checkedPrices.url || "https://www.pathofexile.com/trade";
-                    window.electron.shell.openExternal(url);
-                  }}
-                >
-                  Open on Poe Trade
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <Button
-              size="small"
-              onClick={handleCheckPrice}
-              className="bg-gradient-to-r from-purple-950 to-gray-900"
-            >
-              Check Price
-            </Button>
-          )}
-
           <div className="flex flex-col items-center gap-2">
             <div className="text-sm text-gray-200 mr-2 flex flex-row items-center gap-2">
               <label className="text-xs text-gray-400">Price:</label>
@@ -275,9 +188,28 @@ const Item: React.FC<ItemProps> = ({
               </span>
             </div>
 
-            <Button size="small" onClick={handleCopyWhisper}>
-              Copy Whisper
-            </Button>
+            <div className="flex flex-col gap-1">
+              <Button size="small" onClick={handleCopyWhisper}>
+                Copy Whisper
+              </Button>
+              {item.hideoutToken && (
+                <Button
+                  size="small"
+                  onClick={handleSendWhisper}
+                  disabled={isSendingWhisper || isWhispered}
+                  className={clsx(
+                    isSendingWhisper && "opacity-50 cursor-not-allowed",
+                    isWhispered && "bg-green-600 hover:bg-green-700"
+                  )}
+                >
+                  {isSendingWhisper
+                    ? "Sending..."
+                    : isWhispered
+                    ? "Sent"
+                    : "Send Whisper"}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

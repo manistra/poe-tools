@@ -1,4 +1,4 @@
-import { ItemData } from "../query-weapons-with-amazon-accuracy/utils/calcs/types";
+import { ItemData } from "../live-search/types";
 import { extractSearchQueryId } from "../utils/extractSearchQueryId";
 import { getPoeSessionId } from "../utils/getPoeSessionId";
 import { poe2SearchUrl } from "./api";

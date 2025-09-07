@@ -1,11 +1,11 @@
-import { DamageWithoutRuneModsResult } from "./helpers/getDamageWithoutRuneMods";
-import { RunePotentialDpsValues } from "./helpers/getPontentialDpsValuesForDifferentRunes";
+// import { DamageWithoutRuneModsResult } from "./helpers/getDamageWithoutRuneMods";
+// import { RunePotentialDpsValues } from "./helpers/getPontentialDpsValuesForDifferentRunes";
 
 export interface ItemData {
   id: string;
   time: string;
   item: {
-    sockets: any;
+    sockets: unknown;
     name: string;
     typeLine: string;
     properties: {
@@ -25,7 +25,7 @@ export interface ItemData {
   };
   pingedAt: string;
   listing?: {
-    indexed: any;
+    indexed: string;
     account: {
       name: string;
     };
@@ -34,20 +34,8 @@ export interface ItemData {
       currency: string;
     };
     whisper?: string;
+    hideout_token?: string;
   };
-}
-
-export interface CalculatedDamage {
-  highestPotentialDpsValue: {
-    value: number;
-    numberOfRuneSockets: number;
-    name: string;
-  };
-  pdps: number;
-  edps: number;
-  dps: number;
-  totalDamageWithoutRuneMods: DamageWithoutRuneModsResult;
-  runePotentialDpsValues: RunePotentialDpsValues;
 }
 
 export interface TransformedItemData {
@@ -57,20 +45,6 @@ export interface TransformedItemData {
   typeLine: string;
   time: string;
   listedAt: string;
-  criticalChance: string;
-  attacksPerSecond: string;
-  physicalDamage: string;
-  fireDamage?: string;
-  coldDamage?: string;
-  lightningDamage?: string;
-  increasedPhysicalDamage?: number;
-
-  elementalDamage: {
-    fire?: string;
-    cold?: string;
-    lightning?: string;
-  };
-  totalAccuracy: number;
   explicitMods?: string[];
   runeMods?: string[];
   fracturedMods?: string[];
@@ -80,6 +54,6 @@ export interface TransformedItemData {
     currency: string;
   };
   whisper?: string;
-  calculatedDamage: CalculatedDamage;
-  calculatedDamageAmazonScaling: CalculatedDamage;
+  hideoutToken?: string;
+  searchQueryId?: string;
 }

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useWebSocketConnection } from "./useWebSocketConnection";
+
 import { fetchItemDetails } from "src/poe-tools/api/fetchItemDetails";
 
 import useLogs from "src/helpers/useLogs";
 import { mockData } from "src/mockData";
-import { ItemData } from "../utils/calcs/types";
+import { ItemData } from "../types";
 import { toast } from "react-hot-toast";
+import { useWebSocketConnection } from "./useWebSocketConnection";
 
 interface UsePoeLiveSearchReturn {
   searchUrl: string;

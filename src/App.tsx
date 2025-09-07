@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import QueryWeaponsWithAmazonAccuracy from "./poe-tools/query-weapons-with-amazon-accuracy/QueryWeaponsWithAmazonAccuracy";
 
 import SavedItemsModal from "./poe-tools/components/SavedItemsModal";
 import SettingsModal from "./poe-tools/components/SettingsModal";
+import PoeLiveSearch from "./poe-tools/live-search/PoeLiveSearch";
 
 export default function App() {
   const [isSavedItemsOpen, setIsSavedItemsOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function App() {
         </button>
       </div>
 
-      <QueryWeaponsWithAmazonAccuracy />
+      <PoeLiveSearch />
 
       <SettingsModal
         isOpen={isSettingsOpen}

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ModalBase from "src/components/Modal";
 import Button from "src/components/Button";
-import { TransformedItemData } from "../query-weapons-with-amazon-accuracy/utils/calcs/types";
+import { ItemData } from "../live-search/types";
 import Items from "./Items";
+import { transformItemData } from "../live-search/utils/transformItemData";
 
 interface SavedItemsModalProps {
   isOpen: boolean;
@@ -13,7 +14,7 @@ const SavedItemsModal: React.FC<SavedItemsModalProps> = ({
   isOpen,
   setIsOpen,
 }) => {
-  const [savedItems, setSavedItems] = useState<TransformedItemData[]>([]);
+  const [savedItems, setSavedItems] = useState<ItemData[]>([]);
 
   useEffect(() => {
     const loadSavedItems = () => {
@@ -74,8 +75,7 @@ const SavedItemsModal: React.FC<SavedItemsModalProps> = ({
           </div>
         ) : (
           <Items
-            items={savedItems}
-            calculateForAmazonAscendancy={true}
+            items={savedItems.map(transformItemData)}
             showSaveButton={false}
           />
         )}

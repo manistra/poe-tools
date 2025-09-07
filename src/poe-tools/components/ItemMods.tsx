@@ -1,5 +1,5 @@
 import React from "react";
-import { TransformedItemData } from "../query-weapons-with-amazon-accuracy/utils/calcs/types";
+import { TransformedItemData } from "../live-search/types";
 
 interface ItemModsProps {
   item: TransformedItemData;
