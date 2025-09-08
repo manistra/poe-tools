@@ -34,9 +34,10 @@ interface UsePoeLiveSearchReturn {
   totalConnections: number;
   autoWhisper: boolean;
   toggleAutoWhisper: () => void;
-  whisperCooldown: number;
-  clearWhisperCooldown: () => void;
   lastWhisperItem: ItemData | undefined;
+  shouldShowCooldownModal: boolean;
+  isWhisperBlocked: boolean;
+  clearWhisperBlock: () => void;
 }
 
 export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
@@ -51,11 +52,12 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
     const stored = localStorage.getItem("poe-auto-whisper");
     return stored ? JSON.parse(stored) : false;
   });
-  const [lastWhisperTime, setLastWhisperTime] = useState<number>(0);
-  const [whisperCooldown, setWhisperCooldown] = useState<number>(0);
   const [lastWhisperItem, setLastWhisperItem] = useState<ItemData | undefined>(
     undefined
   );
+  const [shouldShowCooldownModal, setShouldShowCooldownModal] =
+    useState<boolean>(false);
+  const [isWhisperBlocked, setIsWhisperBlocked] = useState<boolean>(false);
 
   const {
     messages,
@@ -123,8 +125,9 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
           searchQueryId: "",
         });
 
-        setLastWhisperTime(Date.now());
         setLastWhisperItem(item);
+        setShouldShowCooldownModal(true);
+        setIsWhisperBlocked(true);
         addLog("Immediate auto-whisper sent successfully");
 
         sendNotification(
@@ -181,31 +184,23 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
       setItemDetails((prev) => [...newItems, ...prev]);
 
       // IMMEDIATE AUTO-WHISPER - Trigger as soon as we have item details
-      if (autoWhisper && newItems.length > 0) {
-        const now = Date.now();
-        const timeSinceLastWhisper = now - lastWhisperTime;
-
-        if (timeSinceLastWhisper >= 40000) {
-          const firstItem = newItems[0];
-          if (firstItem.listing?.hideout_token) {
-            // Send whisper immediately with the actual item data
-            sendImmediateWhisper(firstItem);
-          } else {
-            addLog(`First item ${firstItem.id} has no hideout token`);
-          }
+      if (autoWhisper && newItems.length > 0 && !isWhisperBlocked) {
+        const firstItem = newItems[0];
+        if (firstItem.listing?.hideout_token) {
+          // Send whisper immediately with the actual item data
+          sendImmediateWhisper(firstItem);
         } else {
-          const remainingCooldown = Math.ceil(
-            (40000 - timeSinceLastWhisper) / 1000
-          );
-          addLog(
-            `Auto-whisper blocked - ${remainingCooldown}s cooldown remaining`
-          );
-
-          sendNotification(
-            "Items Found (Porting to Hideout on Cooldown)",
-            `${newItems.length} items found from ${currentBatch.searchLabel} but whisper is on cooldown (${remainingCooldown}s remaining)`
-          );
+          addLog(`First item ${firstItem.id} has no hideout token`);
         }
+      } else if (autoWhisper && newItems.length > 0 && isWhisperBlocked) {
+        addLog(
+          `Auto-whisper blocked - modal is open, please close it to continue`
+        );
+
+        sendNotification(
+          "Items Found (Whisper Blocked)",
+          `${newItems.length} items found from ${currentBatch.searchLabel} but whisper is blocked by open modal`
+        );
       }
     } catch (error) {
       if (
@@ -236,7 +231,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
     isProcessingQueue,
     rateLimitQueue,
     autoWhisper,
-    lastWhisperTime,
+    isWhisperBlocked,
     sendImmediateWhisper,
     addLog,
   ]);
@@ -288,25 +283,6 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
     }
   }, [messages, allSearchConfigs, addLog, processedMessageIds]);
 
-  // Whisper cooldown timer
-  useEffect(() => {
-    if (lastWhisperTime > 0) {
-      const interval = setInterval(() => {
-        const now = Date.now();
-        const timeSinceLastWhisper = now - lastWhisperTime;
-        const remainingCooldown = Math.max(0, 40000 - timeSinceLastWhisper);
-
-        setWhisperCooldown(remainingCooldown);
-
-        if (remainingCooldown === 0) {
-          setLastWhisperTime(0);
-        }
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [lastWhisperTime]);
-
   const clearListings = () => {
     setItemDetails([]);
     clearMessages();
@@ -322,11 +298,11 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
     addLog(`Auto-whisper ${newValue ? "enabled" : "disabled"}`);
   };
 
-  // Clear whisper cooldown
-  const clearWhisperCooldown = () => {
-    setLastWhisperTime(0);
-    setWhisperCooldown(0);
-    addLog("Whisper cooldown cleared");
+  // Clear whisper block
+  const clearWhisperBlock = () => {
+    setIsWhisperBlocked(false);
+    setShouldShowCooldownModal(false);
+    addLog("Whisper block cleared - auto-whisper re-enabled");
   };
 
   // Connect to all active searches
@@ -385,8 +361,9 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
     totalConnections,
     autoWhisper,
     toggleAutoWhisper,
-    whisperCooldown,
-    clearWhisperCooldown,
     lastWhisperItem,
+    shouldShowCooldownModal,
+    isWhisperBlocked,
+    clearWhisperBlock,
   };
 };

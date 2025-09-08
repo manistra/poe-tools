@@ -26,20 +26,20 @@ const PoELiveSearch = () => {
     allSearchConfigs,
     autoWhisper,
     toggleAutoWhisper,
-    whisperCooldown,
-    clearWhisperCooldown,
     lastWhisperItem,
+    shouldShowCooldownModal,
+    clearWhisperBlock,
   } = usePoeLiveSearch();
 
   const { hasActiveConnections, totalConnections, connectionStatuses } =
     useWebSocketConnection();
 
-  // Show cooldown modal when cooldown starts
+  // Show cooldown modal when whisper is sent
   useEffect(() => {
-    if (whisperCooldown > 0 && lastWhisperItem) {
+    if (shouldShowCooldownModal && lastWhisperItem) {
       setIsCooldownModalOpen(true);
     }
-  }, [whisperCooldown, lastWhisperItem]);
+  }, [shouldShowCooldownModal, lastWhisperItem]);
 
   // Check if any search is currently connecting
   const hasConnectingSearches = Array.from(connectionStatuses.values()).some(
@@ -218,9 +218,8 @@ const PoELiveSearch = () => {
       <CooldownModal
         isOpen={isCooldownModalOpen}
         setIsCooldownOpen={setIsCooldownModalOpen}
-        cooldownTime={whisperCooldown}
         lastWhisperItem={lastWhisperItem}
-        onClearCooldown={clearWhisperCooldown}
+        onClearCooldown={clearWhisperBlock}
       />
     </div>
   );
