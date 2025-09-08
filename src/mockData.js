@@ -1,5 +1,217 @@
 export const mockData = [
   {
+    id: "c98a9a657d87e452f321a3e57957a5e0a1d431e9ee92c0807c53ca2c4dd04160-2025-09-08T10:46:44.622Z",
+    listing: {
+      method: "psapi",
+      indexed: "2025-09-08T10:46:43Z",
+      stash: {
+        name: "珠宝 戒指",
+        x: 10,
+        y: 7,
+      },
+      price: {
+        type: "~b/o",
+        amount: 330,
+        currency: "exalted",
+      },
+      fee: 31570,
+      account: {
+        name: "kkk599#5002",
+        online: null,
+      },
+      hideout_token:
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJmY2Q4MDg3YzNiOTk1NGYzZGQyYWU4YTkwM2ZhOGUyNyIsImlzcyI6IldYMFltYnpIbSIsImF1ZCI6ImI4ZWQ4YzQwLThhMmQtNDU4OC04ODg4LWM3YjliOGJiZmRmMiIsInRvayI6ImhpZGVvdXQiLCJzdWIiOiJjOThhOWE2NTdkODdlNDUyZjMyMWEzZTU3OTU3YTVlMGExZDQzMWU5ZWU5MmMwODA3YzUzY2EyYzRkZDA0MTYwIiwiZGF0IjoiODFkNzRjMzRkMjVkMjcwYTQ0ODk4ZDFiN2Q2MmIxOTgiLCJpYXQiOjE3NTczMjg0MDQsImV4cCI6MTc1NzMyODcwNH0.ZFS5hKrO6HHRKJ0KWScWUJqHLTeFLKu9rb4ypdyUZK4",
+    },
+    item: {
+      realm: "poe2",
+      verified: true,
+      w: 1,
+      h: 1,
+      icon: "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9CYXNldHlwZXMvTGFwaXNBbXVsZXQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/572eeaf30b/LapisAmulet.png",
+      league: "Rise of the Abyssal",
+      id: "c98a9a657d87e452f321a3e57957a5e0a1d431e9ee92c0807c53ca2c4dd04160",
+      fractured: true,
+      name: "Plague Collar",
+      typeLine: "Lapis Amulet",
+      baseType: "Lapis Amulet",
+      rarity: "Rare",
+      ilvl: 80,
+      identified: true,
+      note: "~b/o 330 exalted",
+      properties: [
+        {
+          name: "Amulet",
+          values: [],
+          displayMode: 0,
+        },
+        {
+          name: "Quality (Defence Modifiers)",
+          values: [["+20%", 1]],
+          displayMode: 0,
+          type: 6,
+        },
+      ],
+      notableProperties: [
+        {
+          name: "Subterfuge Mask",
+          values: [
+            [
+              "+2 to [Evasion] Rating per 1 [ItemDefences|Item Energy Shield] on Equipped Helmet",
+              0,
+            ],
+          ],
+          displayMode: 0,
+          type: 28,
+          suffix: "55193",
+        },
+      ],
+      requirements: [
+        {
+          name: "Level",
+          values: [["60", 0]],
+          displayMode: 0,
+          type: 62,
+        },
+      ],
+      enchantMods: ["Allocates [evasion_and_energy_shield25|Subterfuge Mask]"],
+      implicitMods: ["+11 to [Intelligence|Intelligence]"],
+      explicitMods: [
+        "51% increased [Armour]",
+        "56% increased maximum [EnergyShield|Energy Shield]",
+        "+3 to Level of all [Projectile] Skills",
+        "+16% to all [ElementalDamage|Elemental] [Resistances]",
+      ],
+      fracturedMods: ["+301 to [Accuracy|Accuracy] Rating"],
+      desecratedMods: [
+        "21% increased [CriticalDamageBonus|Critical Damage Bonus]",
+      ],
+      desecrated: true,
+      frameType: 2,
+      extended: {
+        mods: {
+          explicit: [
+            {
+              name: "of the Sharpshooter",
+              tier: "S1",
+              level: 75,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_1202301673",
+                  min: "3",
+                  max: "3",
+                },
+              ],
+            },
+            {
+              name: "Girded",
+              tier: "P2",
+              level: 65,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_2866361420",
+                  min: "39",
+                  max: "44",
+                },
+              ],
+            },
+            {
+              name: "of the Rainbow",
+              tier: "S2",
+              level: 68,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_2901986750",
+                  min: "15",
+                  max: "16",
+                },
+              ],
+            },
+            {
+              name: "Unassailable",
+              tier: "P1",
+              level: 75,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_2482852589",
+                  min: "45",
+                  max: "50",
+                },
+              ],
+            },
+          ],
+          implicit: [
+            {
+              name: "",
+              tier: "",
+              level: 10,
+              magnitudes: [
+                {
+                  hash: "implicit.stat_328541901",
+                  min: "10",
+                  max: "15",
+                },
+              ],
+            },
+          ],
+          fractured: [
+            {
+              name: "Hunter's",
+              tier: "P2",
+              level: 58,
+              magnitudes: [
+                {
+                  hash: "fractured.stat_803737631",
+                  min: "237",
+                  max: "346",
+                },
+              ],
+            },
+          ],
+          enchant: [
+            {
+              name: "",
+              tier: "",
+              level: 1,
+              magnitudes: [
+                {
+                  hash: "enchant.stat_2954116742|55193",
+                  min: 1,
+                  max: 1,
+                },
+              ],
+            },
+          ],
+          desecrated: [
+            {
+              name: "of Rage",
+              tier: "S4",
+              level: 31,
+              magnitudes: [
+                {
+                  hash: "desecrated.stat_3556824919",
+                  min: "20",
+                  max: "24",
+                },
+              ],
+            },
+          ],
+        },
+        hashes: {
+          explicit: [
+            ["explicit.stat_2866361420", [1]],
+            ["explicit.stat_2482852589", [3]],
+            ["explicit.stat_1202301673", [0]],
+            ["explicit.stat_2901986750", [2]],
+          ],
+          implicit: [["implicit.stat_328541901", [0]]],
+          fractured: [["fractured.stat_803737631", [0]]],
+          enchant: [["enchant.stat_2954116742|55193", [0]]],
+          desecrated: [["desecrated.stat_3556824919", [0]]],
+        },
+      },
+    },
+  },
+  {
     id: "de51a69f046b7bd7cc3c41d58218e7893616fa1063d23ba58a129dc62b7cf518",
     listing: {
       method: "psapi",
@@ -652,4 +864,186 @@ export const mockData = [
       },
     },
   },
+  {
+    id: "74bc9af9272a95cef36a0eac524a2f189f534676cd555abe82559a66200d2d2c-2025-09-08T10:09:20.420Z",
+    time: new Date().toISOString(),
+    pingedAt: new Date().toISOString(),
+    searchLabel: "Dev Mock Search",
+    listing: {
+      method: "psapi",
+      indexed: "2025-09-08T10:09:17Z",
+      stash: {
+        name: "$$$",
+        x: 6,
+        y: 3,
+      },
+      price: {
+        type: "~b/o",
+        amount: 12,
+        currency: "divine",
+      },
+      fee: 20167,
+
+      account: {
+        name: "waywayahead#2474",
+        online: null,
+      },
+      hideout_token:
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI5Y2JjMjA1MWI1ODU5Mjc5NmEyNmU5OWEwMzAyMzVhMiIsImlzcyI6ImRHRTJ6OHZDSiIsImF1ZCI6ImI4ZWQ4YzQwLThhMmQtNDU4OC04ODg4LWM3YjliOGJiZmRmMiIsInRvayI6ImhpZGVvdXQiLCJzdWIiOiI3NGJjOWFmOTI3MmE5NWNlZjM2YTBlYWM1MjRhMmYxODlmNTM0Njc2Y2Q1NTVhYmU4MjU1OWE2NjIwMGQyZDJjIiwiZGF0IjoiZTNlZjI0OGE4ZWM0YTk3MTNjMTA0NDA4MmExNWJhOTIiLCJpYXQiOjE3NTczMjYxNjAsImV4cCI6MTc1NzMyNjQ2MH0.vQ--w2xNzMar6acvQzQ-WoB5ym8PaK-Lhbpb5TtFX5g",
+    },
+    item: {
+      realm: "poe2",
+      verified: true,
+      w: 2,
+      h: 3,
+      icon: "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvUXVpdmVycy9CYXNldHlwZXMvUXVpdmVyVmlzY2VyYWwiLCJ3IjoyLCJoIjozLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/1c5ba2c98f/QuiverVisceral.png",
+      league: "Rise of the Abyssal",
+      id: "74bc9af9272a95cef36a0eac524a2f189f534676cd555abe82559a66200d2d2c",
+      name: "Woe Stinger",
+      typeLine: "Visceral Quiver",
+      baseType: "Visceral Quiver",
+      rarity: "Rare",
+      ilvl: 80,
+      identified: true,
+      note: "~b/o 12 divine",
+      properties: [
+        {
+          name: "[Quiver]",
+          values: [],
+          displayMode: 0,
+        },
+      ],
+      requirements: [
+        {
+          name: "Level",
+          values: [["64", 0]],
+          displayMode: 0,
+          type: 62,
+        },
+      ],
+      implicitMods: [
+        "22% increased [Critical|Critical Hit Chance] for [Attack|Attacks]",
+      ],
+      explicitMods: [
+        "Adds 2 to 63 [Lightning] damage to [Attack|Attacks]",
+        "48% increased Damage with Bow Skills",
+        "36% increased [Projectile] Speed",
+        "27% increased [Critical|Critical Hit Chance] for [Attack|Attacks]",
+        "30% increased [CriticalDamageBonus|Critical Damage Bonus] for [Attack] Damage",
+        "16% increased [Attack] Speed",
+      ],
+      descrText: "Can only be equipped if you are wielding a Bow.",
+      frameType: 2,
+      extended: {
+        mods: {
+          explicit: [
+            {
+              name: "Rapid",
+              tier: "P2",
+              level: 55,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_3759663284",
+                  min: "34",
+                  max: "41",
+                },
+              ],
+            },
+            {
+              name: "Electrocuting",
+              tier: "P1",
+              level: 75,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_1754445556",
+                  min: "1",
+                  max: "4",
+                },
+                {
+                  hash: "explicit.stat_1754445556",
+                  min: "60",
+                  max: "71",
+                },
+              ],
+            },
+            {
+              name: "Lacerating",
+              tier: "P2",
+              level: 60,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_1241625305",
+                  min: "43",
+                  max: "50",
+                },
+              ],
+            },
+            {
+              name: "of Ferocity",
+              tier: "S2",
+              level: 59,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_3714003708",
+                  min: "30",
+                  max: "34",
+                },
+              ],
+            },
+            {
+              name: "of Renown",
+              tier: "S1",
+              level: 60,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_681332047",
+                  min: "14",
+                  max: "16",
+                },
+              ],
+            },
+            {
+              name: "of Calamity",
+              tier: "S3",
+              level: 44,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_2194114101",
+                  min: "25",
+                  max: "29",
+                },
+              ],
+            },
+          ],
+          implicit: [
+            {
+              name: "",
+              tier: "",
+              level: 80,
+              magnitudes: [
+                {
+                  hash: "implicit.stat_2194114101",
+                  min: "20",
+                  max: "30",
+                },
+              ],
+            },
+          ],
+        },
+        hashes: {
+          explicit: [
+            ["explicit.stat_1754445556", [1]],
+            ["explicit.stat_1241625305", [2]],
+            ["explicit.stat_3759663284", [0]],
+            ["explicit.stat_2194114101", [5]],
+            ["explicit.stat_3714003708", [3]],
+            ["explicit.stat_681332047", [4]],
+          ],
+          implicit: [["implicit.stat_2194114101", [0]]],
+        },
+      },
+    },
+  },
 ];
+
+// Add the new mock item for development

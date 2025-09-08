@@ -16,11 +16,7 @@ interface ItemProps {
   showSaveButton?: boolean;
 }
 
-const Item: React.FC<ItemProps> = ({
-  item,
-
-  showSaveButton,
-}) => {
+const Item: React.FC<ItemProps> = ({ item }) => {
   const [listedAgo, setListedAgo] = useState<string>("");
 
   const [isWhispered, setIsWhispered] = useState<boolean>(false);
@@ -127,7 +123,28 @@ const Item: React.FC<ItemProps> = ({
       }}
     >
       <div className=" w-full border-b border-gray-700 bg-gradient-to-r from-gray-950 to-orange-950 p-2 flex-row flex justify-between">
-        <ItemMods item={item} />
+        <div className="flex items-center gap-3 w-full">
+          {item?.icon && (
+            <div className="w-[170px] flex h-full items-center justify-center">
+              <img
+                src={item.icon}
+                alt={item.name || "Item"}
+                className="w-auto object-contain"
+                onLoad={() => {
+                  console.log("Image loaded successfully:", item.icon);
+                }}
+                onError={(e) => {
+                  console.error("Image failed to load:", item.icon, e);
+                  // Don't hide the image, show a placeholder instead
+                  e.currentTarget.style.display = "block";
+                  e.currentTarget.src =
+                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjMzc0MTUxIi8+CjxwYXRoIGQ9Ik0yNCAzNkMzMC42Mjc0IDM2IDM2IDMwLjYyNzQgMzYgMjRDMzYgMTcuMzcyNiAzMC42Mjc0IDEyIDI0IDEyQzE3LjM3MjYgMTIgMTIgMTcuMzcyNiAxMiAyNEMxMiAzMC42Mjc0IDE3LjM3MjYgMzYgMjQgMzZaIiBmaWxsPSIjNkI3MjgwIi8+CjxwYXRoIGQ9Ik0yNCAzMkMyOC40MTgzIDMyIDMyIDI4LjQxODMgMzIgMjRDMzIgMTkuNTgxNyAyOC40MTgzIDE2IDI0IDE2QzE5LjU4MTcgMTYgMTYgMTkuNTgxNyAxNiAyNEMxNiAyOC40MTgzIDE5LjU4MTcgMzIgMjQgMzJaIiBmaWxsPSIjOUI5QkE1Ii8+Cjwvc3ZnPgo=";
+                }}
+              />
+            </div>
+          )}
+          <ItemMods item={item} />
+        </div>
       </div>
 
       <div className="flex justify-between items-end gap-4 p-2 pt-0">
@@ -184,9 +201,7 @@ const Item: React.FC<ItemProps> = ({
                     isWhispered && "bg-green-600 hover:bg-green-700"
                   )}
                 >
-                  {isSendingWhisper
-                    ? "Sending..."
-                    : "Travel to Hideout / Send Whisper"}
+                  {isSendingWhisper ? "Traveling..." : "Travel to Hideout"}
                 </Button>
               )}
             </div>

@@ -9,6 +9,7 @@ import { useSimpleMultiWebSocket } from "./useSimpleMultiWebSocket";
 import { getActiveSearchConfigs } from "./searchConfigManager";
 import { sendNotification } from "../../utils/useNotification";
 import { sendWhisper } from "../../api/sendWhisper";
+import { mockData } from "../../../mockData";
 
 interface UsePoeLiveSearchReturn {
   searchUrls: string[];
@@ -71,6 +72,9 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
     console.log("🔧 Loaded configs:", configs);
     setActiveSearchConfigs(configs);
     setSearchUrls(configs.map((config) => config.url));
+
+    // Add mock item for development
+    setItemDetails(mockData as unknown as ItemData[]);
 
     // Don't auto-connect - let user decide when to start
     addLog(

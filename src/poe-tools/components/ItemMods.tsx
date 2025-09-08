@@ -13,22 +13,22 @@ const ItemMods: React.FC<ItemModsProps> = ({ item }) => {
 
       <hr className="mx-3 border-gray-900" />
 
-      <div className="">
-        {item.runeMods && item.runeMods.length > 0 && (
-          <>
-            <h4 className="text-sm text-gray-400">Runes:</h4>
-            <div className="flex-col flex">
-              {item.runeMods.map((mod: string, i: number) => (
+      {item.runeSockets !== undefined && (
+        <div>
+          <h4 className="text-sm text-gray-400">
+            Runes sockets: {item.runeSockets}
+          </h4>
+          <div className="flex-col flex">
+            {item.runeMods.length > 0 &&
+              item.runeMods.map((mod: string, i: number) => (
                 <div key={i} className="text-sm text-poe-mods-enchanted">
                   {mod}
                 </div>
               ))}
-            </div>
-          </>
-        )}
-      </div>
-
-      <hr className="mx-3 border-gray-900" />
+          </div>
+          <hr className="mx-3 mt-2 border-gray-900" />
+        </div>
+      )}
 
       <div className="">
         <h4 className="text-sm text-gray-400">Mods:</h4>
@@ -48,6 +48,7 @@ const ItemMods: React.FC<ItemModsProps> = ({ item }) => {
           ))}
         </div>
       </div>
+      {item.corrupted && <div className="text-sm text-red-700">Corrupted</div>}
     </div>
   );
 };

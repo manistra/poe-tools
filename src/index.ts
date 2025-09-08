@@ -44,7 +44,7 @@ const createWindow = (): void => {
         responseHeaders: {
           ...details.responseHeaders,
           "Content-Security-Policy": [
-            "default-src 'self' 'unsafe-inline' data:; connect-src 'self' wss://www.pathofexile.com https://www.pathofexile.com; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
+            "default-src 'self' 'unsafe-inline' data:; connect-src 'self' wss://www.pathofexile.com https://www.pathofexile.com; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://web.poecdn.com;",
           ],
         },
       });

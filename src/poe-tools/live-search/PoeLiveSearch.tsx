@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Button from "src/components/Button";
 import CollapsibleItem from "src/components/CollapsibleItem";
-import Input from "src/components/Input";
 
 import Items from "src/poe-tools/components/Items";
 
@@ -11,13 +10,9 @@ import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 import { transformItemData } from "./utils/transformItemData";
 import { usePoeLiveSearch } from "./utils/usePoeLiveSearch";
 import SearchConfigManager from "./components/SearchConfigManager";
-import { getActiveSearchConfigs } from "./utils/searchConfigManager";
 
 const PoELiveSearch = () => {
   const {
-    searchUrls,
-    setSearchUrls,
-    isConnected,
     connect,
     disconnect,
     error,
@@ -26,7 +21,6 @@ const PoELiveSearch = () => {
     isLoading,
     clearListings,
     activeSearchConfigs,
-    updateCurrentSearchUrl,
     connectionStatuses,
     hasActiveConnections,
     totalConnections,
@@ -37,7 +31,6 @@ const PoELiveSearch = () => {
   } = usePoeLiveSearch();
 
   const [showConfigManager, setShowConfigManager] = useState(false);
-  const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
 
   const handleClearListings = () => {
     clearListings();
@@ -47,10 +40,6 @@ const PoELiveSearch = () => {
     // This will trigger a re-render of the hook
     window.location.reload(); // Simple way to refresh the hook state
   };
-
-  const currentSearchUrl = activeSearchConfigs[currentSearchIndex]?.url || "";
-  const currentSearchLabel =
-    activeSearchConfigs[currentSearchIndex]?.label || "No Search Selected";
 
   return (
     <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">

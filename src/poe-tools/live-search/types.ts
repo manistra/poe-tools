@@ -56,4 +56,6 @@ export interface TransformedItemData {
   whisper?: string;
   hideoutToken?: string;
   searchQueryId?: string;
+  corrupted?: boolean;
+  runeSockets?: number;
 }
