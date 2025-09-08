@@ -7,7 +7,7 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   className?: string;
-  variant?: "default" | "danger" | "success" | "outline";
+  variant?: "default" | "danger" | "success" | "outline" | "text";
   size?: "small" | "medium" | "large";
   fullWidth?: boolean;
 }
@@ -48,6 +48,7 @@ const Button: React.FC<ButtonProps> = ({
             variant === "success",
           "border border-gray-500 bg-transparent hover:text-gray-200 hover:border-gray-200 text-gray-500":
             variant === "outline",
+          "bg-transparent": variant === "text",
         },
 
         // Width

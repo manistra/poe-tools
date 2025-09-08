@@ -332,7 +332,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
   // Connect to all active searches
   const connect = useCallback(() => {
     console.log(
-      "🔌 Connect function called - this should only happen when user clicks Start Monitoring"
+      "🔌 Connect function called - this should only happen when user clicks Start Sniping"
     );
     console.trace("🔍 Stack trace for connect call:");
     const configs = getSearchConfigs();

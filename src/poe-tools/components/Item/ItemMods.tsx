@@ -9,7 +9,7 @@ const ItemMods: React.FC<ItemModsProps> = ({ item }) => {
   return (
     <div className="flex flex-col gap-2 text-center border border-gray-800 bg-black rounded p-3 w-full h-full flex-1 justify-center">
       <h1 className="text-lg text-poe-mods-title">{item.name}</h1>
-      <div className="text-sm text-gray-500">{item.typeLine}</div>
+      <div className="text-sm text-gray-300 font-bold">{item.typeLine}</div>
 
       <hr className="mx-3 border-gray-900" />
 

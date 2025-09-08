@@ -12,9 +12,55 @@ import ItemMods from "./ItemMods";
 import { sendWhisper } from "../../api/sendWhisper";
 import StashVisualization from "./StashVisualization";
 
+// Import currency images
+import chaosImg from "src/assets/chaos.png";
+import divineImg from "src/assets/divine.png";
+import exaltedImg from "src/assets/exalted.png";
+
 interface ItemProps {
   item: TransformedItemData;
 }
+
+// Currency display component
+const CurrencyDisplay: React.FC<{ amount: number; currency: string }> = ({
+  amount,
+  currency,
+}) => {
+  const getCurrencyImage = (currency: string) => {
+    switch (currency.toLowerCase()) {
+      case "chaos":
+        return chaosImg;
+      case "divine":
+        return divineImg;
+      case "exalted":
+      case "exalt":
+        return exaltedImg;
+      default:
+        return null;
+    }
+  };
+
+  const currencyImage = getCurrencyImage(currency);
+
+  if (currencyImage) {
+    return (
+      <div className="flex items-center gap-1 text-[#aa9e82] text-[18px]">
+        <span>{amount} x</span>
+        <img
+          src={currencyImage}
+          alt={currency}
+          className="w-6 h-6 object-contain"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <span className="text-[#aa9e82]">
+      {amount} x {currency}
+    </span>
+  );
+};
 
 const Item: React.FC<ItemProps> = ({ item }) => {
   const [listedAgo, setListedAgo] = useState<string>("");
@@ -108,8 +154,15 @@ const Item: React.FC<ItemProps> = ({ item }) => {
           <ItemMods item={item} />
 
           <div className="flex-col h-full flex gap-5">
+            <div className="text-[12px] text-gray-200 flex items-center flex-col">
+              <label className="text-gray-400 text-[9px]">Found by:</label>
+              <span className=" text-xs text-[#e6e6e6] bg-gradient-to-r from-[#000000] to-green-900/20 px-2 py-1 rounded">
+                {item.searchLabel}
+              </span>
+            </div>
+
             {item?.icon && (
-              <div className="w-[170px] flex flex-col flex-1 max-w-[170px] items-center justify-center pt-5">
+              <div className="w-[170px] flex flex-col flex-1 max-w-[170px] items-center justify-center">
                 <img
                   src={item.icon}
                   alt={item.name || "Item"}
@@ -127,6 +180,15 @@ const Item: React.FC<ItemProps> = ({ item }) => {
                 />
               </div>
             )}
+            <div className="m-auto">
+              {item.price && (
+                <CurrencyDisplay
+                  amount={item.price.amount}
+                  currency={item.price.currency}
+                />
+              )}
+            </div>
+
             <StashVisualization x={item.stash?.x} y={item.stash?.y} />
           </div>
         </div>
@@ -166,26 +228,15 @@ const Item: React.FC<ItemProps> = ({ item }) => {
         <div className="flex flex-row items-center gap-2">
           <div className="flex flex-row items-center gap-5">
             <div className="text-sm text-gray-200 flex flex-col items-start">
-              <div>
-                <label className="text-xs mr-1 text-gray-400">Stash:</label>
-                <span className="text-gray-500 text-md text-nowrap">
-                  [X:
-                  <span className="text-gray-200 text-md text-nowrap">
-                    {" "}
-                    {item.stash?.x}
-                  </span>{" "}
-                  Y:
-                  <span className="text-gray-200 text-md text-nowrap">
-                    {" "}
-                    {item.stash?.y}
-                  </span>
-                  ]
-                </span>
-              </div>
-              <div>
+              <div className="flex items-center gap-1 flex-row">
                 <label className="text-xs mr-1 text-gray-400">Price:</label>
                 <span className="text-yellow-500 text-md text-nowrap">
-                  {item.price?.amount} {item.price?.currency}
+                  {item.price && (
+                    <CurrencyDisplay
+                      amount={item.price.amount}
+                      currency={item.price.currency}
+                    />
+                  )}
                 </span>
               </div>
             </div>

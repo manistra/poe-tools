@@ -8,7 +8,6 @@ import {
   deleteSearchConfig,
 } from "../utils/searchConfigManager";
 import { toast } from "react-hot-toast";
-import Checkbox from "src/components/Checkbox";
 
 interface LiveSearchItemProps {
   config: SearchConfig;
@@ -35,7 +34,9 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
 
   const handleUrlClick = async (url: string) => {
     try {
-      await window.electron.shell.openExternal(url);
+      // Remove "/live" suffix if it exists
+      const cleanUrl = url.endsWith("/live") ? url.slice(0, -5) : url;
+      await window.electron.shell.openExternal(cleanUrl);
     } catch (error) {
       console.error("Failed to open external URL:", error);
     }
@@ -96,25 +97,25 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
   return (
     <div
       className={clsx(
-        "flex-col items-center justify-between p-1 rounded border",
+        "flex-col items-center justify-between rounded border",
         isConnected
-          ? "border-green-600 bg-green-900/20"
+          ? "border-[#0d311e]/20"
           : isLoading
-          ? "border-yellow-600 bg-yellow-900/20"
-          : "border-gray-700 bg-gray-900"
+          ? "border-yellow-900/20 bg-yellow-900/20"
+          : "border-gray-900 bg-gray-900"
       )}
     >
-      <div className="flex items-center justify-between w-full bg-gradient-to-r from-[#0a0a1a] to-green-900/20">
+      <div className="flex items-center justify-between rounded p-1 w-full bg-gradient-to-r from-[#000000] to-green-900/20">
         <div className="flex-1 flex flex-row items-center gap-2 min-w-0 pl-2">
           <input
             type="checkbox"
             checked={config.isActive}
             onChange={() => handleActiveChange(config.id)}
-            className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+            className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2 opacity-60"
           />
           <button
             onClick={() => handleUrlClick(config.url)}
-            className="text-white font-bold truncate hover:text-blue-700 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1"
+            className="text-gray-400 truncate hover:text-blue-900 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1"
           >
             {config.label}
             <svg
@@ -137,20 +138,28 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
           )}
         </div>
         <div className="ml-2 flex items-center gap-2">
-          <div
-            className={clsx(
-              "w-2 h-2 rounded-full",
-              isConnected
-                ? "bg-green-400"
-                : isLoading
-                ? "bg-yellow-400 animate-pulse"
-                : "bg-red-400"
+          <div className="flex gap-2 mx-2">
+            {isConnected ? (
+              <Button
+                size="small"
+                variant="text"
+                onClick={() => onDisconnect(config.id)}
+                className="text-xs text-red-900/20 border border-red-900/20 p-2 hover:text-red-500 hover:border-red-500"
+              >
+                Disconnect
+              </Button>
+            ) : (
+              <Button
+                size="small"
+                variant="text"
+                onClick={() => onConnect(config)}
+                disabled={isLoading || isOpen}
+                className="text-xs text-green-700 border border-green-700 p-2 hover:text-green-500 hover:border-green-500"
+              >
+                {isLoading ? "Connecting..." : "Connect"}
+              </Button>
             )}
-          />
-          <span className="text-xs text-gray-400">
-            {isConnected ? "Live" : isLoading ? "Connecting..." : "Offline"}
-          </span>
-          <div className="flex gap-1 ml-2">
+
             <Button
               disabled={isConnected || isLoading}
               size="small"
@@ -174,27 +183,21 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
               </svg>
               Edit
             </Button>
-            {isConnected ? (
-              <Button
-                size="small"
-                variant="danger"
-                onClick={() => onDisconnect(config.id)}
-                className="text-xs px-2 py-1"
-              >
-                Disconnect
-              </Button>
-            ) : (
-              <Button
-                size="small"
-                variant="success"
-                onClick={() => onConnect(config)}
-                disabled={isLoading || isOpen}
-                className="text-xs px-2 py-1"
-              >
-                {isLoading ? "Connecting..." : "Connect"}
-              </Button>
-            )}
           </div>
+
+          <div
+            className={clsx(
+              "w-2 h-2 rounded-full",
+              isConnected
+                ? "bg-green-400"
+                : isLoading
+                ? "bg-yellow-400 animate-pulse"
+                : "bg-red-400"
+            )}
+          />
+          <span className="text-xs text-gray-400 mr-2">
+            {isConnected ? "Live" : isLoading ? "Connecting..." : "Offline"}
+          </span>
         </div>
       </div>
 

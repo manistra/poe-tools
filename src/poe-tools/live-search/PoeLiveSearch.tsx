@@ -100,7 +100,7 @@ const PoELiveSearch = () => {
             >
               {hasActiveConnections
                 ? `Monitoring ${totalConnections} searches...`
-                : "Ready to start monitoring"}
+                : "Ready to start sniping"}
             </span>
             {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
@@ -161,11 +161,11 @@ const PoELiveSearch = () => {
                 ? "Set POE Session ID First"
                 : allSearchConfigs.length === 0
                 ? "Add Searches First"
-                : "Start Monitoring"}
+                : "Start Sniping"}
             </Button>
           ) : (
             <Button variant="danger" onClick={disconnect}>
-              Stop Monitoring
+              Stop Sniping
             </Button>
           )}
         </div>
