@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import clsx from "clsx";
 import ItemMods from "./ItemMods";
 import { sendWhisper } from "../api/sendWhisper";
+import StashVisualization from "./StashVisualization";
 
 interface ItemProps {
   item: TransformedItemData;
@@ -122,32 +123,36 @@ const Item: React.FC<ItemProps> = ({ item }) => {
         setIsWhispered(false);
       }}
     >
-      <div className=" w-full border-b border-gray-700 bg-gradient-to-r from-gray-950 to-orange-950 p-2 flex-row flex justify-between">
-        <div className="flex items-center gap-3 w-full">
-          {item?.icon && (
-            <div className="w-[170px] flex h-full items-center justify-center">
-              <img
-                src={item.icon}
-                alt={item.name || "Item"}
-                className="w-auto object-contain"
-                onLoad={() => {
-                  console.log("Image loaded successfully:", item.icon);
-                }}
-                onError={(e) => {
-                  console.error("Image failed to load:", item.icon, e);
-                  // Don't hide the image, show a placeholder instead
-                  e.currentTarget.style.display = "block";
-                  e.currentTarget.src =
-                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjMzc0MTUxIi8+CjxwYXRoIGQ9Ik0yNCAzNkMzMC42Mjc0IDM2IDM2IDMwLjYyNzQgMzYgMjRDMzYgMTcuMzcyNiAzMC42Mjc0IDEyIDI0IDEyQzE3LjM3MjYgMTIgMTIgMTcuMzcyNiAxMiAyNEMxMiAzMC42Mjc0IDE3LjM3MjYgMzYgMjQgMzZaIiBmaWxsPSIjNkI3MjgwIi8+CjxwYXRoIGQ9Ik0yNCAzMkMyOC40MTgzIDMyIDMyIDI4LjQxODMgMzIgMjRDMzIgMTkuNTgxNyAyOC40MTgzIDE2IDI0IDE2QzE5LjU4MTcgMTYgMTYgMTkuNTgxNyAxNiAyNEMxNiAyOC40MTgzIDE5LjU4MTcgMzIgMjQgMzJaIiBmaWxsPSIjOUI5QkE1Ii8+Cjwvc3ZnPgo=";
-                }}
-              />
-            </div>
-          )}
+      <div className=" w-full border-b border-gray-700 bg-gradient-to-l from-gray-950 to-orange-950 p-2 flex-row flex justify-between">
+        <div className="flex items-center gap-2 w-full">
           <ItemMods item={item} />
+
+          <div className="flex-col h-full flex gap-5">
+            {item?.icon && (
+              <div className="w-[170px] flex flex-col flex-1 max-w-[170px] items-center justify-center pt-5">
+                <img
+                  src={item.icon}
+                  alt={item.name || "Item"}
+                  className="w-auto object-contain"
+                  onLoad={() => {
+                    console.log("Image loaded successfully:", item.icon);
+                  }}
+                  onError={(e) => {
+                    console.error("Image failed to load:", item.icon, e);
+                    // Don't hide the image, show a placeholder instead
+                    e.currentTarget.style.display = "block";
+                    e.currentTarget.src =
+                      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjMzc0MTUxIi8+CjxwYXRoIGQ9Ik0yNCAzNkMzMC42Mjc0IDM2IDM2IDMwLjYyNzQgMzYgMjRDMzYgMTcuMzcyNiAzMC42Mjc0IDEyIDI0IDEyQzE3LjM3MjYgMTIgMTIgMTcuMzcyNiAxMiAyNEMxMiAzMC42Mjc0IDE3LjM3MjYgMzYgMjQgMzZaIiBmaWxsPSIjNkI3MjgwIi8+CjxwYXRoIGQ9Ik0yNCAzMkMyOC40MTgzIDMyIDMyIDI4LjQxODMgMzIgMjRDMzIgMTkuNTgxNyAyOC40MTgzIDE2IDI0IDE2QzE5LjU4MTcgMTYgMTYgMTkuNTgxNyAxNiAyNEMxNiAyOC40MTgzIDE5LjU4MTcgMzIgMjQgMzJaIiBmaWxsPSIjOUI5QkE1Ii8+Cjwvc3ZnPgo=";
+                  }}
+                />
+              </div>
+            )}
+            <StashVisualization x={item.stash?.x} y={item.stash?.y} />
+          </div>
         </div>
       </div>
 
-      <div className="flex justify-between items-end gap-4 p-2 pt-0">
+      <div className="flex justify-between items-center gap-4 p-2">
         <div className="flex flex-col">
           <div className="text-[12px] text-gray-200 gap-2 flex items-center flex-row">
             <label className="text-gray-400">Pinged At:</label>
@@ -178,13 +183,31 @@ const Item: React.FC<ItemProps> = ({ item }) => {
           )}
         </div>
 
-        <div className="flex flex-row items-end gap-2">
-          <div className="flex flex-col items-center gap-2">
-            <div className="text-sm text-gray-200 mr-2 flex flex-row items-center gap-2">
-              <label className="text-xs text-gray-400">Price:</label>
-              <span className="text-yellow-500 text-md text-nowrap">
-                {item.price?.amount} {item.price?.currency}
-              </span>
+        <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-row items-center gap-5">
+            <div className="text-sm text-gray-200 flex flex-col items-start">
+              <div>
+                <label className="text-xs mr-1 text-gray-400">Stash:</label>
+                <span className="text-gray-500 text-md text-nowrap">
+                  [X:
+                  <span className="text-gray-200 text-md text-nowrap">
+                    {" "}
+                    {item.stash?.x}
+                  </span>{" "}
+                  Y:
+                  <span className="text-gray-200 text-md text-nowrap">
+                    {" "}
+                    {item.stash?.y}
+                  </span>
+                  ]
+                </span>
+              </div>
+              <div>
+                <label className="text-xs mr-1 text-gray-400">Price:</label>
+                <span className="text-yellow-500 text-md text-nowrap">
+                  {item.price?.amount} {item.price?.currency}
+                </span>
+              </div>
             </div>
 
             <div className="flex flex-col gap-1">
