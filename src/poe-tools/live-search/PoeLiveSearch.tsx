@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "src/components/Button";
 import CollapsibleItem from "src/components/CollapsibleItem";
-
-import Items from "src/poe-tools/components/Items";
+import CooldownModal from "../components/CooldownModal";
 
 import clsx from "clsx";
 
 import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
 import { transformItemData } from "./utils/transformItemData";
 import { usePoeLiveSearch } from "./utils/usePoeLiveSearch";
-import SearchConfigManager from "./components/SearchConfigManager";
+import Items from "../components/Item/Items";
+import LiveSearchesList from "./components/LiveSearchesList";
+import { useWebSocketConnection } from "./ConnectionContext/WebSocketConnectionProvider";
 
 const PoELiveSearch = () => {
+  const [isCooldownModalOpen, setIsCooldownModalOpen] = useState(false);
+
   const {
     connect,
     disconnect,
@@ -20,25 +23,31 @@ const PoELiveSearch = () => {
     itemDetails,
     isLoading,
     clearListings,
-    activeSearchConfigs,
-    connectionStatuses,
-    hasActiveConnections,
-    totalConnections,
+    allSearchConfigs,
     autoWhisper,
     toggleAutoWhisper,
     whisperCooldown,
     clearWhisperCooldown,
+    lastWhisperItem,
   } = usePoeLiveSearch();
 
-  const [showConfigManager, setShowConfigManager] = useState(false);
+  const { hasActiveConnections, totalConnections, connectionStatuses } =
+    useWebSocketConnection();
+
+  // Show cooldown modal when cooldown starts
+  useEffect(() => {
+    if (whisperCooldown > 0 && lastWhisperItem) {
+      setIsCooldownModalOpen(true);
+    }
+  }, [whisperCooldown, lastWhisperItem]);
+
+  // Check if any search is currently connecting
+  const hasConnectingSearches = Array.from(connectionStatuses.values()).some(
+    (status) => status.isLoading
+  );
 
   const handleClearListings = () => {
     clearListings();
-  };
-
-  const handleConfigsChange = () => {
-    // This will trigger a re-render of the hook
-    window.location.reload(); // Simple way to refresh the hook state
   };
 
   return (
@@ -49,94 +58,34 @@ const PoELiveSearch = () => {
         </div>
 
         <div className="flex gap-2">
-          <Button
-            size="small"
-            variant="outline"
-            onClick={() => setShowConfigManager(!showConfigManager)}
-          >
-            {showConfigManager ? "Hide Config" : "Manage Searches"}
-          </Button>
+          {/* Config management is now integrated into LiveSearchesList */}
         </div>
       </div>
 
-      {showConfigManager && (
-        <div className="border border-gray-700 rounded-md p-4 bg-gray-900">
-          <SearchConfigManager onConfigsChange={handleConfigsChange} />
-        </div>
-      )}
-
       <div className="flex gap-2 items-end justify-between">
         <div className="flex-1">
-          {activeSearchConfigs.length > 0 ? (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm text-gray-400">
-                  Active Searches ({totalConnections}):
-                </label>
-                <div className="flex items-center gap-2 text-xs">
-                  <span
-                    className={clsx(
-                      "px-2 py-1 rounded",
-                      hasActiveConnections
-                        ? "bg-green-900/30 text-green-400"
-                        : "bg-red-900/30 text-red-400"
-                    )}
-                  >
-                    {hasActiveConnections ? "Connected" : "Disconnected"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                {activeSearchConfigs.map((config) => {
-                  const status = connectionStatuses.get(config.id);
-                  const isConnected = status?.isConnected || false;
-                  const hasError = status?.error;
-
-                  return (
-                    <div
-                      key={config.id}
-                      className={clsx(
-                        "flex items-center justify-between p-2 rounded border",
-                        isConnected
-                          ? "border-green-600 bg-green-900/20"
-                          : "border-gray-700 bg-gray-900"
-                      )}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-200 truncate">
-                          {config.label}
-                        </div>
-                        <div className="text-xs text-gray-400 truncate">
-                          {config.url}
-                        </div>
-                        {hasError && (
-                          <div className="text-xs text-red-400 mt-1">
-                            Error: {hasError}
-                          </div>
-                        )}
-                      </div>
-                      <div className="ml-2 flex items-center gap-2">
-                        <div
-                          className={clsx(
-                            "w-2 h-2 rounded-full",
-                            isConnected ? "bg-green-400" : "bg-red-400"
-                          )}
-                        />
-                        <span className="text-xs text-gray-400">
-                          {isConnected ? "Live" : "Offline"}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm text-gray-400">
+                Search Configurations ({allSearchConfigs.length} total,{" "}
+                {totalConnections} active):
+              </label>
+              <div className="flex items-center gap-2 text-xs">
+                <span
+                  className={clsx(
+                    "px-2 py-1 rounded",
+                    hasActiveConnections
+                      ? "bg-green-900/30 text-green-400"
+                      : "bg-red-900/30 text-red-400"
+                  )}
+                >
+                  {hasActiveConnections ? "Connected" : "Disconnected"}
+                </span>
               </div>
             </div>
-          ) : (
-            <div className="text-gray-400 text-sm">
-              No active searches. Add one in the configuration manager above.
-            </div>
-          )}
+
+            <LiveSearchesList />
+          </div>
         </div>
 
         <div className="flex flex-col gap-1">
@@ -160,7 +109,7 @@ const PoELiveSearch = () => {
               <div>
                 POE Session ID: {getPoeSessionId() ? "✓ Set" : "✗ Missing"}
               </div>
-              <div>Active Searches: {activeSearchConfigs.length}</div>
+              <div>Total Configurations: {allSearchConfigs.length}</div>
             </div>
 
             {/* POE Session ID input */}
@@ -187,19 +136,7 @@ const PoELiveSearch = () => {
               </div>
             )}
 
-            {/* Quick add search button */}
-            {activeSearchConfigs.length === 0 && getPoeSessionId() && (
-              <div className="mt-2">
-                <Button
-                  variant="outline"
-                  size="small"
-                  onClick={() => setShowConfigManager(true)}
-                  className="text-xs"
-                >
-                  + Add Search Configuration
-                </Button>
-              </div>
-            )}
+            {/* Quick add search button - now handled in LiveSearchesList */}
           </div>
 
           {/* Auto-whisper controls */}
@@ -211,34 +148,18 @@ const PoELiveSearch = () => {
                 onChange={toggleAutoWhisper}
                 className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
               />
-              <span>Auto-whisper</span>
+              <span>Auto-Teleport ⚡</span>
             </label>
-
-            {whisperCooldown > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-yellow-400">
-                  Cooldown: {Math.ceil(whisperCooldown / 1000)}s
-                </span>
-                <Button
-                  size="small"
-                  variant="outline"
-                  onClick={clearWhisperCooldown}
-                  className="text-xs px-2 py-1"
-                >
-                  Clear
-                </Button>
-              </div>
-            )}
           </div>
-          {!hasActiveConnections ? (
+          {!hasActiveConnections && !hasConnectingSearches ? (
             <Button
               variant="success"
               onClick={connect}
-              disabled={!getPoeSessionId() || activeSearchConfigs.length === 0}
+              disabled={!getPoeSessionId() || allSearchConfigs.length === 0}
             >
               {!getPoeSessionId()
                 ? "Set POE Session ID First"
-                : activeSearchConfigs.length === 0
+                : allSearchConfigs.length === 0
                 ? "Add Searches First"
                 : "Start Monitoring"}
             </Button>
@@ -291,11 +212,16 @@ const PoELiveSearch = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Items
-          items={itemDetails.map(transformItemData)}
-          showSaveButton={true}
-        />
+        <Items items={itemDetails.map(transformItemData)} />
       </div>
+
+      <CooldownModal
+        isOpen={isCooldownModalOpen}
+        setIsCooldownOpen={setIsCooldownModalOpen}
+        cooldownTime={whisperCooldown}
+        lastWhisperItem={lastWhisperItem}
+        onClearCooldown={clearWhisperCooldown}
+      />
     </div>
   );
 };

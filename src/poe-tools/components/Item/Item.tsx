@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { copyToClipboard } from "../utils/clipboard";
+import { copyToClipboard } from "../../utils/clipboard";
 
 import Button from "src/components/Button";
 
-import { TransformedItemData } from "../live-search/utils/types";
+import { TransformedItemData } from "../../live-search/utils/types";
 
 import toast from "react-hot-toast";
 
 import clsx from "clsx";
 import ItemMods from "./ItemMods";
-import { sendWhisper } from "../api/sendWhisper";
+import { sendWhisper } from "../../api/sendWhisper";
 import StashVisualization from "./StashVisualization";
 
 interface ItemProps {
   item: TransformedItemData;
-  showSaveButton?: boolean;
 }
 
 const Item: React.FC<ItemProps> = ({ item }) => {
@@ -60,25 +59,6 @@ const Item: React.FC<ItemProps> = ({ item }) => {
 
     return () => clearInterval(intervalId);
   }, [item.listedAt]);
-
-  const handleSaveItem = () => {
-    const savedItems = JSON.parse(
-      window.localStorage.getItem("savedItems") || "[]"
-    );
-    const itemExists = savedItems.some(
-      (savedItem: TransformedItemData) => savedItem.id === item.id
-    );
-
-    if (itemExists) {
-      toast.error("Item already saved");
-      return;
-    }
-
-    const newSavedItems = [...savedItems, item];
-    window.localStorage.setItem("savedItems", JSON.stringify(newSavedItems));
-    console.log("Saving item");
-    toast.success("Item saved");
-  };
 
   const handleCopyWhisper = async () => {
     await copyToClipboard(item.whisper);

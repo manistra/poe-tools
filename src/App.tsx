@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 
-import SavedItemsModal from "./poe-tools/components/SavedItemsModal";
 import SettingsModal from "./poe-tools/components/SettingsModal";
+import ImportExportModal from "./poe-tools/components/ImportExportModal";
 import PoeLiveSearch from "./poe-tools/live-search/PoeLiveSearch";
+import { WebSocketConnectionProvider } from "./poe-tools/live-search/ConnectionContext/WebSocketConnectionProvider";
 
 export default function App() {
-  const [isSavedItemsOpen, setIsSavedItemsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
+  const [isImportExportOpen, setIsImportExportOpen] = useState(false);
   return (
     <div>
-      <div className="absolute top-0 left-0 flex flex-row">
+      <div className="absolute top-0 left-0 flex flex-row gap-2">
         <button onClick={() => setIsSettingsOpen(true)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -26,33 +26,34 @@ export default function App() {
           </svg>
         </button>
 
-        <button onClick={() => setIsSavedItemsOpen(true)}>
+        <button onClick={() => setIsImportExportOpen(true)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="size-10 m-2 hover:text-gray-200 transition-colors duration-300 text-gray-400"
+            className="size-10 m-2 hover:scale-110 transition-transform duration-300 text-gray-400"
           >
-            <path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375Z" />
-            <path
-              fill-rule="evenodd"
-              d="m3.087 9 .54 9.176A3 3 0 0 0 6.62 21h10.757a3 3 0 0 0 2.995-2.824L20.913 9H3.087ZM12 10.5a.75.75 0 0 1 .75.75v4.94l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72v-4.94a.75.75 0 0 1 .75-.75Z"
-              clip-rule="evenodd"
-            />
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+            <path d="M14 2v6h6" />
+            <path d="M16 13H8" />
+            <path d="M16 17H8" />
+            <path d="M10 9H8" />
           </svg>
         </button>
       </div>
 
-      <PoeLiveSearch />
+      <WebSocketConnectionProvider>
+        <PoeLiveSearch />
+      </WebSocketConnectionProvider>
 
       <SettingsModal
         isOpen={isSettingsOpen}
         setIsSettingsOpen={setIsSettingsOpen}
       />
 
-      <SavedItemsModal
-        isOpen={isSavedItemsOpen}
-        setIsOpen={setIsSavedItemsOpen}
+      <ImportExportModal
+        isOpen={isImportExportOpen}
+        setIsImportExportOpen={setIsImportExportOpen}
       />
     </div>
   );

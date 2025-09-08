@@ -1,0 +1,252 @@
+import React, { useState } from "react";
+import clsx from "clsx";
+import Button from "src/components/Button";
+import Input from "src/components/Input";
+import { SearchConfig } from "../utils/types";
+import {
+  updateSearchConfig,
+  deleteSearchConfig,
+} from "../utils/searchConfigManager";
+import { toast } from "react-hot-toast";
+import Checkbox from "src/components/Checkbox";
+
+interface LiveSearchItemProps {
+  config: SearchConfig;
+  isConnected: boolean;
+  isLoading: boolean;
+  hasError?: string;
+  onConnect: (config: SearchConfig) => void;
+  onDisconnect: (id: string) => void;
+  onConfigChange: () => void;
+}
+
+const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
+  config,
+  isConnected,
+  isLoading,
+  hasError,
+  onConnect,
+  onDisconnect,
+  onConfigChange,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [editLabel, setEditLabel] = useState(config.label);
+  const [editUrl, setEditUrl] = useState(config.url);
+
+  const handleUrlClick = async (url: string) => {
+    try {
+      await window.electron.shell.openExternal(url);
+    } catch (error) {
+      console.error("Failed to open external URL:", error);
+    }
+  };
+
+  const handleSave = () => {
+    if (!editLabel.trim() || !editUrl.trim()) {
+      toast.error("Please provide both label and URL");
+      return;
+    }
+
+    try {
+      updateSearchConfig(config.id, {
+        label: editLabel.trim(),
+        url: editUrl.trim(),
+      });
+      onConfigChange();
+      setIsOpen(false);
+      toast.success("Search configuration updated");
+    } catch (error) {
+      toast.error("Failed to update search configuration");
+    }
+  };
+
+  const handleCancel = () => {
+    setEditLabel(config.label);
+    setEditUrl(config.url);
+    setIsOpen(false);
+  };
+
+  const handleDelete = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this search configuration?"
+      )
+    ) {
+      try {
+        deleteSearchConfig(config.id);
+        onConfigChange();
+        toast.success("Search configuration deleted");
+      } catch (error) {
+        toast.error("Failed to delete search configuration");
+      }
+    }
+  };
+
+  const handleActiveChange = (configId: string) => {
+    try {
+      updateSearchConfig(configId, {
+        isActive: !config.isActive,
+      });
+      onConfigChange();
+    } catch (error) {
+      toast.error("Failed to update search configuration");
+    }
+  };
+
+  return (
+    <div
+      className={clsx(
+        "flex-col items-center justify-between p-1 rounded border",
+        isConnected
+          ? "border-green-600 bg-green-900/20"
+          : isLoading
+          ? "border-yellow-600 bg-yellow-900/20"
+          : "border-gray-700 bg-gray-900"
+      )}
+    >
+      <div className="flex items-center justify-between w-full bg-gradient-to-r from-[#0a0a1a] to-green-900/20">
+        <div className="flex-1 flex flex-row items-center gap-2 min-w-0 pl-2">
+          <input
+            type="checkbox"
+            checked={config.isActive}
+            onChange={() => handleActiveChange(config.id)}
+            className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+          />
+          <button
+            onClick={() => handleUrlClick(config.url)}
+            className="text-white font-bold truncate hover:text-blue-700 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1"
+          >
+            {config.label}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              className="size-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+              />
+            </svg>
+          </button>
+          {hasError && (
+            <div className="text-xs text-red-400 mt-1">Error: {hasError}</div>
+          )}
+        </div>
+        <div className="ml-2 flex items-center gap-2">
+          <div
+            className={clsx(
+              "w-2 h-2 rounded-full",
+              isConnected
+                ? "bg-green-400"
+                : isLoading
+                ? "bg-yellow-400 animate-pulse"
+                : "bg-red-400"
+            )}
+          />
+          <span className="text-xs text-gray-400">
+            {isConnected ? "Live" : isLoading ? "Connecting..." : "Offline"}
+          </span>
+          <div className="flex gap-1 ml-2">
+            <Button
+              disabled={isConnected || isLoading}
+              size="small"
+              variant="outline"
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-xs px-2 py-1 flex flex-row items-center gap-1"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="size-4 hover:scale-110 transition-transform duration-200 cursor-pointer"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                />
+              </svg>
+              Edit
+            </Button>
+            {isConnected ? (
+              <Button
+                size="small"
+                variant="danger"
+                onClick={() => onDisconnect(config.id)}
+                className="text-xs px-2 py-1"
+              >
+                Disconnect
+              </Button>
+            ) : (
+              <Button
+                size="small"
+                variant="success"
+                onClick={() => onConnect(config)}
+                disabled={isLoading || isOpen}
+                className="text-xs px-2 py-1"
+              >
+                {isLoading ? "Connecting..." : "Connect"}
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {isOpen && (
+        <div className="flex border-t border-gray-700 mt-1 items-center gap-2 w-full p-5 bg-black">
+          <div className="flex-1 flex flex-row items-end gap-3 min-w-0 ">
+            <div className="flex flex-col gap-2 w-full">
+              <Input
+                label="Search Label:"
+                className="text-xs"
+                value={editLabel}
+                onChange={(value) => setEditLabel(String(value))}
+              />
+              <Input
+                label="URL:"
+                className="text-xs"
+                value={editUrl}
+                onChange={(value) => setEditUrl(String(value))}
+              />
+            </div>
+
+            <div className="flex flex-row gap-2">
+              <Button
+                size="small"
+                variant="danger"
+                onClick={handleDelete}
+                className="text-xs px-2 py-1"
+              >
+                Delete
+              </Button>
+              <Button
+                size="small"
+                variant="outline"
+                onClick={handleCancel}
+                className="text-xs px-2 py-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                size="small"
+                variant="success"
+                onClick={handleSave}
+                className="text-xs px-2 py-1"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default LiveSearchItem;

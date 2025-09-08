@@ -1,13 +1,12 @@
 import React from "react";
 import Item from "./Item";
-import { TransformedItemData } from "../live-search/types";
+import { TransformedItemData } from "../../live-search/utils/types";
 
 interface ItemsProps {
   items: TransformedItemData[];
-  showSaveButton?: boolean;
 }
 
-const Items: React.FC<ItemsProps> = ({ items, showSaveButton }) => {
+const Items: React.FC<ItemsProps> = ({ items }) => {
   if (!items || items.length === 0) {
     return <p>No item details available</p>;
   }
@@ -18,7 +17,7 @@ const Items: React.FC<ItemsProps> = ({ items, showSaveButton }) => {
     <ul className="space-y-4">
       {items.map((item) => (
         <li key={item.id}>
-          <Item key={item.id} item={item} showSaveButton={showSaveButton} />
+          <Item key={item.id} item={item} />
         </li>
       ))}
     </ul>

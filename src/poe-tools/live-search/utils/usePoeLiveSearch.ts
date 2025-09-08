@@ -5,8 +5,8 @@ import { fetchItemDetails } from "src/poe-tools/api/fetchItemDetails";
 import useLogs from "src/helpers/useLogs";
 import { ItemData, SearchConfig } from "./types";
 import { toast } from "react-hot-toast";
-import { useSimpleMultiWebSocket } from "./useSimpleMultiWebSocket";
-import { getActiveSearchConfigs } from "./searchConfigManager";
+import { useWebSocketConnection } from "../ConnectionContext/WebSocketConnectionProvider";
+import { getSearchConfigs } from "./searchConfigManager";
 import { sendNotification } from "../../utils/useNotification";
 import { sendWhisper } from "../../api/sendWhisper";
 import { mockData } from "../../../mockData";
@@ -17,16 +17,18 @@ interface UsePoeLiveSearchReturn {
   isConnected: boolean;
   connect: () => void;
   disconnect: () => void;
+  connectIndividual: (config: SearchConfig) => void;
+  disconnectIndividual: (searchId: string) => void;
   error: string | null;
   logs: string[];
   itemDetails: ItemData[];
   isLoading: boolean;
   clearListings: () => void;
-  activeSearchConfigs: SearchConfig[];
+  allSearchConfigs: SearchConfig[];
   updateCurrentSearchUrl: (url: string) => void;
   connectionStatuses: Map<
     string,
-    { isConnected: boolean; error: string | null }
+    { isConnected: boolean; isLoading: boolean; error: string | null }
   >;
   hasActiveConnections: boolean;
   totalConnections: number;
@@ -34,14 +36,13 @@ interface UsePoeLiveSearchReturn {
   toggleAutoWhisper: () => void;
   whisperCooldown: number;
   clearWhisperCooldown: () => void;
+  lastWhisperItem: ItemData | undefined;
 }
 
 export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
   const [itemDetails, setItemDetails] = useState<ItemData[]>([]);
   const [isLoading] = useState(false);
-  const [activeSearchConfigs, setActiveSearchConfigs] = useState<
-    SearchConfig[]
-  >([]);
+  const [allSearchConfigs, setAllSearchConfigs] = useState<SearchConfig[]>([]);
   const [searchUrls, setSearchUrls] = useState<string[]>([]);
   const [processedMessageIds, setProcessedMessageIds] = useState<Set<string>>(
     new Set()
@@ -52,6 +53,9 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
   });
   const [lastWhisperTime, setLastWhisperTime] = useState<number>(0);
   const [whisperCooldown, setWhisperCooldown] = useState<number>(0);
+  const [lastWhisperItem, setLastWhisperItem] = useState<ItemData | undefined>(
+    undefined
+  );
 
   const {
     messages,
@@ -60,25 +64,28 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
     totalConnections,
     connectAll,
     disconnectAll,
+    connectIndividual,
+    disconnectIndividual,
     clearMessages,
-  } = useSimpleMultiWebSocket();
+  } = useWebSocketConnection();
 
   const { logs, addLog } = useLogs();
 
-  // Load active search configs on mount (but don't auto-connect)
+  // Load all search configs on mount (but don't auto-connect)
   useEffect(() => {
     console.log("🔧 usePoeLiveSearch useEffect called - loading configs");
-    const configs = getActiveSearchConfigs();
+    const configs = getSearchConfigs();
     console.log("🔧 Loaded configs:", configs);
-    setActiveSearchConfigs(configs);
-    setSearchUrls(configs.map((config) => config.url));
+    setAllSearchConfigs(configs);
+    const activeConfigs = configs.filter((config) => config.isActive);
+    setSearchUrls(activeConfigs.map((config) => config.url));
 
     // Add mock item for development
     setItemDetails(mockData as unknown as ItemData[]);
 
     // Don't auto-connect - let user decide when to start
     addLog(
-      `Loaded ${configs.length} search configurations. Click "Start All Searches" to begin monitoring.`
+      `Loaded ${configs.length} search configurations (${activeConfigs.length} active). Click "Start All Searches" to begin monitoring.`
     );
 
     // Ensure no auto-connection happens by explicitly disconnecting any existing connections
@@ -117,6 +124,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
         });
 
         setLastWhisperTime(Date.now());
+        setLastWhisperItem(item);
         addLog("Immediate auto-whisper sent successfully");
 
         sendNotification(
@@ -260,7 +268,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
           );
 
           // Find the search config that matches the search ID
-          const searchConfig = activeSearchConfigs.find(
+          const searchConfig = allSearchConfigs.find(
             (config) => config.id === message.searchId
           );
           const searchUrl = searchConfig?.url || "";
@@ -278,7 +286,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
         }
       });
     }
-  }, [messages, activeSearchConfigs, addLog, processedMessageIds]);
+  }, [messages, allSearchConfigs, addLog, processedMessageIds]);
 
   // Whisper cooldown timer
   useEffect(() => {
@@ -327,12 +335,13 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
       "🔌 Connect function called - this should only happen when user clicks Start Monitoring"
     );
     console.trace("🔍 Stack trace for connect call:");
-    const configs = getActiveSearchConfigs();
-    console.log("📋 Active configs found:", configs);
-    setActiveSearchConfigs(configs);
-    setSearchUrls(configs.map((config) => config.url));
-    connectAll(configs);
-    addLog(`Connecting to ${configs.length} active searches...`);
+    const configs = getSearchConfigs();
+    const activeConfigs = configs.filter((config) => config.isActive);
+    console.log("📋 Active configs found:", activeConfigs);
+    setAllSearchConfigs(configs);
+    setSearchUrls(activeConfigs.map((config) => config.url));
+    connectAll(activeConfigs);
+    addLog(`Connecting to ${activeConfigs.length} active searches...`);
   }, [connectAll]); // Remove addLog to prevent infinite loop
 
   // Disconnect from all searches
@@ -362,12 +371,14 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
     isConnected,
     connect,
     disconnect,
+    connectIndividual,
+    disconnectIndividual,
     error,
     logs,
     itemDetails,
     isLoading: isLoading || isProcessingQueue,
     clearListings,
-    activeSearchConfigs,
+    allSearchConfigs,
     updateCurrentSearchUrl,
     connectionStatuses,
     hasActiveConnections,
@@ -376,5 +387,6 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
     toggleAutoWhisper,
     whisperCooldown,
     clearWhisperCooldown,
+    lastWhisperItem,
   };
 };

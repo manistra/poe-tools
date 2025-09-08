@@ -1,6 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
-import { SearchConfig } from "./types";
-import { getActiveSearchConfigs } from "./searchConfigManager";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from "react";
+import { SearchConfig } from "../utils/types";
+import { getActiveSearchConfigs } from "../utils/searchConfigManager";
 
 interface Message {
   time: string;
@@ -9,23 +16,38 @@ interface Message {
   searchLabel: string;
 }
 
-interface UseSimpleMultiWebSocketReturn {
+interface ConnectionStatus {
+  isConnected: boolean;
+  isLoading: boolean;
+  error: string | null;
+}
+
+interface WebSocketConnectionContextType {
   messages: Message[];
-  connectionStatuses: Map<
-    string,
-    { isConnected: boolean; error: string | null }
-  >;
+  connectionStatuses: Map<string, ConnectionStatus>;
   hasActiveConnections: boolean;
   totalConnections: number;
   connectAll: (configs: SearchConfig[]) => void;
   disconnectAll: () => void;
+  connectIndividual: (config: SearchConfig) => void;
+  disconnectIndividual: (searchId: string) => void;
   clearMessages: () => void;
 }
 
-export const useSimpleMultiWebSocket = (): UseSimpleMultiWebSocketReturn => {
+const WebSocketConnectionContext = createContext<
+  WebSocketConnectionContextType | undefined
+>(undefined);
+
+interface WebSocketConnectionProviderProps {
+  children: ReactNode;
+}
+
+export const WebSocketConnectionProvider: React.FC<
+  WebSocketConnectionProviderProps
+> = ({ children }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [connectionStatuses, setConnectionStatuses] = useState<
-    Map<string, { isConnected: boolean; error: string | null }>
+    Map<string, ConnectionStatus>
   >(new Map());
   const [activeConnections, setActiveConnections] = useState<Set<string>>(
     new Set()
@@ -52,6 +74,21 @@ export const useSimpleMultiWebSocket = (): UseSimpleMultiWebSocketReturn => {
 
     // Disconnect all existing connections first
     disconnectAll();
+
+    // Set all configs to loading state
+    setConnectionStatuses((prev) => {
+      const newStatuses = new Map(prev);
+      configs.forEach((config) => {
+        if (config.isActive) {
+          newStatuses.set(config.id, {
+            isConnected: false,
+            isLoading: true,
+            error: null,
+          });
+        }
+      });
+      return newStatuses;
+    });
 
     // Connect to each active config with a delay
     configs.forEach((config, index) => {
@@ -82,6 +119,32 @@ export const useSimpleMultiWebSocket = (): UseSimpleMultiWebSocketReturn => {
     setConnectionStatuses(new Map());
   }, []);
 
+  const connectIndividual = useCallback(async (config: SearchConfig) => {
+    console.log(`🔌 Connecting to individual search: ${config.label}`);
+
+    // Set loading state
+    setConnectionStatuses((prev) => {
+      const newStatuses = new Map(prev);
+      newStatuses.set(config.id, {
+        isConnected: false,
+        isLoading: true,
+        error: null,
+      });
+      return newStatuses;
+    });
+
+    const wsUri = getWebSocketUri(config.url);
+    if (wsUri) {
+      const sessionId = await (window.electron.api as any).getPoeSessionId();
+      (window.electron.websocket as any).connect(wsUri, sessionId, config.id);
+    }
+  }, []);
+
+  const disconnectIndividual = useCallback((searchId: string) => {
+    console.log(`🔌 Disconnecting individual search: ${searchId}`);
+    (window.electron.websocket as any).disconnect(searchId);
+  }, []);
+
   const clearMessages = useCallback(() => {
     setMessages([]);
   }, []);
@@ -95,7 +158,11 @@ export const useSimpleMultiWebSocket = (): UseSimpleMultiWebSocketReturn => {
       setActiveConnections((prev) => new Set([...prev, searchId]));
       setConnectionStatuses((prev) => {
         const newStatuses = new Map(prev);
-        newStatuses.set(searchId, { isConnected: true, error: null });
+        newStatuses.set(searchId, {
+          isConnected: true,
+          isLoading: false,
+          error: null,
+        });
         return newStatuses;
       });
     });
@@ -111,7 +178,11 @@ export const useSimpleMultiWebSocket = (): UseSimpleMultiWebSocketReturn => {
       });
       setConnectionStatuses((prev) => {
         const newStatuses = new Map(prev);
-        newStatuses.set(searchId, { isConnected: false, error: null });
+        newStatuses.set(searchId, {
+          isConnected: false,
+          isLoading: false,
+          error: null,
+        });
         return newStatuses;
       });
     });
@@ -148,7 +219,11 @@ export const useSimpleMultiWebSocket = (): UseSimpleMultiWebSocketReturn => {
         console.error(`🔌 WebSocket error for ${searchId}:`, errorMsg);
         setConnectionStatuses((prev) => {
           const newStatuses = new Map(prev);
-          newStatuses.set(searchId, { isConnected: false, error: errorMsg });
+          newStatuses.set(searchId, {
+            isConnected: false,
+            isLoading: false,
+            error: errorMsg,
+          });
           return newStatuses;
         });
       }
@@ -164,13 +239,31 @@ export const useSimpleMultiWebSocket = (): UseSimpleMultiWebSocketReturn => {
     };
   }, [disconnectAll]);
 
-  return {
+  const contextValue: WebSocketConnectionContextType = {
     messages,
     connectionStatuses,
     hasActiveConnections: activeConnections.size > 0,
     totalConnections: activeConnections.size,
     connectAll,
     disconnectAll,
+    connectIndividual,
+    disconnectIndividual,
     clearMessages,
   };
+
+  return (
+    <WebSocketConnectionContext.Provider value={contextValue}>
+      {children}
+    </WebSocketConnectionContext.Provider>
+  );
+};
+
+export const useWebSocketConnection = (): WebSocketConnectionContextType => {
+  const context = useContext(WebSocketConnectionContext);
+  if (context === undefined) {
+    throw new Error(
+      "useWebSocketConnection must be used within a WebSocketConnectionProvider"
+    );
+  }
+  return context;
 };

@@ -57,3 +57,7 @@ export const deleteSearchConfig = (id: string): void => {
 export const getActiveSearchConfigs = (): SearchConfig[] => {
   return getSearchConfigs().filter((config) => config.isActive);
 };
+
+export const deleteAllSearchConfigs = (): void => {
+  saveSearchConfigs([]);
+};
