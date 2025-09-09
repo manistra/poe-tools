@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import ModalBase from "src/components/Modal";
-import Button from "src/components/Button";
-import TextArea from "src/components/TextArea";
+import ModalBase from "src/renderer/components/Modal";
+import Button from "src/renderer/components/Button";
+import TextArea from "src/renderer/components/TextArea";
 import {
   getSearchConfigs,
   addSearchConfig,

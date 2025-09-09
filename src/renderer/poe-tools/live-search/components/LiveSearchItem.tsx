@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import clsx from "clsx";
-import Button from "src/components/Button";
-import Input from "src/components/Input";
+import Button from "src/renderer/components/Button";
+import Input from "src/renderer/components/Input";
 import { SearchConfig } from "../utils/types";
 import {
   updateSearchConfig,
