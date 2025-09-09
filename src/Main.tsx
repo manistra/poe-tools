@@ -3,7 +3,7 @@ import "./index.css"; // import css
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import UpdateIndicator from "./components/UpdateIndicator";
+
 import Toast from "./components/Toast";
 
 declare global {
@@ -47,6 +47,5 @@ root.render(
   <React.StrictMode>
     <App />
     <Toast />
-    <UpdateIndicator />
   </React.StrictMode>
 );
