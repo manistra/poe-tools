@@ -5,7 +5,7 @@ export const sendNotification = async (
   try {
     new Notification(title, {
       body: message,
-      //   icon: "src/assets/poe-icon.png",
+      //   icon: "src/renderer/assets/poe-icon.png",
     });
   } catch (error) {
     console.error("Error sending notification:", error);

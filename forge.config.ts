@@ -15,12 +15,13 @@ import { rendererConfig } from "./webpack.renderer.config";
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    icon: "./src/renderer/assets/icon.ico",
   },
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
       // Configure auto-updates
-      setupIcon: "./src/assets/icon.ico", // Add an icon file
+      setupIcon: "./src/renderer/assets/icon.ico", // Add an icon file
       // The URLs below are for update.electronjs.org
       remoteReleases: `https://github.com/manistra/poe-tools`, // Replace with your repo
     }),
