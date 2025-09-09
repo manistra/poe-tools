@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import Button from "src/components/Button";
-import CollapsibleItem from "src/components/CollapsibleItem";
+import Button from "src/renderer/components/Button";
+import CollapsibleItem from "src/renderer/components/CollapsibleItem";
 import CooldownModal from "../components/CooldownModal";
 
 import clsx from "clsx";
 
-import { getPoeSessionId } from "src/poe-tools/utils/getPoeSessionId";
+import { getPoeSessionId } from "src/renderer/poe-tools/utils/getPoeSessionId";
 import { transformItemData } from "./utils/transformItemData";
 import { usePoeLiveSearch } from "./utils/usePoeLiveSearch";
 import Items from "../components/Item/Items";

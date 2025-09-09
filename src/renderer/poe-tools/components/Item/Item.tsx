@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { copyToClipboard } from "../../utils/clipboard";
 
-import Button from "src/components/Button";
+import Button from "src/renderer/components/Button";
 
 import { TransformedItemData } from "../../live-search/utils/types";
 
@@ -13,9 +13,9 @@ import { sendWhisper } from "../../api/sendWhisper";
 import StashVisualization from "./StashVisualization";
 
 // Import currency images
-import chaosImg from "src/assets/chaos.png";
-import divineImg from "src/assets/divine.png";
-import exaltedImg from "src/assets/exalted.png";
+import chaosImg from "src/renderer/assets/chaos.png";
+import divineImg from "src/renderer/assets/divine.png";
+import exaltedImg from "src/renderer/assets/exalted.png";
 
 interface ItemProps {
   item: TransformedItemData;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import ModalBase from "src/components/Modal";
-import Input from "src/components/Input";
-import Button from "src/components/Button";
+import ModalBase from "src/renderer/components/Modal";
+import Input from "src/renderer/components/Input";
+import Button from "src/renderer/components/Button";
 
 interface SettingsModalProps {
   isOpen: boolean;

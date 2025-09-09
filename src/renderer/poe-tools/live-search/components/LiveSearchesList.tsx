@@ -5,8 +5,8 @@ import {
   addSearchConfig,
 } from "../utils/searchConfigManager";
 import LiveSearchItem from "./LiveSearchItem";
-import Button from "src/components/Button";
-import Input from "src/components/Input";
+import Button from "src/renderer/components/Button";
+import Input from "src/renderer/components/Input";
 import { toast } from "react-hot-toast";
 
 const LiveSearchesList: React.FC = () => {
