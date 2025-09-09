@@ -1,5 +1,5 @@
 import React from "react";
-import { TransformedItemData } from "../../live-search/utils/types";
+import { TransformedItemData } from "../../../types/types";
 
 interface ItemModsProps {
   item: TransformedItemData;

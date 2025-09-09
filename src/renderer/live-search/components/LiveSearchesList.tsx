@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { useWebSocketConnection } from "../ConnectionContext/WebSocketConnectionProvider";
-import {
-  getSearchConfigs,
-  addSearchConfig,
-} from "../utils/searchConfigManager";
+
 import LiveSearchItem from "./LiveSearchItem";
 import Button from "src/renderer/components/Button";
 import Input from "src/renderer/components/Input";
 import { toast } from "react-hot-toast";
+import { useWebSocketConnection } from "../../context/WebSocketConnectionProvider";
+import {
+  addSearchConfig,
+  getSearchConfigs,
+} from "../hooks/searchConfigManager";
 
 const LiveSearchesList: React.FC = () => {
   const { connectionStatuses, connectIndividual, disconnectIndividual } =

@@ -1,4 +1,4 @@
-import { SearchConfig } from "./types";
+import { SearchConfig } from "src/renderer/types/types";
 
 const STORAGE_KEY = "poe-search-configs";
 

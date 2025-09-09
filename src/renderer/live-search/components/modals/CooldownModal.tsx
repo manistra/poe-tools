@@ -1,8 +1,8 @@
 import React from "react";
 import ModalBase from "src/renderer/components/Modal";
-import { ItemData } from "../live-search/utils/types";
-import Item from "./Item/Item";
-import { transformItemData } from "../live-search/utils/transformItemData";
+import { ItemData } from "../../../types/types";
+import Item from "../Item/Item";
+import { transformItemData } from "../../../helpers/transformItemData";
 
 interface CooldownModalProps {
   isOpen: boolean;

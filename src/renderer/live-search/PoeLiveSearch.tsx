@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import Button from "src/renderer/components/Button";
 import CollapsibleItem from "src/renderer/components/CollapsibleItem";
-import CooldownModal from "../components/CooldownModal";
+import CooldownModal from "./components/modals/CooldownModal";
 
 import clsx from "clsx";
 
-import { getPoeSessionId } from "src/renderer/poe-tools/utils/getPoeSessionId";
-import { transformItemData } from "./utils/transformItemData";
-import { usePoeLiveSearch } from "./utils/usePoeLiveSearch";
-import Items from "../components/Item/Items";
+import { getPoeSessionId } from "src/renderer/helpers/getPoeSessionId";
+
+import Items from "./components/Item/Items";
 import LiveSearchesList from "./components/LiveSearchesList";
-import { useWebSocketConnection } from "./ConnectionContext/WebSocketConnectionProvider";
+import { useWebSocketConnection } from "../context/WebSocketConnectionProvider";
+import { usePoeLiveSearch } from "./hooks/usePoeLiveSearch";
+import { transformItemData } from "../helpers/transformItemData";
 
 const PoELiveSearch = () => {
   const [isCooldownModalOpen, setIsCooldownModalOpen] = useState(false);

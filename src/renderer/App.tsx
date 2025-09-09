@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
-import SettingsModal from "./poe-tools/components/SettingsModal";
-import ImportExportModal from "./poe-tools/components/ImportExportModal";
-import PoeLiveSearch from "./poe-tools/live-search/PoeLiveSearch";
-import { WebSocketConnectionProvider } from "./poe-tools/live-search/ConnectionContext/WebSocketConnectionProvider";
+import SettingsModal from "./live-search/components/modals/SettingsModal";
+import ImportExportModal from "./live-search/components/modals/ImportExportModal";
+import PoeLiveSearch from "./live-search/PoeLiveSearch";
+import { WebSocketConnectionProvider } from "./context/WebSocketConnectionProvider";
 
 export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);

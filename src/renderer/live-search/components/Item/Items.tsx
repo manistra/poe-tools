@@ -1,6 +1,6 @@
 import React from "react";
 import Item from "./Item";
-import { TransformedItemData } from "../../live-search/utils/types";
+import { TransformedItemData } from "src/renderer/types/types";
 
 interface ItemsProps {
   items: TransformedItemData[];

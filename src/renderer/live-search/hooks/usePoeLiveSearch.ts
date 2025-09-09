@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 
-import { fetchItemDetails } from "src/renderer/poe-tools/api/fetchItemDetails";
+import { fetchItemDetails } from "../../api/fetchItemDetails";
 
 import useLogs from "src/renderer/helpers/useLogs";
-import { ItemData, SearchConfig } from "./types";
+import { ItemData, SearchConfig } from "../../types/types";
 import { toast } from "react-hot-toast";
-import { useWebSocketConnection } from "../ConnectionContext/WebSocketConnectionProvider";
+import { useWebSocketConnection } from "../../context/WebSocketConnectionProvider";
 import { getSearchConfigs } from "./searchConfigManager";
-import { sendNotification } from "../../utils/useNotification";
+import { sendNotification } from "../../helpers/useNotification";
 import { sendWhisper } from "../../api/sendWhisper";
 import { mockData } from "src/renderer/mocks/mockData";
 

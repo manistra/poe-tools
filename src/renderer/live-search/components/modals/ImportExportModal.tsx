@@ -6,8 +6,8 @@ import {
   getSearchConfigs,
   addSearchConfig,
   deleteAllSearchConfigs,
-} from "../live-search/utils/searchConfigManager";
-import { copyToClipboard } from "../utils/clipboard";
+} from "../../hooks/searchConfigManager";
+import { copyToClipboard } from "../../../helpers/clipboard";
 
 interface ImportExportModalProps {
   isOpen: boolean;

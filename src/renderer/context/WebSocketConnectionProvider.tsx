@@ -6,8 +6,8 @@ import React, {
   useCallback,
   ReactNode,
 } from "react";
-import { SearchConfig } from "../utils/types";
-import { getActiveSearchConfigs } from "../utils/searchConfigManager";
+import { SearchConfig } from "../types/types";
+import { getActiveSearchConfigs } from "../live-search/hooks/searchConfigManager";
 
 interface Message {
   time: string;

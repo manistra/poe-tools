@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import clsx from "clsx";
 import Button from "src/renderer/components/Button";
 import Input from "src/renderer/components/Input";
-import { SearchConfig } from "../utils/types";
+
 import {
   updateSearchConfig,
   deleteSearchConfig,
-} from "../utils/searchConfigManager";
+} from "../hooks/searchConfigManager";
 import { toast } from "react-hot-toast";
+import { SearchConfig } from "src/renderer/types/types";
 
 interface LiveSearchItemProps {
   config: SearchConfig;

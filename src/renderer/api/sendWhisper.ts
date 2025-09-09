@@ -1,5 +1,5 @@
 import { createHeaders } from "./api";
-import { getPoeSessionId } from "../utils/getPoeSessionId";
+import { getPoeSessionId } from "../helpers/getPoeSessionId";
 
 export interface WhisperRequest {
   itemId: string;
