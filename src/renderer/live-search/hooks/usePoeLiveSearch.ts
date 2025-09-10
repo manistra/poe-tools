@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { fetchItemDetails } from "../../api/fetchItemDetails";
 
 import useLogs from "src/renderer/helpers/useLogs";
-import { ItemData, SearchConfig } from "../../types/types";
+import { ItemData, SearchConfig } from "../../../shared/types";
 import { toast } from "react-hot-toast";
 import { useWebSocketConnection } from "../../context/WebSocketConnectionProvider";
 import { getSearchConfigs } from "./searchConfigManager";

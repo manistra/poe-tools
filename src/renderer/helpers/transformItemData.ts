@@ -1,4 +1,4 @@
-import { ItemData, TransformedItemData } from "../types/types";
+import { ItemData, TransformedItemData } from "../../shared/types";
 
 export function transformItemData(rawItem: ItemData): TransformedItemData {
   const transformedItem: TransformedItemData = {

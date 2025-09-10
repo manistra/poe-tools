@@ -1,5 +1,5 @@
 import React from "react";
-import { TransformedItemData } from "../../../types/types";
+import { TransformedItemData } from "../../../../shared/types";
 
 interface ItemModsProps {
   item: TransformedItemData;

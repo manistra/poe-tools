@@ -1,6 +1,6 @@
 import React from "react";
 import ModalBase from "src/renderer/components/Modal";
-import { ItemData } from "../../../types/types";
+import { ItemData } from "../../../../shared/types";
 import Item from "../Item/Item";
 import { transformItemData } from "../../../helpers/transformItemData";
 

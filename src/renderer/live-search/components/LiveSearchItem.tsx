@@ -8,7 +8,7 @@ import {
   deleteSearchConfig,
 } from "../hooks/searchConfigManager";
 import { toast } from "react-hot-toast";
-import { SearchConfig } from "src/renderer/types/types";
+import { SearchConfig } from "src/shared/types";
 
 interface LiveSearchItemProps {
   config: SearchConfig;

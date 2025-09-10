@@ -14,7 +14,7 @@ import StashVisualization from "./StashVisualization";
 import chaosImg from "src/renderer/assets/chaos.png";
 import divineImg from "src/renderer/assets/divine.png";
 import exaltedImg from "src/renderer/assets/exalted.png";
-import { TransformedItemData } from "../../../types/types";
+import { TransformedItemData } from "../../../../shared/types";
 
 interface ItemProps {
   item: TransformedItemData;

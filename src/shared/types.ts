@@ -69,7 +69,7 @@ export interface TransformedItemData {
   whisper?: string;
   hideoutToken?: string;
   searchQueryId?: string;
-  searchLabel?: string; // Add search label to identify which search found the item
+  searchLabel?: string;
 
   stash?: {
     x: number;

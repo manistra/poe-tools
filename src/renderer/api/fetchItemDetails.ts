@@ -1,6 +1,6 @@
 import { extractSearchQueryId } from "../helpers/extractSearchQueryId";
 import { getPoeSessionId } from "../helpers/getPoeSessionId";
-import { ItemData } from "../types/types";
+import { ItemData } from "../../shared/types";
 import { poe2SearchUrl } from "./api";
 
 export const fetchItemDetails = async ({

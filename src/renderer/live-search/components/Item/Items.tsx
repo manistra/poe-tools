@@ -1,6 +1,6 @@
 import React from "react";
 import Item from "./Item";
-import { TransformedItemData } from "src/renderer/types/types";
+import { TransformedItemData } from "src/shared/types";
 
 interface ItemsProps {
   items: TransformedItemData[];
