@@ -21,10 +21,12 @@ interface ItemProps {
 }
 
 // Currency display component
-const CurrencyDisplay: React.FC<{ amount: number; currency: string }> = ({
-  amount,
-  currency,
-}) => {
+const CurrencyDisplay: React.FC<{
+  amount: number;
+  currency: string;
+  className?: string;
+  iconClassName?: string;
+}> = ({ amount, currency, className, iconClassName }) => {
   const getCurrencyImage = (currency: string) => {
     switch (currency.toLowerCase()) {
       case "chaos":
@@ -43,12 +45,17 @@ const CurrencyDisplay: React.FC<{ amount: number; currency: string }> = ({
 
   if (currencyImage) {
     return (
-      <div className="flex items-center gap-1 text-[#aa9e82] text-[18px]">
+      <div
+        className={clsx(
+          "flex items-center gap-1 text-[#aa9e82] text-[18px] justify-center",
+          className
+        )}
+      >
         <span>{amount} x</span>
         <img
           src={currencyImage}
           alt={currency}
-          className="w-6 h-6 object-contain"
+          className={clsx("w-6 h-6 object-contain", iconClassName)}
         />
       </div>
     );
@@ -153,12 +160,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
           <ItemMods item={item} />
 
           <div className="flex-col h-full flex gap-5">
-            <div className="text-[12px] text-gray-200 flex items-center flex-col">
-              <label className="text-gray-400 text-[9px]">Found by:</label>
-              <span className=" text-xs text-[#e6e6e6] bg-gradient-to-r from-[#000000] to-green-900/20 px-2 py-1 rounded">
-                {item.searchLabel}
-              </span>
-            </div>
+            <StashVisualization x={item.stash?.x} y={item.stash?.y} />
 
             {item?.icon && (
               <div className="w-[170px] flex flex-col flex-1 max-w-[170px] items-center justify-center">
@@ -179,22 +181,21 @@ const Item: React.FC<ItemProps> = ({ item }) => {
                 />
               </div>
             )}
-            <div className="m-auto">
-              {item.price && (
-                <CurrencyDisplay
-                  amount={item.price.amount}
-                  currency={item.price.currency}
-                />
-              )}
-            </div>
 
-            <StashVisualization x={item.stash?.x} y={item.stash?.y} />
+            {item.price && (
+              <CurrencyDisplay
+                className="text-xl px-2 py-1 border border-poe-mods-fractured border-opacity-25 rounded-md mx-auto w-full"
+                iconClassName="w-8 h-8"
+                amount={item.price.amount}
+                currency={item.price.currency}
+              />
+            )}
           </div>
         </div>
       </div>
 
-      <div className="flex justify-between items-center gap-4 p-2">
-        <div className="flex flex-col">
+      <div className="flex justify-between items-center gap-4">
+        <div className="flex flex-col p-2">
           <div className="text-[12px] text-gray-200 gap-2 flex items-center flex-row">
             <label className="text-gray-400">Pinged At:</label>
             <span className="text-gray-200">
@@ -213,43 +214,24 @@ const Item: React.FC<ItemProps> = ({ item }) => {
             <label className="text-gray-400">Listed:</label>
             <span className="text-gray-200">{listedAgo} </span>
           </div>
-
-          {item.searchLabel && (
-            <div className="text-[12px] text-gray-200 gap-2 flex items-center flex-row">
-              <label className="text-gray-400">Found by:</label>
-              <span className="text-blue-400 text-xs bg-blue-900/30 px-2 py-1 rounded">
-                {item.searchLabel}
-              </span>
-            </div>
-          )}
         </div>
 
         <div className="flex flex-row items-center gap-2">
           <div className="flex flex-row items-center gap-5">
-            <div className="text-sm text-gray-200 flex flex-col items-start">
-              <div className="flex items-center gap-1 flex-row">
-                <label className="text-xs mr-1 text-gray-400">Price:</label>
-                <span className="text-yellow-500 text-md text-nowrap">
-                  {item.price && (
-                    <CurrencyDisplay
-                      amount={item.price.amount}
-                      currency={item.price.currency}
-                    />
-                  )}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <Button size="small" onClick={handleCopyWhisper}>
+            <div className="flex flex-row items-center">
+              <Button
+                size="small"
+                onClick={handleCopyWhisper}
+                className="h-8 text-xl text-center mr-2"
+              >
                 Copy Whisper
               </Button>
               {item.hideoutToken && (
                 <Button
-                  size="small"
                   onClick={handleSendWhisper}
                   disabled={isSendingWhisper}
                   className={clsx(
+                    "h-[70px] w-[186px] !text-[17px] text-gray-500 font-bold",
                     isSendingWhisper && "opacity-50 cursor-not-allowed",
                     isWhispered && "bg-green-600 hover:bg-green-700"
                   )}
