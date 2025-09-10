@@ -1,57 +1,30 @@
 import { SearchConfig } from "src/shared/types";
+import { persistentStore } from "src/shared/sharedStore";
 
-const STORAGE_KEY = "poe-search-configs";
-
+// New search config manager using shared store
 export const getSearchConfigs = (): SearchConfig[] => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      // Return default empty config
-      return [];
-    }
-    return JSON.parse(stored);
-  } catch (error) {
-    console.error("Error loading search configs:", error);
-    return [];
-  }
+  return persistentStore.getState().searchConfigs;
 };
 
 export const saveSearchConfigs = (configs: SearchConfig[]): void => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(configs));
-  } catch (error) {
-    console.error("Error saving search configs:", error);
-  }
+  persistentStore.setSearchConfigs(configs);
 };
 
 export const addSearchConfig = (
   config: Omit<SearchConfig, "id">
 ): SearchConfig => {
-  const configs = getSearchConfigs();
-  const newConfig: SearchConfig = {
-    ...config,
-    id: `search-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-  };
-  const updatedConfigs = [...configs, newConfig];
-  saveSearchConfigs(updatedConfigs);
-  return newConfig;
+  return persistentStore.addSearchConfig(config);
 };
 
 export const updateSearchConfig = (
   id: string,
   updates: Partial<Omit<SearchConfig, "id">>
 ): void => {
-  const configs = getSearchConfigs();
-  const updatedConfigs = configs.map((config) =>
-    config.id === id ? { ...config, ...updates } : config
-  );
-  saveSearchConfigs(updatedConfigs);
+  persistentStore.updateSearchConfig(id, updates);
 };
 
 export const deleteSearchConfig = (id: string): void => {
-  const configs = getSearchConfigs();
-  const updatedConfigs = configs.filter((config) => config.id !== id);
-  saveSearchConfigs(updatedConfigs);
+  persistentStore.deleteSearchConfig(id);
 };
 
 export const getActiveSearchConfigs = (): SearchConfig[] => {
@@ -59,5 +32,23 @@ export const getActiveSearchConfigs = (): SearchConfig[] => {
 };
 
 export const deleteAllSearchConfigs = (): void => {
-  saveSearchConfigs([]);
+  persistentStore.setSearchConfigs([]);
+};
+
+// Migration function to move data from old localStorage to shared store
+export const migrateSearchConfigs = (): void => {
+  try {
+    const oldConfigs = localStorage.getItem("poe-search-configs");
+    if (oldConfigs) {
+      const configs = JSON.parse(oldConfigs);
+      if (Array.isArray(configs) && configs.length > 0) {
+        persistentStore.setSearchConfigs(configs);
+        // Remove old data after successful migration
+        localStorage.removeItem("poe-search-configs");
+        console.log("Successfully migrated search configs to shared store");
+      }
+    }
+  } catch (error) {
+    console.error("Error migrating search configs:", error);
+  }
 };

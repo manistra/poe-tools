@@ -53,6 +53,7 @@
     "@headlessui/react": "^2.2.1",
     "axios": "^1.8.4",
     "clsx": "^2.1.1",
+    "electron-shared-state": "^1.1.0",
     "electron-squirrel-startup": "^1.0.1",
     "postcss-loader": "^8.1.1",
     "react": "^19.1.0",

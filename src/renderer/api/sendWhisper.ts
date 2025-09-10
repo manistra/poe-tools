@@ -1,5 +1,6 @@
 import { createHeaders } from "./api";
 import { getPoeSessionId } from "../helpers/getPoeSessionId";
+import { electronAPI } from "./electronAPI";
 
 export interface WhisperRequest {
   itemId: string;
@@ -29,7 +30,7 @@ export const sendWhisper = async ({
 
   const headers = createHeaders(getPoeSessionId());
 
-  const data = await window.electron.api.request({
+  const data = await electronAPI.api.request({
     url,
     method: "POST",
     headers,

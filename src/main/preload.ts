@@ -56,9 +56,6 @@ contextBridge.exposeInMainWorld("electron", {
     }) => {
       return ipcRenderer.invoke("api-request", options);
     },
-    getPoeSessionId: () => {
-      return ipcRenderer.invoke("get-poe-session-id");
-    },
   },
   updates: {
     getAppVersion: () => ipcRenderer.invoke("get-app-version"),

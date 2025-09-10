@@ -6,6 +6,7 @@ import CooldownModal from "./components/modals/CooldownModal";
 import clsx from "clsx";
 
 import { getPoeSessionId } from "src/renderer/helpers/getPoeSessionId";
+import { usePoeSessionId } from "src/shared/hooks";
 
 import Items from "./components/Item/Items";
 import LiveSearchesList from "./components/LiveSearchesList";
@@ -15,6 +16,7 @@ import { transformItemData } from "../helpers/transformItemData";
 
 const PoELiveSearch = () => {
   const [isCooldownModalOpen, setIsCooldownModalOpen] = useState(false);
+  const [sessionId, setSessionId] = usePoeSessionId();
 
   const {
     connect,
@@ -114,7 +116,7 @@ const PoELiveSearch = () => {
             </div>
 
             {/* POE Session ID input */}
-            {!getPoeSessionId() && (
+            {!sessionId && (
               <div className="mt-2">
                 <input
                   type="text"
@@ -124,7 +126,7 @@ const PoELiveSearch = () => {
                     if (e.key === "Enter") {
                       const value = (e.target as HTMLInputElement).value;
                       if (value) {
-                        localStorage.setItem("poeSessionId", value);
+                        setSessionId(value);
                         window.location.reload();
                       }
                     }
@@ -156,9 +158,9 @@ const PoELiveSearch = () => {
             <Button
               variant="success"
               onClick={connect}
-              disabled={!getPoeSessionId() || allSearchConfigs.length === 0}
+              disabled={!sessionId || allSearchConfigs.length === 0}
             >
-              {!getPoeSessionId()
+              {!sessionId
                 ? "Set POE Session ID First"
                 : allSearchConfigs.length === 0
                 ? "Add Searches First"

@@ -7,6 +7,7 @@ import { ItemData, SearchConfig } from "../../../shared/types";
 import { toast } from "react-hot-toast";
 import { useWebSocketConnection } from "../../context/WebSocketConnectionProvider";
 import { getSearchConfigs } from "./searchConfigManager";
+import { useAutoWhisper } from "src/shared/hooks";
 import { sendNotification } from "../../helpers/useNotification";
 import { sendWhisper } from "../../api/sendWhisper";
 import { mockData } from "src/renderer/mocks/mockData";
@@ -48,10 +49,7 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
   const [processedMessageIds, setProcessedMessageIds] = useState<Set<string>>(
     new Set()
   );
-  const [autoWhisper, setAutoWhisper] = useState<boolean>(() => {
-    const stored = localStorage.getItem("poe-auto-whisper");
-    return stored ? JSON.parse(stored) : false;
-  });
+  const [autoWhisper, setAutoWhisper] = useAutoWhisper();
   const [lastWhisperItem, setLastWhisperItem] = useState<ItemData | undefined>(
     undefined
   );
@@ -294,7 +292,6 @@ export const usePoeLiveSearch = (): UsePoeLiveSearchReturn => {
   const toggleAutoWhisper = () => {
     const newValue = !autoWhisper;
     setAutoWhisper(newValue);
-    localStorage.setItem("poe-auto-whisper", JSON.stringify(newValue));
     addLog(`Auto-whisper ${newValue ? "enabled" : "disabled"}`);
   };
 

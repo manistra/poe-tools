@@ -8,6 +8,8 @@ import React, {
 } from "react";
 import { SearchConfig } from "../../shared/types";
 import { getActiveSearchConfigs } from "../live-search/hooks/searchConfigManager";
+import { electronAPI } from "../api/electronAPI";
+import { getPoeSessionId } from "../helpers/getPoeSessionId";
 
 interface Message {
   time: string;
@@ -52,6 +54,12 @@ export const WebSocketConnectionProvider: React.FC<
   const [activeConnections, setActiveConnections] = useState<Set<string>>(
     new Set()
   );
+
+  // Debug: Check electron API availability
+  useEffect(() => {
+    console.log("Electron API available:", !!electronAPI);
+    console.log("WebSocket API available:", !!electronAPI.websocket);
+  }, []);
 
   // Extract WebSocket URI from trade URL
   const getWebSocketUri = (url: string) => {
@@ -98,14 +106,8 @@ export const WebSocketConnectionProvider: React.FC<
           // Add delay between connections to respect rate limits
           setTimeout(async () => {
             console.log(`🔌 Connecting to: ${config.label}`);
-            const sessionId = await (
-              window.electron.api as any
-            ).getPoeSessionId();
-            (window.electron.websocket as any).connect(
-              wsUri,
-              sessionId,
-              config.id
-            );
+            const sessionId = getPoeSessionId();
+            electronAPI.websocket.connect(wsUri, sessionId, config.id);
           }, index * 2000); // 2 second delay between each connection
         }
       }
@@ -114,7 +116,7 @@ export const WebSocketConnectionProvider: React.FC<
 
   const disconnectAll = useCallback(() => {
     console.log("🔌 Simple disconnectAll called");
-    window.electron.websocket.disconnect();
+    electronAPI.websocket.disconnect();
     setActiveConnections(new Set());
     setConnectionStatuses(new Map());
   }, []);
@@ -135,14 +137,14 @@ export const WebSocketConnectionProvider: React.FC<
 
     const wsUri = getWebSocketUri(config.url);
     if (wsUri) {
-      const sessionId = await (window.electron.api as any).getPoeSessionId();
-      (window.electron.websocket as any).connect(wsUri, sessionId, config.id);
+      const sessionId = getPoeSessionId();
+      electronAPI.websocket.connect(wsUri, sessionId, config.id);
     }
   }, []);
 
   const disconnectIndividual = useCallback((searchId: string) => {
     console.log(`🔌 Disconnecting individual search: ${searchId}`);
-    (window.electron.websocket as any).disconnect(searchId);
+    electronAPI.websocket.disconnect(searchId);
   }, []);
 
   const clearMessages = useCallback(() => {
@@ -151,43 +153,49 @@ export const WebSocketConnectionProvider: React.FC<
 
   // Set up event listeners
   useEffect(() => {
-    const removeConnectedListener = (
-      window.electron.websocket as any
-    ).onConnected((searchId: string) => {
-      console.log(`🔌 Connected to search: ${searchId}`);
-      setActiveConnections((prev) => new Set([...prev, searchId]));
-      setConnectionStatuses((prev) => {
-        const newStatuses = new Map(prev);
-        newStatuses.set(searchId, {
-          isConnected: true,
-          isLoading: false,
-          error: null,
-        });
-        return newStatuses;
-      });
-    });
+    // Check if electron API is available
+    if (!electronAPI?.websocket) {
+      console.warn("Electron websocket API not available");
+      return;
+    }
 
-    const removeDisconnectedListener = (
-      window.electron.websocket as any
-    ).onDisconnected((searchId: string) => {
-      console.log(`🔌 Disconnected from search: ${searchId}`);
-      setActiveConnections((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(searchId);
-        return newSet;
-      });
-      setConnectionStatuses((prev) => {
-        const newStatuses = new Map(prev);
-        newStatuses.set(searchId, {
-          isConnected: false,
-          isLoading: false,
-          error: null,
+    const removeConnectedListener = electronAPI.websocket.onConnected(
+      (searchId: string) => {
+        console.log(`🔌 Connected to search: ${searchId}`);
+        setActiveConnections((prev) => new Set([...prev, searchId]));
+        setConnectionStatuses((prev) => {
+          const newStatuses = new Map(prev);
+          newStatuses.set(searchId, {
+            isConnected: true,
+            isLoading: false,
+            error: null,
+          });
+          return newStatuses;
         });
-        return newStatuses;
-      });
-    });
+      }
+    );
 
-    const removeMessageListener = (window.electron.websocket as any).onMessage(
+    const removeDisconnectedListener = electronAPI.websocket.onDisconnected(
+      (searchId: string) => {
+        console.log(`🔌 Disconnected from search: ${searchId}`);
+        setActiveConnections((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(searchId);
+          return newSet;
+        });
+        setConnectionStatuses((prev) => {
+          const newStatuses = new Map(prev);
+          newStatuses.set(searchId, {
+            isConnected: false,
+            isLoading: false,
+            error: null,
+          });
+          return newStatuses;
+        });
+      }
+    );
+
+    const removeMessageListener = electronAPI.websocket.onMessage(
       (searchId: string, data: unknown) => {
         console.log(`🔌 Received message from ${searchId}:`, data);
         const messageData = data as { new?: string[] };
@@ -214,7 +222,7 @@ export const WebSocketConnectionProvider: React.FC<
       }
     );
 
-    const removeErrorListener = (window.electron.websocket as any).onError(
+    const removeErrorListener = electronAPI.websocket.onError(
       (searchId: string, errorMsg: string) => {
         console.error(`🔌 WebSocket error for ${searchId}:`, errorMsg);
         setConnectionStatuses((prev) => {
@@ -231,10 +239,10 @@ export const WebSocketConnectionProvider: React.FC<
 
     // Clean up listeners on unmount
     return () => {
-      removeConnectedListener();
-      removeDisconnectedListener();
-      removeMessageListener();
-      removeErrorListener();
+      removeConnectedListener?.();
+      removeDisconnectedListener?.();
+      removeMessageListener?.();
+      removeErrorListener?.();
       disconnectAll();
     };
   }, [disconnectAll]);

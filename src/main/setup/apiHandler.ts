@@ -39,11 +39,4 @@ export function setupApiHandler() {
       }
     }
   );
-
-  ipcMain.handle("get-poe-session-id", async (event) => {
-    // Get the session ID from the renderer process
-    return event.sender.executeJavaScript(`
-      window.localStorage.getItem("poeSessionId")
-    `);
-  });
 }

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import clsx from "clsx";
 import Button from "src/renderer/components/Button";
 import Input from "src/renderer/components/Input";
+import { electronAPI } from "src/renderer/api/electronAPI";
 
 import {
   updateSearchConfig,
@@ -37,7 +38,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
     try {
       // Remove "/live" suffix if it exists
       const cleanUrl = url.endsWith("/live") ? url.slice(0, -5) : url;
-      await window.electron.shell.openExternal(cleanUrl);
+      await electronAPI.shell.openExternal(cleanUrl);
     } catch (error) {
       console.error("Failed to open external URL:", error);
     }

@@ -2,6 +2,7 @@ import { extractSearchQueryId } from "../helpers/extractSearchQueryId";
 import { getPoeSessionId } from "../helpers/getPoeSessionId";
 import { ItemData } from "../../shared/types";
 import { poe2SearchUrl } from "./api";
+import { electronAPI } from "./electronAPI";
 
 export const fetchItemDetails = async ({
   itemIds,
@@ -26,7 +27,7 @@ export const fetchItemDetails = async ({
     isPoe2 ? "poe2" : "poe"
   }`;
 
-  const data = await window.electron.api.request({
+  const data = await electronAPI.api.request({
     url,
     method: "GET",
     headers: {
