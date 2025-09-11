@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import SettingsModal from "./live-search/components/modals/SettingsModal";
 import ImportExportModal from "./live-search/components/modals/ImportExportModal";
 import PoeLiveSearch from "./live-search/PoeLiveSearch";
-import { WebSocketConnectionProvider } from "./context/WebSocketConnectionProvider";
 
 export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -42,9 +41,7 @@ export default function App() {
         </button>
       </div>
 
-      <WebSocketConnectionProvider>
-        <PoeLiveSearch />
-      </WebSocketConnectionProvider>
+      <PoeLiveSearch />
 
       <SettingsModal
         isOpen={isSettingsOpen}

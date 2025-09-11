@@ -1,25 +1,15 @@
 import React, { useState } from "react";
 
-import LiveSearchItem from "./LiveSearchItem";
 import Button from "src/renderer/components/Button";
 import Input from "src/renderer/components/Input";
 import { toast } from "react-hot-toast";
-import { useWebSocketConnection } from "../../context/WebSocketConnectionProvider";
-import {
-  addSearchConfig,
-  getSearchConfigs,
-} from "../hooks/searchConfigManager";
+import { useSearchConfigs } from "src/shared/hooks";
+import LiveSearchItem from "./LiveSearchItem";
 
 const LiveSearchesList: React.FC = () => {
-  const { connectionStatuses, connectIndividual, disconnectIndividual } =
-    useWebSocketConnection();
-  const [searchConfigs, setSearchConfigs] = useState(getSearchConfigs());
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newConfig, setNewConfig] = useState({ label: "", url: "" });
-
-  const handleConfigChange = () => {
-    setSearchConfigs(getSearchConfigs());
-  };
+  const { configs, addConfig } = useSearchConfigs();
 
   const handleAddConfig = () => {
     if (!newConfig.label.trim() || !newConfig.url.trim()) {
@@ -28,22 +18,20 @@ const LiveSearchesList: React.FC = () => {
     }
 
     try {
-      addSearchConfig({
-        label: newConfig.label.trim(),
-        url: newConfig.url.trim(),
-        isActive: false, // Don't auto-activate new configs
-      });
+      //Add to search configs
+      addConfig({ label: newConfig.label, url: newConfig.url, isActive: true });
+
       setNewConfig({ label: "", url: "" });
       setIsAddingNew(false);
-      handleConfigChange();
-      toast.success("Search configuration added");
+
+      toast.success("Live Search added");
     } catch (error) {
-      toast.error("Failed to add search configuration");
+      toast.error("Failed to add Live Search");
     }
   };
 
   return (
-    <div className="space-y-1">
+    <div className="w-full space-y-1">
       {/* Add New Search Button */}
       <div className="flex justify-end mb-2">
         <Button
@@ -106,24 +94,8 @@ const LiveSearchesList: React.FC = () => {
       )}
 
       {/* Existing Search Items */}
-      {searchConfigs.map((config) => {
-        const status = connectionStatuses.get(config.id);
-        const isConnected = status?.isConnected || false;
-        const isLoading = status?.isLoading || false;
-        const hasError = status?.error;
-
-        return (
-          <LiveSearchItem
-            key={config.id}
-            config={config}
-            isConnected={isConnected}
-            isLoading={isLoading}
-            hasError={hasError}
-            onConnect={connectIndividual}
-            onDisconnect={disconnectIndividual}
-            onConfigChange={handleConfigChange}
-          />
-        );
+      {configs.map((config) => {
+        return <LiveSearchItem key={config.id} config={config} />;
       })}
     </div>
   );

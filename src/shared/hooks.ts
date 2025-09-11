@@ -82,6 +82,7 @@ export const useSearchConfigs = () => {
     addConfig,
     updateConfig,
     deleteConfig,
+    setConfigs,
   };
 };
 

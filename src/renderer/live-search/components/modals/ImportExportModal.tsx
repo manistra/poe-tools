@@ -2,12 +2,8 @@ import React, { useState } from "react";
 import ModalBase from "src/renderer/components/Modal";
 import Button from "src/renderer/components/Button";
 import TextArea from "src/renderer/components/TextArea";
-import {
-  getSearchConfigs,
-  addSearchConfig,
-  deleteAllSearchConfigs,
-} from "../../hooks/searchConfigManager";
 import { copyToClipboard } from "../../../helpers/clipboard";
+import { useSearchConfigs } from "src/shared/hooks";
 
 interface ImportExportModalProps {
   isOpen: boolean;
@@ -20,6 +16,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 }) => {
   const [importData, setImportData] = useState("");
   const [importError, setImportError] = useState("");
+  const { configs, setConfigs } = useSearchConfigs();
 
   const handleImport = () => {
     setImportError("");
@@ -39,13 +36,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
       }
 
       // Add each search config
-      parsedData.forEach((item: { label: string; url: string }) => {
-        addSearchConfig({
-          label: item.label,
-          url: item.url,
-          isActive: true,
-        });
-      });
+      setConfigs(parsedData);
 
       setImportData("");
       setImportError("");
@@ -63,9 +54,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
   const handleExport = async () => {
     try {
-      const activeConfigs = getSearchConfigs().filter(
-        (config) => config.isActive
-      );
+      const activeConfigs = configs.filter((config) => config.isActive);
       const exportData = activeConfigs.map((config) => ({
         label: config.label,
         url: config.url,
@@ -83,19 +72,17 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
   };
 
   const handleDeleteAll = () => {
-    const allConfigs = getSearchConfigs();
-    if (allConfigs.length === 0) {
+    if (configs.length === 0) {
       alert("No live searches to delete!");
       return;
     }
 
     const confirmed = window.confirm(
-      `Are you sure you want to delete ALL ${allConfigs.length} live searches? This action cannot be undone!`
+      `Are you sure you want to delete ALL ${configs.length} live searches? This action cannot be undone!`
     );
 
     if (confirmed) {
-      deleteAllSearchConfigs();
-      alert(`Successfully deleted all ${allConfigs.length} live searches!`);
+      setConfigs([]);
 
       // Close modal and force refresh the page
       setIsImportExportOpen(false);

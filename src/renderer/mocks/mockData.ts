@@ -1,3 +1,5 @@
+import { ItemData } from "src/shared/types";
+
 export const mockData = [
   {
     id: "74bc9af9272a95cef36a0eac524a2f189f534676cd555abe82559a66200d2d2c-2025-09-08T10:09:20.420Z",
@@ -1044,6 +1046,4 @@ export const mockData = [
       },
     },
   },
-];
-
-// Add the new mock item for development
+] as unknown as ItemData[];

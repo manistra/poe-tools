@@ -4,35 +4,19 @@ import Button from "src/renderer/components/Button";
 import Input from "src/renderer/components/Input";
 import { electronAPI } from "src/renderer/api/electronAPI";
 
-import {
-  updateSearchConfig,
-  deleteSearchConfig,
-} from "../hooks/searchConfigManager";
 import { toast } from "react-hot-toast";
 import { SearchConfig } from "src/shared/types";
+import { useSearchConfigs } from "src/shared/hooks";
 
 interface LiveSearchItemProps {
   config: SearchConfig;
-  isConnected: boolean;
-  isLoading: boolean;
-  hasError?: string;
-  onConnect: (config: SearchConfig) => void;
-  onDisconnect: (id: string) => void;
-  onConfigChange: () => void;
 }
 
-const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
-  config,
-  isConnected,
-  isLoading,
-  hasError,
-  onConnect,
-  onDisconnect,
-  onConfigChange,
-}) => {
+const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ config }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editLabel, setEditLabel] = useState(config.label);
   const [editUrl, setEditUrl] = useState(config.url);
+  const { updateConfig, deleteConfig } = useSearchConfigs();
 
   const handleUrlClick = async (url: string) => {
     try {
@@ -51,11 +35,11 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
     }
 
     try {
-      updateSearchConfig(config.id, {
+      updateConfig(config.id, {
         label: editLabel.trim(),
         url: editUrl.trim(),
       });
-      onConfigChange();
+
       setIsOpen(false);
       toast.success("Search configuration updated");
     } catch (error) {
@@ -76,8 +60,8 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
       )
     ) {
       try {
-        deleteSearchConfig(config.id);
-        onConfigChange();
+        deleteConfig(config.id);
+
         toast.success("Search configuration deleted");
       } catch (error) {
         toast.error("Failed to delete search configuration");
@@ -87,10 +71,9 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
 
   const handleActiveChange = (configId: string) => {
     try {
-      updateSearchConfig(configId, {
+      updateConfig(configId, {
         isActive: !config.isActive,
       });
-      onConfigChange();
     } catch (error) {
       toast.error("Failed to update search configuration");
     }
@@ -99,12 +82,12 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
   return (
     <div
       className={clsx(
-        "flex-col items-center justify-between rounded border",
-        isConnected
-          ? "border-[#0d311e]/20"
-          : isLoading
-          ? "border-yellow-900/20 bg-yellow-900/20"
-          : "border-gray-900 bg-gray-900"
+        "flex-col items-center justify-between rounded border border-gray-900 bg-gray-900"
+        // isConnected
+        //   ? "border-[#0d311e]/20"
+        //   : isLoading
+        //   ? "border-yellow-900/20 bg-yellow-900/20"
+        //   : "border-gray-900 bg-gray-900"
       )}
     >
       <div className="flex items-center justify-between rounded p-1 w-full bg-gradient-to-r from-[#000000] to-green-900/20">
@@ -135,17 +118,14 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
               />
             </svg>
           </button>
-          {hasError && (
-            <div className="text-xs text-red-400 mt-1">Error: {hasError}</div>
-          )}
         </div>
         <div className="ml-2 flex items-center gap-2">
           <div className="flex gap-2 mx-2">
-            {isConnected ? (
+            {/* {isConnected ? (
               <Button
                 size="small"
                 variant="text"
-                onClick={() => onDisconnect(config.id)}
+                // onClick={() => onDisconnect(config.id)}
                 className="text-xs text-red-900/20 border border-red-900/20 p-2 hover:text-red-500 hover:border-red-500"
               >
                 Disconnect
@@ -154,16 +134,16 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
               <Button
                 size="small"
                 variant="text"
-                onClick={() => onConnect(config)}
-                disabled={isLoading || isOpen}
+                // onClick={() => onConnect(config)}
+                disabled={isOpen}
                 className="text-xs text-green-700 border border-green-700 p-2 hover:text-green-500 hover:border-green-500"
               >
-                {isLoading ? "Connecting..." : "Connect"}
+                Connect
               </Button>
-            )}
+            )} */}
 
             <Button
-              disabled={isConnected || isLoading}
+              // disabled={isConnected}
               size="small"
               variant="outline"
               onClick={() => setIsOpen(!isOpen)}
@@ -189,17 +169,17 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
 
           <div
             className={clsx(
-              "w-2 h-2 rounded-full",
-              isConnected
-                ? "bg-green-400"
-                : isLoading
-                ? "bg-yellow-400 animate-pulse"
-                : "bg-red-400"
+              "w-2 h-2 rounded-full"
+              // isConnected
+              //   ? "bg-green-400"
+              //   : isLoading
+              //   ? "bg-yellow-400 animate-pulse"
+              //   : "bg-red-400"
             )}
           />
-          <span className="text-xs text-gray-400 mr-2">
+          {/* <span className="text-xs text-gray-400 mr-2">
             {isConnected ? "Live" : isLoading ? "Connecting..." : "Offline"}
-          </span>
+          </span> */}
         </div>
       </div>
 
