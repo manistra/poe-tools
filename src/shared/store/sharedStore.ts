@@ -94,9 +94,9 @@ export class PersistentSharedStore {
   addResult(result: TransformedItemData): void {
     this.setState((state) => {
       state.results.unshift(result); // Add to beginning
-      // Keep only last 1000 results to prevent memory issues
-      if (state.results.length > 1000) {
-        state.results = state.results.slice(0, 1000);
+      // Keep only last 200 results to prevent memory issues
+      if (state.results.length > 200) {
+        state.results = state.results.slice(0, 200);
       }
     });
   }

@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { AppState } from "./storeUtils";
 import { LiveSearch, TransformedItemData } from "../types";
 import { persistentStore } from "../store/sharedStore";
-import { electronAPI } from "src/renderer/api/electronAPI";
 
 // Main hook to access the entire store
 export const useAppStore = () => {
