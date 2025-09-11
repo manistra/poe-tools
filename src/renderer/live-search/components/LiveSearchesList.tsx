@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Button from "src/renderer/components/Button";
 import Input from "src/renderer/components/Input";
 import { toast } from "react-hot-toast";
-import { useSearchConfigs } from "src/shared/hooks";
+import { useSearchConfigs } from "src/shared/store/hooks";
 import LiveSearchItem from "./LiveSearchItem";
 
 const LiveSearchesList: React.FC = () => {

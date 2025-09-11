@@ -1,6 +1,6 @@
 import { createSharedStore } from "electron-shared-state";
-import { AppState, getInitialState, saveStateToStorage } from "./store";
-import { SearchConfig, TransformedItemData } from "./types";
+import { AppState, getInitialState, saveStateToStorage } from "./storeUtils";
+import { SearchConfig, TransformedItemData } from "../types";
 
 // Create the shared store with initial state loaded from localStorage
 const sharedStore = createSharedStore<AppState>(getInitialState(), {

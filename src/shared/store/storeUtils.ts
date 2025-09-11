@@ -1,4 +1,4 @@
-import { SearchConfig, TransformedItemData } from "./types";
+import { SearchConfig, TransformedItemData } from "../types";
 
 export interface AppState {
   poeSessionid: string;

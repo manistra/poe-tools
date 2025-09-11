@@ -1,5 +1,5 @@
 import React from "react";
-import { useAutoWhisper } from "src/shared/hooks";
+import { useAutoWhisper } from "src/shared/store/hooks";
 
 const AutoTeleportToggle: React.FC = () => {
   const [autoWhisper, updateAutoWhisper] = useAutoWhisper();

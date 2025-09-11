@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { AppState } from "./store";
-import { SearchConfig, TransformedItemData } from "./types";
-import { persistentStore } from "./sharedStore";
+import { AppState } from "./storeUtils";
+import { SearchConfig, TransformedItemData } from "../types";
+import { persistentStore } from "../store/sharedStore";
 
 // Main hook to access the entire store
 export const useAppStore = () => {

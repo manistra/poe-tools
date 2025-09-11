@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ModalBase from "src/renderer/components/Modal";
 import Input from "src/renderer/components/Input";
 import Button from "src/renderer/components/Button";
-import { usePoeSessionId } from "src/shared/hooks";
+import { usePoeSessionId } from "src/shared/store/hooks";
 
 interface SettingsModalProps {
   isOpen: boolean;

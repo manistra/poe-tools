@@ -85,6 +85,7 @@ const createWindow = (): void => {
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   createWindow();
+
   setupWebSocketHandlers();
   setupApiHandler();
   setupAutoUpdater();

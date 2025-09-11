@@ -3,7 +3,7 @@ import ModalBase from "src/renderer/components/Modal";
 import Button from "src/renderer/components/Button";
 import TextArea from "src/renderer/components/TextArea";
 import { copyToClipboard } from "../../../helpers/clipboard";
-import { useSearchConfigs } from "src/shared/hooks";
+import { useSearchConfigs } from "src/shared/store/hooks";
 
 interface ImportExportModalProps {
   isOpen: boolean;

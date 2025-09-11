@@ -6,7 +6,7 @@ import { electronAPI } from "src/renderer/api/electronAPI";
 
 import { toast } from "react-hot-toast";
 import { SearchConfig } from "src/shared/types";
-import { useSearchConfigs } from "src/shared/hooks";
+import { useSearchConfigs } from "src/shared/store/hooks";
 
 interface LiveSearchItemProps {
   config: SearchConfig;
