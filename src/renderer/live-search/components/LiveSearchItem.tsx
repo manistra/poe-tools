@@ -6,7 +6,7 @@ import { electronAPI } from "src/renderer/api/electronAPI";
 
 import { toast } from "react-hot-toast";
 import { LiveSearch } from "src/shared/types";
-import { useLiveSearches } from "src/shared/store/hooks";
+import { useLiveSearchContext } from "./context/hooks/useLiveSearchContext";
 
 interface LiveSearchItemProps {
   liveSearch: LiveSearch;
@@ -16,7 +16,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editLabel, setEditLabel] = useState(liveSearch.label);
   const [editUrl, setEditUrl] = useState(liveSearch.url);
-  const { updateLiveSearch, deleteLiveSearch } = useLiveSearches();
+  const { updateLiveSearch, deleteLiveSearch } = useLiveSearchContext();
 
   const handleUrlClick = async (url: string) => {
     try {

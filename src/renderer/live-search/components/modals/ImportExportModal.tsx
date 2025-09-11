@@ -3,7 +3,7 @@ import ModalBase from "src/renderer/components/Modal";
 import Button from "src/renderer/components/Button";
 import TextArea from "src/renderer/components/TextArea";
 import { copyToClipboard } from "../../../helpers/clipboard";
-import { useLiveSearches } from "src/shared/store/hooks";
+import { useLiveSearchContext } from "../context/hooks/useLiveSearchContext";
 
 interface ImportExportModalProps {
   isOpen: boolean;
@@ -16,7 +16,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 }) => {
   const [importData, setImportData] = useState("");
   const [importError, setImportError] = useState("");
-  const { liveSearches, setLiveSearches } = useLiveSearches();
+  const { liveSearches, setLiveSearches } = useLiveSearchContext();
 
   const handleImport = () => {
     setImportError("");

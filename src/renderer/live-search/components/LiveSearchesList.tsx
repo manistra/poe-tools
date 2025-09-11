@@ -3,13 +3,14 @@ import React, { useState } from "react";
 import Button from "src/renderer/components/Button";
 import Input from "src/renderer/components/Input";
 import { toast } from "react-hot-toast";
-import { useLiveSearches } from "src/shared/store/hooks";
+
 import LiveSearchItem from "./LiveSearchItem";
+import { useLiveSearchContext } from "./context/hooks/useLiveSearchContext";
 
 const LiveSearchesList: React.FC = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newConfig, setNewConfig] = useState({ label: "", url: "" });
-  const { liveSearches, addLiveSearch } = useLiveSearches();
+  const { liveSearches, addLiveSearch } = useLiveSearchContext();
 
   const handleAddConfig = () => {
     if (!newConfig.label.trim() || !newConfig.url.trim()) {
