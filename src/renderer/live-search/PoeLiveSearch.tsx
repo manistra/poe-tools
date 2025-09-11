@@ -38,7 +38,7 @@ const PoELiveSearch = () => {
           <Button
             variant="success"
             // onClick={connect}
-            // disabled={!sessionId || allSearchConfigs.length === 0}
+            // disabled={!sessionId || allLiveSearches.length === 0}
           >
             Start Sniping
           </Button>

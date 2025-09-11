@@ -3,7 +3,7 @@ import ModalBase from "src/renderer/components/Modal";
 import Button from "src/renderer/components/Button";
 import TextArea from "src/renderer/components/TextArea";
 import { copyToClipboard } from "../../../helpers/clipboard";
-import { useSearchConfigs } from "src/shared/store/hooks";
+import { useLiveSearches } from "src/shared/store/hooks";
 
 interface ImportExportModalProps {
   isOpen: boolean;
@@ -16,7 +16,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 }) => {
   const [importData, setImportData] = useState("");
   const [importError, setImportError] = useState("");
-  const { configs, setConfigs } = useSearchConfigs();
+  const { liveSearches, setLiveSearches } = useLiveSearches();
 
   const handleImport = () => {
     setImportError("");
@@ -35,8 +35,8 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
         }
       }
 
-      // Add each search config
-      setConfigs(parsedData);
+      // Add each live search
+      setLiveSearches(parsedData);
 
       setImportData("");
       setImportError("");
@@ -54,16 +54,18 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
   const handleExport = async () => {
     try {
-      const activeConfigs = configs.filter((config) => config.isActive);
-      const exportData = activeConfigs.map((config) => ({
-        label: config.label,
-        url: config.url,
+      const activeLiveSearches = liveSearches.filter(
+        (liveSearch) => liveSearch.isActive
+      );
+      const exportData = activeLiveSearches.map((liveSearch) => ({
+        label: liveSearch.label,
+        url: liveSearch.url,
       }));
 
       const jsonString = JSON.stringify(exportData, null, 2);
       await copyToClipboard(jsonString);
       alert(
-        `Exported ${activeConfigs.length} active live searches to clipboard!`
+        `Exported ${activeLiveSearches.length} active live searches to clipboard!`
       );
     } catch (error) {
       console.error("Export failed:", error);
@@ -72,17 +74,17 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
   };
 
   const handleDeleteAll = () => {
-    if (configs.length === 0) {
+    if (liveSearches.length === 0) {
       alert("No live searches to delete!");
       return;
     }
 
     const confirmed = window.confirm(
-      `Are you sure you want to delete ALL ${configs.length} live searches? This action cannot be undone!`
+      `Are you sure you want to delete ALL ${liveSearches.length} live searches? This action cannot be undone!`
     );
 
     if (confirmed) {
-      setConfigs([]);
+      setLiveSearches([]);
 
       // Close modal and force refresh the page
       setIsImportExportOpen(false);

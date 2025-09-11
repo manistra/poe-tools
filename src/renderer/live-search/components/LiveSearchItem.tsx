@@ -5,18 +5,18 @@ import Input from "src/renderer/components/Input";
 import { electronAPI } from "src/renderer/api/electronAPI";
 
 import { toast } from "react-hot-toast";
-import { SearchConfig } from "src/shared/types";
-import { useSearchConfigs } from "src/shared/store/hooks";
+import { LiveSearch } from "src/shared/types";
+import { useLiveSearches } from "src/shared/store/hooks";
 
 interface LiveSearchItemProps {
-  config: SearchConfig;
+  liveSearch: LiveSearch;
 }
 
-const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ config }) => {
+const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [editLabel, setEditLabel] = useState(config.label);
-  const [editUrl, setEditUrl] = useState(config.url);
-  const { updateConfig, deleteConfig } = useSearchConfigs();
+  const [editLabel, setEditLabel] = useState(liveSearch.label);
+  const [editUrl, setEditUrl] = useState(liveSearch.url);
+  const { updateLiveSearch, deleteLiveSearch } = useLiveSearches();
 
   const handleUrlClick = async (url: string) => {
     try {
@@ -35,7 +35,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ config }) => {
     }
 
     try {
-      updateConfig(config.id, {
+      updateLiveSearch(liveSearch.id, {
         label: editLabel.trim(),
         url: editUrl.trim(),
       });
@@ -48,8 +48,8 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ config }) => {
   };
 
   const handleCancel = () => {
-    setEditLabel(config.label);
-    setEditUrl(config.url);
+    setEditLabel(liveSearch.label);
+    setEditUrl(liveSearch.url);
     setIsOpen(false);
   };
 
@@ -60,7 +60,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ config }) => {
       )
     ) {
       try {
-        deleteConfig(config.id);
+        deleteLiveSearch(liveSearch.id);
 
         toast.success("Search configuration deleted");
       } catch (error) {
@@ -69,10 +69,10 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ config }) => {
     }
   };
 
-  const handleActiveChange = (configId: string) => {
+  const handleActiveChange = (liveSearchId: string) => {
     try {
-      updateConfig(configId, {
-        isActive: !config.isActive,
+      updateLiveSearch(liveSearchId, {
+        isActive: !liveSearch.isActive,
       });
     } catch (error) {
       toast.error("Failed to update search configuration");
@@ -94,15 +94,15 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ config }) => {
         <div className="flex-1 flex flex-row items-center gap-2 min-w-0 pl-2">
           <input
             type="checkbox"
-            checked={config.isActive}
-            onChange={() => handleActiveChange(config.id)}
+            checked={liveSearch.isActive}
+            onChange={() => handleActiveChange(liveSearch.id)}
             className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2 opacity-60"
           />
           <button
-            onClick={() => handleUrlClick(config.url)}
+            onClick={() => handleUrlClick(liveSearch.url)}
             className="text-gray-400 truncate hover:text-blue-900 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1"
           >
-            {config.label}
+            {liveSearch.label}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -125,7 +125,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ config }) => {
               <Button
                 size="small"
                 variant="text"
-                // onClick={() => onDisconnect(config.id)}
+                // onClick={() => onDisconnect(liveSearchId.id)}
                 className="text-xs text-red-900/20 border border-red-900/20 p-2 hover:text-red-500 hover:border-red-500"
               >
                 Disconnect
@@ -134,7 +134,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ config }) => {
               <Button
                 size="small"
                 variant="text"
-                // onClick={() => onConnect(config)}
+                // onClick={() => onConnect(liveSearchId)}
                 disabled={isOpen}
                 className="text-xs text-green-700 border border-green-700 p-2 hover:text-green-500 hover:border-green-500"
               >
@@ -188,7 +188,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ config }) => {
           <div className="flex-1 flex flex-row items-end gap-3 min-w-0 ">
             <div className="flex flex-col gap-2 w-full">
               <Input
-                label="Search Label:"
+                label="Live Search Label:"
                 className="text-xs"
                 value={editLabel}
                 onChange={(value) => setEditLabel(String(value))}

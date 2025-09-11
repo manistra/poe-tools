@@ -1,4 +1,4 @@
-export interface SearchConfig {
+export interface LiveSearch {
   id: string;
   label: string;
   url: string;

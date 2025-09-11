@@ -1,6 +1,6 @@
 import { createSharedStore } from "electron-shared-state";
 import { AppState, getInitialState, saveStateToStorage } from "./storeUtils";
-import { SearchConfig, TransformedItemData } from "../types";
+import { LiveSearch, TransformedItemData } from "../types";
 
 // Create the shared store with initial state loaded from localStorage
 const sharedStore = createSharedStore<AppState>(getInitialState(), {
@@ -44,46 +44,43 @@ export class PersistentSharedStore {
     });
   }
 
-  setSearchConfigs(configs: SearchConfig[]): void {
+  setLiveSearches(liveSearches: LiveSearch[]): void {
     this.setState((state) => {
-      state.searchConfigs = configs;
+      state.liveSearches = liveSearches;
     });
   }
 
-  addSearchConfig(config: Omit<SearchConfig, "id">): SearchConfig {
-    const newConfig: SearchConfig = {
-      ...config,
+  addLiveSearch(liveSearch: Omit<LiveSearch, "id">): LiveSearch {
+    const newLiveSearch: LiveSearch = {
+      ...liveSearch,
       id: `search-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     };
 
     this.setState((state) => {
-      state.searchConfigs.push(newConfig);
+      state.liveSearches.push(newLiveSearch);
     });
 
-    return newConfig;
+    return newLiveSearch;
   }
 
-  updateSearchConfig(
-    id: string,
-    updates: Partial<Omit<SearchConfig, "id">>
-  ): void {
+  updateLiveSearch(id: string, updates: Partial<Omit<LiveSearch, "id">>): void {
     this.setState((state) => {
-      const configIndex = state.searchConfigs.findIndex(
-        (config) => config.id === id
+      const liveSearchIndex = state.liveSearches.findIndex(
+        (liveSearch) => liveSearch.id === id
       );
-      if (configIndex !== -1) {
-        state.searchConfigs[configIndex] = {
-          ...state.searchConfigs[configIndex],
+      if (liveSearchIndex !== -1) {
+        state.liveSearches[liveSearchIndex] = {
+          ...state.liveSearches[liveSearchIndex],
           ...updates,
         };
       }
     });
   }
 
-  deleteSearchConfig(id: string): void {
+  deleteLiveSearch(id: string): void {
     this.setState((state) => {
-      state.searchConfigs = state.searchConfigs.filter(
-        (config) => config.id !== id
+      state.liveSearches = state.liveSearches.filter(
+        (liveSearch) => liveSearch.id !== id
       );
     });
   }

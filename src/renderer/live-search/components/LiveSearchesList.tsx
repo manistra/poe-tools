@@ -3,13 +3,13 @@ import React, { useState } from "react";
 import Button from "src/renderer/components/Button";
 import Input from "src/renderer/components/Input";
 import { toast } from "react-hot-toast";
-import { useSearchConfigs } from "src/shared/store/hooks";
+import { useLiveSearches } from "src/shared/store/hooks";
 import LiveSearchItem from "./LiveSearchItem";
 
 const LiveSearchesList: React.FC = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newConfig, setNewConfig] = useState({ label: "", url: "" });
-  const { configs, addConfig } = useSearchConfigs();
+  const { liveSearches, addLiveSearch } = useLiveSearches();
 
   const handleAddConfig = () => {
     if (!newConfig.label.trim() || !newConfig.url.trim()) {
@@ -18,8 +18,12 @@ const LiveSearchesList: React.FC = () => {
     }
 
     try {
-      //Add to search configs
-      addConfig({ label: newConfig.label, url: newConfig.url, isActive: true });
+      //Add to live searches
+      addLiveSearch({
+        label: newConfig.label,
+        url: newConfig.url,
+        isActive: true,
+      });
 
       setNewConfig({ label: "", url: "" });
       setIsAddingNew(false);
@@ -94,8 +98,8 @@ const LiveSearchesList: React.FC = () => {
       )}
 
       {/* Existing Search Items */}
-      {configs.map((config) => {
-        return <LiveSearchItem key={config.id} config={config} />;
+      {liveSearches.map((liveSearch) => {
+        return <LiveSearchItem key={liveSearch.id} liveSearch={liveSearch} />;
       })}
     </div>
   );

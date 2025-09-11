@@ -31,13 +31,14 @@ function MyComponent() {
 
 ```tsx
 import {
-  useSearchConfigs,
+  useLiveSearches,
   usePoeSessionId,
   useAutoWhisper,
 } from "src/shared/hooks";
 
-function SearchConfigsComponent() {
-  const { configs, addConfig, updateConfig, deleteConfig } = useSearchConfigs();
+function LiveSearchesComponent() {
+  const { liveSearches, addLiveSearch, updateLiveSearch, deleteLiveSearch } =
+    useLiveSearches();
   const [sessionId, setSessionId] = usePoeSessionId();
   const [autoWhisper, setAutoWhisper] = useAutoWhisper();
 
@@ -67,7 +68,7 @@ To migrate your existing localStorage-based search configs:
 1. Import the migration function:
 
 ```tsx
-import { migrateSearchConfigs } from "src/renderer/live-search/hooks/searchConfigManagerNew";
+import { migrateLiveSearches } from "src/renderer/live-search/hooks/liveSearchManagerNew";
 ```
 
 2. Call it during app initialization:
@@ -75,7 +76,7 @@ import { migrateSearchConfigs } from "src/renderer/live-search/hooks/searchConfi
 ```tsx
 // In your main App component or index.tsx
 useEffect(() => {
-  migrateSearchConfigs();
+  migrateLiveSearches();
 }, []);
 ```
 
@@ -83,10 +84,10 @@ useEffect(() => {
 
 ```tsx
 // Old
-import { getSearchConfigs, addSearchConfig } from "./searchConfigManager";
+import { getLiveSearches, addLiveSearch } from "./liveSearchManager";
 
 // New
-import { getSearchConfigs, addSearchConfig } from "./searchConfigManagerNew";
+import { getLiveSearches, addLiveSearch } from "./liveSearchManagerNew";
 ```
 
 ## Data Structure
@@ -96,7 +97,7 @@ The store contains:
 ```typescript
 interface AppState {
   poeSessionid: string; // POE session ID
-  searchConfigs: SearchConfig[]; // Array of search configurations
+  liveSearches: LiveSearch[]; // Array of live search configurations
   results: TransformedItemData[]; // Array of search results
   autoWhisper: boolean; // Auto-whisper setting
 }

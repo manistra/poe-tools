@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { AppState } from "./storeUtils";
-import { SearchConfig, TransformedItemData } from "../types";
+import { LiveSearch, TransformedItemData } from "../types";
 import { persistentStore } from "../store/sharedStore";
 import { electronAPI } from "src/renderer/api/electronAPI";
 
@@ -17,12 +17,10 @@ export const useAppStore = () => {
     state,
     setState: persistentStore.setState.bind(persistentStore),
     setPoeSessionId: persistentStore.setPoeSessionId.bind(persistentStore),
-    setSearchConfigs: persistentStore.setSearchConfigs.bind(persistentStore),
-    addSearchConfig: persistentStore.addSearchConfig.bind(persistentStore),
-    updateSearchConfig:
-      persistentStore.updateSearchConfig.bind(persistentStore),
-    deleteSearchConfig:
-      persistentStore.deleteSearchConfig.bind(persistentStore),
+    setLiveSearches: persistentStore.setLiveSearches.bind(persistentStore),
+    addLiveSearch: persistentStore.addLiveSearch.bind(persistentStore),
+    updateLiveSearch: persistentStore.updateLiveSearch.bind(persistentStore),
+    deleteLiveSearch: persistentStore.deleteLiveSearch.bind(persistentStore),
     setResults: persistentStore.setResults.bind(persistentStore),
     addResult: persistentStore.addResult.bind(persistentStore),
     clearResults: persistentStore.clearResults.bind(persistentStore),
@@ -51,39 +49,39 @@ export const usePoeSessionId = () => {
   return [sessionId, updateSessionId] as const;
 };
 
-export const useSearchConfigs = () => {
-  const [configs, setConfigs] = useState<SearchConfig[]>(
-    persistentStore.getState().searchConfigs
+export const useLiveSearches = () => {
+  const [liveSearches, setLiveSearches] = useState<LiveSearch[]>(
+    persistentStore.getState().liveSearches
   );
 
   useEffect(() => {
     const unsubscribe = persistentStore.subscribe((state) => {
-      setConfigs(state.searchConfigs);
+      setLiveSearches(state.liveSearches);
     });
     return unsubscribe;
   }, []);
 
-  const addConfig = useCallback((config: Omit<SearchConfig, "id">) => {
-    return persistentStore.addSearchConfig(config);
+  const addLiveSearch = useCallback((liveSearch: Omit<LiveSearch, "id">) => {
+    return persistentStore.addLiveSearch(liveSearch);
   }, []);
 
-  const updateConfig = useCallback(
-    (id: string, updates: Partial<Omit<SearchConfig, "id">>) => {
-      persistentStore.updateSearchConfig(id, updates);
+  const updateLiveSearch = useCallback(
+    (id: string, updates: Partial<Omit<LiveSearch, "id">>) => {
+      persistentStore.updateLiveSearch(id, updates);
     },
     []
   );
 
-  const deleteConfig = useCallback((id: string) => {
-    persistentStore.deleteSearchConfig(id);
+  const deleteLiveSearch = useCallback((id: string) => {
+    persistentStore.deleteLiveSearch(id);
   }, []);
 
   return {
-    configs,
-    addConfig,
-    updateConfig,
-    deleteConfig,
-    setConfigs,
+    liveSearches,
+    addLiveSearch,
+    updateLiveSearch,
+    deleteLiveSearch,
+    setLiveSearches,
   };
 };
 
@@ -180,12 +178,10 @@ export const useAppStoreSync = () => {
   return {
     getState: persistentStore.getState.bind(persistentStore),
     setPoeSessionId: persistentStore.setPoeSessionId.bind(persistentStore),
-    setSearchConfigs: persistentStore.setSearchConfigs.bind(persistentStore),
-    addSearchConfig: persistentStore.addSearchConfig.bind(persistentStore),
-    updateSearchConfig:
-      persistentStore.updateSearchConfig.bind(persistentStore),
-    deleteSearchConfig:
-      persistentStore.deleteSearchConfig.bind(persistentStore),
+    setLiveSearches: persistentStore.setLiveSearches.bind(persistentStore),
+    addLiveSearch: persistentStore.addLiveSearch.bind(persistentStore),
+    updateLiveSearch: persistentStore.updateLiveSearch.bind(persistentStore),
+    deleteLiveSearch: persistentStore.deleteLiveSearch.bind(persistentStore),
     setResults: persistentStore.setResults.bind(persistentStore),
     addResult: persistentStore.addResult.bind(persistentStore),
     clearResults: persistentStore.clearResults.bind(persistentStore),

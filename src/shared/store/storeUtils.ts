@@ -1,8 +1,8 @@
-import { SearchConfig, TransformedItemData } from "../types";
+import { LiveSearch, TransformedItemData } from "../types";
 
 export interface AppState {
   poeSessionid: string;
-  searchConfigs: SearchConfig[];
+  liveSearches: LiveSearch[];
   results: TransformedItemData[];
   autoWhisper: boolean;
   rateLimiterTokens: number;
@@ -10,7 +10,7 @@ export interface AppState {
 
 export const initialState: AppState = {
   poeSessionid: "",
-  searchConfigs: [],
+  liveSearches: [],
   results: [],
   autoWhisper: false,
   rateLimiterTokens: 6,
@@ -19,7 +19,7 @@ export const initialState: AppState = {
 // Storage keys for localStorage
 const STORAGE_KEYS = {
   POE_SESSION_ID: "poeSessionId",
-  SEARCH_CONFIGS: "poe-search-configs",
+  LIVE_SEARCHES: "poe-live-searches",
   RESULTS: "poe-results",
   AUTO_WHISPER: "poe-auto-whisper",
   RATE_LIMITER_TOKENS: "poe-rate-limiter-tokens",
@@ -30,8 +30,8 @@ export const loadStateFromStorage = (): Partial<AppState> => {
   try {
     const poeSessionid =
       localStorage.getItem(STORAGE_KEYS.POE_SESSION_ID) || "";
-    const searchConfigs = JSON.parse(
-      localStorage.getItem(STORAGE_KEYS.SEARCH_CONFIGS) || "[]"
+    const liveSearches = JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.LIVE_SEARCHES) || "[]"
     );
     const results = JSON.parse(
       localStorage.getItem(STORAGE_KEYS.RESULTS) || "[]"
@@ -44,7 +44,7 @@ export const loadStateFromStorage = (): Partial<AppState> => {
 
     return {
       poeSessionid,
-      searchConfigs,
+      liveSearches,
       results,
       autoWhisper,
       rateLimiterTokens,
@@ -60,10 +60,10 @@ export const saveStateToStorage = (state: Partial<AppState>): void => {
     if (state.poeSessionid !== undefined) {
       localStorage.setItem(STORAGE_KEYS.POE_SESSION_ID, state.poeSessionid);
     }
-    if (state.searchConfigs !== undefined) {
+    if (state.liveSearches !== undefined) {
       localStorage.setItem(
-        STORAGE_KEYS.SEARCH_CONFIGS,
-        JSON.stringify(state.searchConfigs)
+        STORAGE_KEYS.LIVE_SEARCHES,
+        JSON.stringify(state.liveSearches)
       );
     }
     if (state.results !== undefined) {
