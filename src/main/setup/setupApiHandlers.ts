@@ -134,4 +134,9 @@ export function setupApiHandlers() {
       }
     }
   );
+
+  // Add handler for getting current reservoir tokens
+  ipcMain.handle("get-rate-limiter-tokens", async () => {
+    return await HttpRequestLimiter.currentReservoir();
+  });
 }

@@ -81,6 +81,11 @@ export const shellAPI = {
   openExternal: (url: string) => ipcRenderer.invoke("shell-open-external", url),
 };
 
+// Rate limiter API
+export const rateLimiterAPI = {
+  getCurrentTokens: () => ipcRenderer.invoke("get-rate-limiter-tokens"),
+};
+
 // Combined API object for easy access
 export const electronAPI = {
   websocket: websocketAPI,
@@ -90,4 +95,5 @@ export const electronAPI = {
   },
   updates: updatesAPI,
   shell: shellAPI,
+  rateLimiter: rateLimiterAPI,
 };

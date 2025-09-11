@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { AppState } from "./storeUtils";
 import { SearchConfig, TransformedItemData } from "../types";
 import { persistentStore } from "../store/sharedStore";
+import { electronAPI } from "src/renderer/api/electronAPI";
 
 // Main hook to access the entire store
 export const useAppStore = () => {
@@ -142,6 +143,29 @@ export const useRateLimiterTokens = () => {
       setTokens(state.rateLimiterTokens);
     });
     return unsubscribe;
+  }, []);
+
+  // Add periodic refresh every 0.5 seconds
+  useEffect(() => {
+    const refreshTokens = async () => {
+      try {
+        const { electronAPI } = await import("../../renderer/api/electronAPI");
+        const currentTokens = await electronAPI.rateLimiter.getCurrentTokens();
+        persistentStore.setRateLimiterTokens(currentTokens);
+      } catch (error) {
+        console.error("Failed to refresh rate limiter tokens:", error);
+      }
+    };
+
+    // Initial refresh
+    refreshTokens();
+
+    // Set up interval for periodic refresh
+    const interval = setInterval(refreshTokens, 500);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const updateTokens = useCallback((newTokens: number) => {
