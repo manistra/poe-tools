@@ -1,46 +1,5 @@
 import { ipcRenderer } from "electron";
-
-// WebSocket API
-export const websocketAPI = {
-  connect: (wsUri: string, sessionId: string, searchId: string) => {
-    ipcRenderer.send("ws-connect", { wsUri, sessionId, searchId });
-  },
-  disconnect: (searchId?: string) => {
-    ipcRenderer.send("ws-disconnect", searchId);
-  },
-  onConnected: (callback: (searchId: string) => void) => {
-    const wrappedCallback = (_event: any, searchId: string) =>
-      callback(searchId);
-    ipcRenderer.on("ws-connected", wrappedCallback);
-    return () => {
-      ipcRenderer.removeListener("ws-connected", wrappedCallback);
-    };
-  },
-  onDisconnected: (callback: (searchId: string) => void) => {
-    const wrappedCallback = (_event: any, searchId: string) =>
-      callback(searchId);
-    ipcRenderer.on("ws-disconnected", wrappedCallback);
-    return () => {
-      ipcRenderer.removeListener("ws-disconnected", wrappedCallback);
-    };
-  },
-  onMessage: (callback: (searchId: string, data: any) => void) => {
-    const wrappedCallback = (_event: any, searchId: string, data: any) =>
-      callback(searchId, data);
-    ipcRenderer.on("ws-message", wrappedCallback);
-    return () => {
-      ipcRenderer.removeListener("ws-message", wrappedCallback);
-    };
-  },
-  onError: (callback: (searchId: string, error: string) => void) => {
-    const wrappedCallback = (_event: any, searchId: string, error: string) =>
-      callback(searchId, error);
-    ipcRenderer.on("ws-error", wrappedCallback);
-    return () => {
-      ipcRenderer.removeListener("ws-error", wrappedCallback);
-    };
-  },
-};
+import { websocketAPI } from "./websockets/websocketsApi";
 
 // API request handler
 export const apiRequest = (options: {

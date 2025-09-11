@@ -1,8 +1,8 @@
-import { extractSearchQueryId } from "../helpers/extractSearchQueryId";
-import { getPoeSessionId } from "../helpers/getPoeSessionId";
-import { ItemData } from "../../shared/types";
+import { extractSearchQueryId } from "../../helpers/extractSearchQueryId";
+import { getPoeSessionId } from "../../helpers/getPoeSessionId";
+import { ItemData } from "../../../shared/types";
 import { poe2SearchUrl } from "./api";
-import { electronAPI } from "./electronAPI";
+import { electronAPI } from "../electronAPI";
 
 export const fetchItemDetails = async ({
   itemIds,

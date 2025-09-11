@@ -1,6 +1,6 @@
 import { createHeaders } from "./api";
-import { getPoeSessionId } from "../helpers/getPoeSessionId";
-import { electronAPI } from "./electronAPI";
+import { getPoeSessionId } from "../../helpers/getPoeSessionId";
+import { electronAPI } from "../electronAPI";
 
 export interface WhisperRequest {
   itemId: string;
