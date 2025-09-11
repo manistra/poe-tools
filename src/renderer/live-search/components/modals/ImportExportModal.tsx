@@ -54,19 +54,14 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
   const handleExport = async () => {
     try {
-      const activeLiveSearches = liveSearches.filter(
-        (liveSearch) => liveSearch.isActive
-      );
-      const exportData = activeLiveSearches.map((liveSearch) => ({
+      const exportData = liveSearches.map((liveSearch) => ({
         label: liveSearch.label,
         url: liveSearch.url,
       }));
 
       const jsonString = JSON.stringify(exportData, null, 2);
       await copyToClipboard(jsonString);
-      alert(
-        `Exported ${activeLiveSearches.length} active live searches to clipboard!`
-      );
+      alert(`Exported ${liveSearches.length} live searches to clipboard!`);
     } catch (error) {
       console.error("Export failed:", error);
       alert("Failed to export live searches");
@@ -133,7 +128,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
               Import
             </Button>
             <Button size="small" variant="success" onClick={handleExport}>
-              Export All Active Live Searches (Blue Checkmark On)
+              Export All Live Searches
             </Button>
             <Button size="small" variant="danger" onClick={handleDeleteAll}>
               Delete All Live Searches

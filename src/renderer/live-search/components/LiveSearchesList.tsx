@@ -23,7 +23,6 @@ const LiveSearchesList: React.FC = () => {
       addLiveSearch({
         label: newConfig.label,
         url: newConfig.url,
-        isActive: true,
       });
 
       setNewConfig({ label: "", url: "" });

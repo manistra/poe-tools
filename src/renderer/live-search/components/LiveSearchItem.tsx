@@ -69,16 +69,6 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
     }
   };
 
-  const handleActiveChange = (liveSearchId: string) => {
-    try {
-      updateLiveSearch(liveSearchId, {
-        isActive: !liveSearch.isActive,
-      });
-    } catch (error) {
-      toast.error("Failed to update search configuration");
-    }
-  };
-
   return (
     <div
       className={clsx(
@@ -91,34 +81,27 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
       )}
     >
       <div className="flex items-center justify-between rounded p-1 w-full bg-gradient-to-r from-[#000000] to-green-900/20">
-        <div className="flex-1 flex flex-row items-center gap-2 min-w-0 pl-2">
-          <input
-            type="checkbox"
-            checked={liveSearch.isActive}
-            onChange={() => handleActiveChange(liveSearch.id)}
-            className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2 opacity-60"
-          />
-          <button
-            onClick={() => handleUrlClick(liveSearch.url)}
-            className="text-gray-400 truncate hover:text-blue-900 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1"
+        <button
+          onClick={() => handleUrlClick(liveSearch.url)}
+          className="text-gray-400 truncate hover:text-blue-900 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1"
+        >
+          {liveSearch.label}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="size-4"
           >
-            {liveSearch.label}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-              />
-            </svg>
-          </button>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+            />
+          </svg>
+        </button>
+
         <div className="ml-2 flex items-center gap-2">
           <div className="flex gap-2 mx-2">
             {/* {isConnected ? (
