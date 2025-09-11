@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 
 import clsx from "clsx";
 import ItemMods from "./ItemMods";
-import { sendWhisper } from "../../../api/sendWhisper";
+import { autoTeleport } from "../../../api/autoTeleport";
 import StashVisualization from "./StashVisualization";
 
 // Import currency images
@@ -125,7 +125,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
 
     setIsSendingWhisper(true);
     try {
-      const response = await sendWhisper({
+      const response = await autoTeleport({
         itemId: item.id,
         hideoutToken: item.hideoutToken,
         searchQueryId: item.searchQueryId,

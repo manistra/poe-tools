@@ -14,7 +14,7 @@ export interface WhisperResponse {
   error?: string;
 }
 
-export const sendWhisper = async ({
+export const autoTeleport = async ({
   itemId,
   hideoutToken,
   searchQueryId,
@@ -30,7 +30,7 @@ export const sendWhisper = async ({
 
   const headers = createHeaders(getPoeSessionId());
 
-  const data = await electronAPI.api.request({
+  const data = await electronAPI.api.requestNoLimiter({
     url,
     method: "POST",
     headers,

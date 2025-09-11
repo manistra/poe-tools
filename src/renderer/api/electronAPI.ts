@@ -53,6 +53,17 @@ export const apiRequest = (options: {
   return ipcRenderer.invoke("api-request", options);
 };
 
+// API request handler no limiter
+export const apiRequestNoLimiter = (options: {
+  url: string;
+  method: string;
+  headers?: Record<string, string>;
+  data?: any;
+  params?: Record<string, string>;
+}) => {
+  return ipcRenderer.invoke("api-request-no-limiter", options);
+};
+
 // Updates API
 export const updatesAPI = {
   getAppVersion: () => ipcRenderer.invoke("get-app-version"),
@@ -75,6 +86,7 @@ export const electronAPI = {
   websocket: websocketAPI,
   api: {
     request: apiRequest,
+    requestNoLimiter: apiRequestNoLimiter,
   },
   updates: updatesAPI,
   shell: shellAPI,

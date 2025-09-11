@@ -132,6 +132,25 @@ export const useAutoWhisper = () => {
   return [autoWhisper, updateAutoWhisper] as const;
 };
 
+export const useRateLimiterTokens = () => {
+  const [tokens, setTokens] = useState<number>(
+    persistentStore.getState().rateLimiterTokens
+  );
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setTokens(state.rateLimiterTokens);
+    });
+    return unsubscribe;
+  }, []);
+
+  const updateTokens = useCallback((newTokens: number) => {
+    persistentStore.setRateLimiterTokens(newTokens);
+  }, []);
+
+  return [tokens, updateTokens] as const;
+};
+
 // Hook for synchronous access to current state (useful for event handlers)
 export const useAppStoreSync = () => {
   return {

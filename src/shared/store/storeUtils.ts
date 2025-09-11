@@ -5,6 +5,7 @@ export interface AppState {
   searchConfigs: SearchConfig[];
   results: TransformedItemData[];
   autoWhisper: boolean;
+  rateLimiterTokens: number;
 }
 
 export const initialState: AppState = {
@@ -12,6 +13,7 @@ export const initialState: AppState = {
   searchConfigs: [],
   results: [],
   autoWhisper: false,
+  rateLimiterTokens: 6,
 };
 
 // Storage keys for localStorage
@@ -20,6 +22,7 @@ const STORAGE_KEYS = {
   SEARCH_CONFIGS: "poe-search-configs",
   RESULTS: "poe-results",
   AUTO_WHISPER: "poe-auto-whisper",
+  RATE_LIMITER_TOKENS: "poe-rate-limiter-tokens",
 } as const;
 
 // Helper functions for localStorage persistence
@@ -35,12 +38,16 @@ export const loadStateFromStorage = (): Partial<AppState> => {
     );
     const autoWhisper =
       localStorage.getItem(STORAGE_KEYS.AUTO_WHISPER) === "true";
+    const rateLimiterTokens = parseInt(
+      localStorage.getItem(STORAGE_KEYS.RATE_LIMITER_TOKENS) || "6"
+    );
 
     return {
       poeSessionid,
       searchConfigs,
       results,
       autoWhisper,
+      rateLimiterTokens,
     };
   } catch (error) {
     console.error("Error loading state from localStorage:", error);
@@ -66,6 +73,12 @@ export const saveStateToStorage = (state: Partial<AppState>): void => {
       localStorage.setItem(
         STORAGE_KEYS.AUTO_WHISPER,
         state.autoWhisper.toString()
+      );
+    }
+    if (state.rateLimiterTokens !== undefined) {
+      localStorage.setItem(
+        STORAGE_KEYS.RATE_LIMITER_TOKENS,
+        state.rateLimiterTokens.toString()
       );
     }
   } catch (error) {

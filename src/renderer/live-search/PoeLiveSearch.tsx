@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "src/renderer/components/Button";
+import RateLimiterTokens from "src/renderer/components/RateLimiterTokens";
 
 import Items from "./components/Item/Items";
 import LiveSearchesList from "./components/LiveSearchesList";
@@ -18,6 +19,7 @@ const PoELiveSearch = () => {
     <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">
       <div className="flex gap-2 items-end justify-between">
         <h1 className="text-2xl text-gray-200 font-bold">Live Search</h1>
+        <RateLimiterTokens />
       </div>
 
       <div className="flex gap-2 items-end justify-between">

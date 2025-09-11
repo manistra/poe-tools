@@ -116,6 +116,12 @@ export class PersistentSharedStore {
     });
   }
 
+  setRateLimiterTokens(tokens: number): void {
+    this.setState((state) => {
+      state.rateLimiterTokens = tokens;
+    });
+  }
+
   // Reset to initial state
   reset(): void {
     this.setState((state) => {

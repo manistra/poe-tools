@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import SettingsModal from "./live-search/components/modals/SettingsModal";
 import ImportExportModal from "./live-search/components/modals/ImportExportModal";
 import PoeLiveSearch from "./live-search/PoeLiveSearch";
+import ApiTester from "./components/ApiTester";
 
 export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -40,6 +41,12 @@ export default function App() {
           </svg>
         </button>
       </div>
+
+      {false && (
+        <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">
+          <ApiTester />
+        </div>
+      )}
 
       <PoeLiveSearch />
 

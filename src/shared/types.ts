@@ -77,3 +77,14 @@ export interface TransformedItemData {
   };
   icon?: string;
 }
+
+export interface ApiResponse {
+  data?: any;
+  error?: {
+    message: string;
+    status: number;
+    headers: Record<string, string>;
+  };
+  status?: number;
+  headers?: Record<string, string>;
+}

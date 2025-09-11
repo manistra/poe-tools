@@ -17,6 +17,14 @@ export interface ElectronAPI {
       data?: any;
       params?: Record<string, string>;
     }) => Promise<any>;
+    requestNoLimiter: (options: {
+      url: string;
+      method: string;
+      headers?: Record<string, string>;
+      data?: any;
+      params?: Record<string, string>;
+    }) => Promise<any>;
+
     getPoeSessionId: () => Promise<string | null>;
   };
   updates: {
