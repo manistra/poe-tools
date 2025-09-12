@@ -4,10 +4,10 @@ import { Mutex } from "async-mutex";
 import Bottleneck from "bottleneck";
 import { randomInt } from "src/shared/utils/randomInt";
 import WsStore from "./ws-store";
-import getWebSocketUri from "./utils/getWebSocketUri";
+import getWebSocketUri from "../utils/getWebSocketUri";
 import { WebSocket } from "ws";
-import { processItems } from "./utils/processItems";
-import { apiHeaders } from "./utils/apiHeaders";
+import { processItems } from "../poe-trade/processItems";
+import { apiHeaders } from "../utils/apiHeaders";
 
 class WsRequestLimiter {
   static bottleneck = new Bottleneck({
@@ -17,6 +17,21 @@ class WsRequestLimiter {
 
   static schedule(cb: () => Promise<void>) {
     return this.bottleneck.schedule(() => cb());
+  }
+
+  static async cancelAll(): Promise<void> {
+    await this.bottleneck.stop({ dropWaitingJobs: true });
+    persistentStore.addLog(
+      "[WsRequestLimiter] All queued WebSocket operations cancelled"
+    );
+  }
+
+  static getQueuedCount(): number {
+    return this.bottleneck.queued();
+  }
+
+  static async getRunningCount(): Promise<number> {
+    return await this.bottleneck.running();
   }
 }
 
@@ -81,13 +96,14 @@ export const connect = async (id: string) =>
       updateWsConnectionState(ws.id, WebSocketState.CONNECTING);
 
       ws.socket = new WebSocket(webSocketUri, {
-        headers: Object.assign(apiHeaders(), {
+        headers: Object.assign(apiHeaders(true), {
           Origin: "https://www.pathofexile.com",
         }),
       });
 
+      // Update the store with the socket reference
       WsStore.update(ws.id, {
-        ...ws,
+        socket: ws.socket,
       });
 
       ws.socket.on("open", () => {
@@ -102,11 +118,10 @@ export const connect = async (id: string) =>
         const parsedResponse = JSON.parse(response.toString());
 
         const itemIds = parsedResponse.new;
-        persistentStore.addLog(
-          `[WebSocket] Socket message received: Found ${
-            itemIds?.length || 0
-          } items - ${ws.label}`
-        );
+        if (itemIds?.length || itemIds?.length > 0)
+          persistentStore.addLog(
+            `[WebSocket] Socket message received: Found ${itemIds?.length} items - ${ws.label}`
+          );
         if (itemIds) {
           processItems(itemIds, game, ws.label);
         }
@@ -226,13 +241,15 @@ export const disconnect = async (id: string) => {
   return true;
 };
 
-const connectAll = async () =>
-  await Promise.all(
-    WsStore.liveSearches.map((liveSearch) => {
-      persistentStore.addLog(`[WebSocket] Connecting all sockets`);
-      return connect(liveSearch.id);
+const connectAll = async () => {
+  persistentStore.addLog(`[WebSocket] Connecting all sockets`);
+
+  return await Promise.all(
+    WsStore.liveSearches.map(async (liveSearch) => {
+      return await connect(liveSearch.id);
     })
   );
+};
 
 export const disconnectAll = async () =>
   await Promise.all(
@@ -250,4 +267,24 @@ export const reconnectAll = async () => {
   await connectAll();
 
   return true;
+};
+
+export const cancelAllQueues = async () => {
+  persistentStore.addLog("[QueueManager] Cancelling all queued operations");
+  await WsRequestLimiter.cancelAll();
+  // Import HttpRequestLimiter dynamically to avoid circular dependencies
+  const { default: HttpRequestLimiter } = await import(
+    "../api/HttpRequestLimiter"
+  );
+  await HttpRequestLimiter.cancelAll();
+};
+
+export const getQueueStatus = async () => {
+  const wsQueued = WsRequestLimiter.getQueuedCount();
+  const wsRunning = await WsRequestLimiter.getRunningCount();
+
+  return {
+    ws: { queued: wsQueued, running: wsRunning },
+    // HttpRequestLimiter status will be added when needed
+  };
 };

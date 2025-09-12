@@ -1,6 +1,6 @@
-import { poe2FetchAPI, poeFetchAPI } from "./baseUrls";
+import { poe2FetchAPI, poeFetchAPI } from "../utils/baseUrls";
 import { rateLimitedApi } from "src/main/api/apis";
-import { apiHeaders } from "./apiHeaders";
+import { apiHeaders } from "../utils/apiHeaders";
 import { ItemData } from "src/shared/types";
 import { AxiosResponse } from "axios";
 

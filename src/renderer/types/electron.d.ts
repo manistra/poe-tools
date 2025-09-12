@@ -1,13 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export interface ElectronAPI {
   websocket: {
-    connect: (wsUri: string, sessionId: string, searchId: string) => void;
-    disconnect: (searchId?: string) => void;
-    onConnected: (callback: (searchId: string) => void) => () => void;
-    onDisconnected: (callback: (searchId: string) => void) => () => void;
-    onMessage: (callback: (searchId: string, data: any) => void) => () => void;
-    onError: (
-      callback: (searchId: string, error: string) => void
-    ) => () => void;
+    setAll: (liveSearchDetails: any[]) => Promise<any>;
+    deleteAll: () => Promise<any>;
+    add: (liveSearchDetails: Omit<any, "id">) => Promise<any>;
+    update: (id: string, liveSearchDetails: Partial<any>) => Promise<any>;
+    remove: (liveSearchDetails: any) => Promise<any>;
+    connectAll: () => Promise<void>;
+    disconnectAll: () => Promise<void>;
+    connect: (id: string) => Promise<void>;
+    disconnect: (id: string) => Promise<void>;
+    cancelAllAndDisconnect: () => Promise<{
+      success: boolean;
+      message: string;
+      error?: string;
+    }>;
   };
   api: {
     request: (options: {

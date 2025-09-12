@@ -8,19 +8,38 @@ export interface Log {
 
 export interface AppState {
   poeSessionid: string;
+  webSocketSessionId: string;
+
+  lastTeleportedItem?: TransformedItemData & { alreadyTeleported?: boolean };
   liveSearches: LiveSearch[];
   results: TransformedItemData[];
+
   autoWhisper: boolean;
+
+  rateLimitData: {
+    requestLimit: number;
+    interval: number;
+  };
   rateLimiterTokens: number;
   logs: Log[];
 }
 
 export const initialState: AppState = {
   poeSessionid: "",
+  webSocketSessionId: "",
+
+  lastTeleportedItem: undefined,
   liveSearches: [],
   results: [],
+
   autoWhisper: false,
+
   rateLimiterTokens: 6,
+  rateLimitData: {
+    requestLimit: 6,
+    interval: 4,
+  },
+
   logs: [],
 };
 
@@ -29,10 +48,20 @@ const store = new Store<AppState>({
   name: "poe-tools-store",
   defaults: {
     poeSessionid: "",
+    webSocketSessionId: "",
+
     liveSearches: [],
+    lastTeleportedItem: undefined,
     results: [],
+
     autoWhisper: false,
+
     rateLimiterTokens: 6,
+    rateLimitData: {
+      requestLimit: 6,
+      interval: 4,
+    },
+
     logs: [],
   },
 });

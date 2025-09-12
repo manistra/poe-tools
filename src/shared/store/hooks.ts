@@ -16,6 +16,11 @@ export const useAppStore = () => {
     state,
     setState: persistentStore.setState.bind(persistentStore),
     setPoeSessionId: persistentStore.setPoeSessionId.bind(persistentStore),
+    setWebSocketSessionId:
+      persistentStore.setWebSocketSessionId.bind(persistentStore),
+    setLastTeleportedItem:
+      persistentStore.setLastTeleportedItem.bind(persistentStore),
+    setRateLimitData: persistentStore.setRateLimitData.bind(persistentStore),
     setLiveSearches: persistentStore.setLiveSearches.bind(persistentStore),
     addLiveSearch: persistentStore.addLiveSearch.bind(persistentStore),
     updateLiveSearch: persistentStore.updateLiveSearch.bind(persistentStore),
@@ -49,6 +54,72 @@ export const usePoeSessionId = () => {
   }, []);
 
   return [sessionId, updateSessionId] as const;
+};
+
+export const useWebSocketSessionId = () => {
+  const [webSocketSessionId, setWebSocketSessionId] = useState<string>(
+    persistentStore.getState().webSocketSessionId
+  );
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setWebSocketSessionId(state.webSocketSessionId);
+    });
+    return unsubscribe;
+  }, []);
+
+  const updateWebSocketSessionId = useCallback((newSessionId: string) => {
+    persistentStore.setWebSocketSessionId(newSessionId);
+  }, []);
+
+  return [webSocketSessionId, updateWebSocketSessionId] as const;
+};
+
+export const useLastTeleportedItem = () => {
+  const [lastTeleportedItem, setLastTeleportedItem] = useState<
+    (TransformedItemData & { alreadyTeleported?: boolean }) | undefined
+  >(persistentStore.getState().lastTeleportedItem);
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setLastTeleportedItem(state.lastTeleportedItem);
+    });
+    return unsubscribe;
+  }, []);
+
+  const updateLastTeleportedItem = useCallback(
+    (
+      item: (TransformedItemData & { alreadyTeleported?: boolean }) | undefined
+    ) => {
+      persistentStore.setLastTeleportedItem(item);
+    },
+    []
+  );
+
+  return [lastTeleportedItem, updateLastTeleportedItem] as const;
+};
+
+export const useRateLimitData = () => {
+  const [rateLimitData, setRateLimitData] = useState<{
+    requestLimit: number;
+    interval: number;
+  }>(persistentStore.getState().rateLimitData);
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setRateLimitData(state.rateLimitData);
+    });
+    return unsubscribe;
+  }, []);
+
+  const updateRateLimitData = useCallback(
+    (data: { requestLimit: number; interval: number }) => {
+      persistentStore.setRateLimitData(data);
+    },
+    []
+  );
+
+  return [rateLimitData, updateRateLimitData] as const;
 };
 
 export const useLiveSearches = () => {
@@ -211,6 +282,11 @@ export const useAppStoreSync = () => {
   return {
     getState: persistentStore.getState.bind(persistentStore),
     setPoeSessionId: persistentStore.setPoeSessionId.bind(persistentStore),
+    setWebSocketSessionId:
+      persistentStore.setWebSocketSessionId.bind(persistentStore),
+    setLastTeleportedItem:
+      persistentStore.setLastTeleportedItem.bind(persistentStore),
+    setRateLimitData: persistentStore.setRateLimitData.bind(persistentStore),
     setLiveSearches: persistentStore.setLiveSearches.bind(persistentStore),
     addLiveSearch: persistentStore.addLiveSearch.bind(persistentStore),
     updateLiveSearch: persistentStore.updateLiveSearch.bind(persistentStore),

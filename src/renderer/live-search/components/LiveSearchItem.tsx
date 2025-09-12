@@ -24,7 +24,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
   const { updateLiveSearch, deleteLiveSearch, ws } = useLiveSearchContext();
   const [isConnecting, setIsConnecting] = useState(false);
 
-  const handleConnect = async (id: string) => {
+  const handleConnect = async () => {
     setIsConnecting(true);
     await ws.connectIndividual(liveSearch.id);
     setIsConnecting(false);
@@ -84,18 +84,21 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
   return (
     <div
       className={clsx(
-        "flex-col items-center justify-between rounded border border-gray-900 bg-gray-900"
-        // isConnected
-        //   ? "border-[#0d311e]/20"
-        //   : isLoading
-        //   ? "border-yellow-900/20 bg-yellow-900/20"
-        //   : "border-gray-900 bg-gray-900"
+        "flex-col items-center justify-between rounded border border-gray-900 bg-gray-900",
+        isWsStateAnyOf(liveSearch?.ws?.readyState, WebSocketState.OPEN)
+          ? "border-[#0d311e]/70"
+          : isWsStateAnyOf(
+              liveSearch?.ws?.readyState,
+              WebSocketState.CONNECTING
+            )
+          ? "border-yellow-900/20 bg-yellow-900/20"
+          : "border-gray-900 bg-gray-900"
       )}
     >
       <div className="flex items-center justify-between rounded p-1 w-full bg-gradient-to-r from-[#000000] to-green-900/20">
         <button
           onClick={() => handleUrlClick(liveSearch.url)}
-          className="text-gray-400 truncate hover:text-blue-900 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1"
+          className="text-gray-400 truncate hover:text-blue-900 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1 pl-2"
         >
           {liveSearch.label}
           <svg
@@ -147,7 +150,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
               <Button
                 size="small"
                 variant="text"
-                onClick={() => handleConnect(liveSearch.id)}
+                onClick={() => handleConnect()}
                 disabled={
                   isOpen ||
                   isConnecting ||

@@ -11,6 +11,7 @@ import { usePoeSessionId, useResults } from "src/shared/store/hooks";
 import { useLiveSearchContext } from "./components/context/hooks/useLiveSearchContext";
 import { isWsStateAnyOf } from "src/renderer/helpers/isWsStateAnyOf";
 import { WebSocketState } from "src/shared/types";
+import LastTeleportedItemModal from "./components/modals/LastTeleportedItemModal";
 
 const PoELiveSearch = () => {
   const { clearResults } = useResults();
@@ -96,12 +97,7 @@ const PoELiveSearch = () => {
         <Items />
       </div>
 
-      {/* <CooldownModal
-        isOpen={isCooldownModalOpen}
-        setIsCooldownOpen={setIsCooldownModalOpen}
-        lastWhisperItem={lastWhisperItem}
-        onClearCooldown={clearWhisperBlock}
-      /> */}
+      <LastTeleportedItemModal />
     </div>
   );
 };

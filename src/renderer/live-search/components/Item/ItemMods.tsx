@@ -1,5 +1,6 @@
 import React from "react";
 import { TransformedItemData } from "../../../../shared/types";
+import clsx from "clsx";
 
 interface ItemModsProps {
   item: TransformedItemData;
@@ -34,8 +35,19 @@ const ItemMods: React.FC<ItemModsProps> = ({ item }) => {
       )}
 
       <div className="flex flex-col gap-2 text-center w-full h-full p-3 flex-1 justify-center bg-black">
-        <h1 className="text-lg text-poe-mods-title">{item.name}</h1>
-        <div className="text-sm text-gray-300 font-bold">{item.typeLine}</div>
+        <h1
+          className={clsx(
+            "text-lg text-poe-mods-title",
+            item.name.length > 0
+              ? "text-poe-mods-title"
+              : "text-poe-mods-regular"
+          )}
+        >
+          {item.name || item.typeLine}
+        </h1>
+        <div className={clsx("text-sm text-gray-300 font-bold")}>
+          {item.typeLine}
+        </div>
 
         <hr className="mx-3 border-gray-900" />
 

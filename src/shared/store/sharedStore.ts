@@ -16,10 +16,16 @@ const getInitialStoreState = (): AppState => {
     console.error("Error loading initial state:", error);
     return {
       poeSessionid: "",
+      webSocketSessionId: "",
+      lastTeleportedItem: undefined,
       liveSearches: [],
       results: [],
       autoWhisper: false,
       rateLimiterTokens: 6,
+      rateLimitData: {
+        requestLimit: 6,
+        interval: 4,
+      },
       logs: [],
     };
   }
@@ -70,6 +76,27 @@ export class PersistentSharedStore {
   setPoeSessionId(sessionId: string): void {
     this.setState((state) => {
       state.poeSessionid = sessionId;
+    });
+  }
+
+  setWebSocketSessionId(sessionId: string): void {
+    this.setState((state) => {
+      state.webSocketSessionId = sessionId;
+    });
+  }
+
+  setLastTeleportedItem(item: TransformedItemData | undefined): void {
+    this.setState((state) => {
+      state.lastTeleportedItem = item;
+    });
+  }
+
+  setRateLimitData(rateLimitData: {
+    requestLimit: number;
+    interval: number;
+  }): void {
+    this.setState((state) => {
+      state.rateLimitData = rateLimitData;
     });
   }
 

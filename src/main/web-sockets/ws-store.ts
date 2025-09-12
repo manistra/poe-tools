@@ -11,15 +11,21 @@ export default class WsStore {
     });
   }
 
-  static update(id: string, data: LiveSearchDetails) {
+  static update(id: string, data: Partial<LiveSearchWithSocket>) {
     const index = this.liveSearches.findIndex(
       (liveSearch) => liveSearch.id === id
     );
 
+    if (index === -1) {
+      return;
+    }
+
+    // Create a new object to avoid extensibility issues
+    const existing = this.liveSearches[index];
     this.liveSearches[index] = {
-      ...this.liveSearches[index],
+      ...existing,
       ...data,
-    };
+    } as LiveSearchWithSocket;
   }
 
   static find(id: string) {
@@ -47,8 +53,11 @@ export default class WsStore {
   }
 
   static set(liveSearches: LiveSearchDetails[]) {
-    // https://stackoverflow.com/a/1232046/9599137
-    this.liveSearches = liveSearches;
+    // Create new objects to avoid extensibility issues with frozen objects from persistent store
+    this.liveSearches = liveSearches.map((liveSearch) => ({
+      ...liveSearch,
+      socket: null,
+    }));
   }
 
   static load() {
@@ -56,6 +65,10 @@ export default class WsStore {
 
     const liveSearches = state.liveSearches;
 
+    // Clear existing searches first
+    this.clear();
+
+    // Add each search as a new object to avoid extensibility issues
     liveSearches.forEach((searchDetails) => {
       this.add(searchDetails);
     });

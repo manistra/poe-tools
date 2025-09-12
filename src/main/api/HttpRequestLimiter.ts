@@ -2,7 +2,7 @@ import Bottleneck from "bottleneck";
 import { HEADER_KEYS } from "../../shared/constants/headerKeys";
 import { persistentStore } from "src/shared/store/sharedStore";
 
-import { fetchItemDetails } from "../web-sockets/utils/itemDetails";
+import { fetchItemDetails } from "../poe-trade/fetchItemDetails";
 import { AxiosResponse } from "axios";
 
 export default class HttpRequestLimiter {
@@ -101,7 +101,9 @@ export default class HttpRequestLimiter {
       ),
       maxConcurrent: 1,
     });
+
     this.notifyTokensChange();
+    persistentStore.setRateLimitData({ requestLimit, interval });
   }
 
   static async currentReservoir(): Promise<number> {
@@ -124,5 +126,20 @@ export default class HttpRequestLimiter {
     const result = this.bottleneck.incrementReservoir(incrementBy);
     this.notifyTokensChange();
     return result;
+  }
+
+  static async cancelAll(): Promise<void> {
+    await this.bottleneck.stop({ dropWaitingJobs: true });
+    persistentStore.addLog(
+      "[HttpRequestLimiter] All queued requests cancelled"
+    );
+  }
+
+  static getQueuedCount(): number {
+    return this.bottleneck.queued();
+  }
+
+  static async getRunningCount(): Promise<number> {
+    return await this.bottleneck.running();
   }
 }

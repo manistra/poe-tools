@@ -9,7 +9,8 @@ export type LiveSearchContextType = {
     liveSearchDetails: Partial<Omit<LiveSearch, "id">>
   ) => void;
   deleteLiveSearch: (liveSearchDetails: LiveSearch) => void;
-  setLiveSearches: (liveSearchDetails: LiveSearch[]) => void;
+  importLiveSearches: (liveSearchDetails: LiveSearch[]) => void;
+  deleteAllLiveSearches: () => Promise<void>;
 
   ws: {
     connectAll: () => Promise<void>;

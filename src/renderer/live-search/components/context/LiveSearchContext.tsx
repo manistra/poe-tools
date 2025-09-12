@@ -12,8 +12,11 @@ export const LiveSearchProvider = ({ children }: PropsWithChildren) => {
   ) => {
     electronAPI.websocket.add(liveSearchDetails);
   };
-  const handleSetAllLiveSearches = (liveSearchDetails: LiveSearchDetails[]) => {
+  const handleImportLiveSearches = (liveSearchDetails: LiveSearchDetails[]) => {
     electronAPI.websocket.setAll(liveSearchDetails);
+  };
+  const handleDeleteAllLiveSearches = async () => {
+    await electronAPI.websocket.deleteAll();
   };
   const handleUpdateLiveSearch = (
     id: string,
@@ -45,7 +48,8 @@ export const LiveSearchProvider = ({ children }: PropsWithChildren) => {
         addLiveSearch: handleAddLiveSearch,
         updateLiveSearch: handleUpdateLiveSearch,
         deleteLiveSearch: handleDeleteLiveSearch,
-        setLiveSearches: handleSetAllLiveSearches,
+        importLiveSearches: handleImportLiveSearches,
+        deleteAllLiveSearches: handleDeleteAllLiveSearches,
 
         ws: {
           connectAll: handleConnectAll,

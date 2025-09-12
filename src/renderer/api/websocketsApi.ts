@@ -6,6 +6,7 @@ import { WS_EVENTS } from "src/shared/ws-events";
 export const websocketAPI = {
   setAll: (liveSearchDetails: LiveSearchDetails[]) =>
     ipcRenderer.invoke(WS_EVENTS.WS_SET_ALL, liveSearchDetails),
+  deleteAll: async () => await ipcRenderer.invoke(WS_EVENTS.WS_DELETE_ALL),
 
   add: (liveSearchDetails: Omit<LiveSearchDetails, "id">) =>
     ipcRenderer.invoke(WS_EVENTS.WS_ADD, liveSearchDetails),
@@ -21,4 +22,7 @@ export const websocketAPI = {
     await ipcRenderer.invoke(WS_EVENTS.WS_CONNECT_SOCKET, id),
   disconnect: async (id: string) =>
     await ipcRenderer.invoke(WS_EVENTS.WS_DISCONNECT_SOCKET, id),
+
+  cancelAllAndDisconnect: async () =>
+    await ipcRenderer.invoke("cancel-all-and-disconnect"),
 };

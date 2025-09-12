@@ -5,6 +5,10 @@ import * as webSocketActions from "../web-sockets/ws-actions";
 import { LiveSearch, LiveSearchDetails } from "../../shared/types";
 import { WS_EVENTS } from "src/shared/ws-events";
 
+const generateId = () => {
+  return `search-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};
+
 export const setupWebSocketHandlers = () => {
   ipcMain.handle(
     WS_EVENTS.WS_SET_ALL,
@@ -23,17 +27,34 @@ export const setupWebSocketHandlers = () => {
         )
       ) {
         console.log(
-          `[WebSocket] Unable to set all connections, some connections are open or connecting or closing`
+          `[WebSocket] Unable to set import connections, some connections are open, connecting or closing`
         );
         return;
       }
 
-      WsStore.set(liveSearchDetails);
-      persistentStore.setLiveSearches(liveSearchDetails);
+      const newLiveSearches = liveSearchDetails.map((liveSearch) => ({
+        ...liveSearch,
+        socket: null,
+        id: generateId(),
+      }));
 
-      return liveSearchDetails;
+      WsStore.set(newLiveSearches);
+      persistentStore.setLiveSearches(newLiveSearches);
+
+      return newLiveSearches;
     }
   );
+  ipcMain.handle(WS_EVENTS.WS_DELETE_ALL, async () => {
+    persistentStore.addLog("[WebSocket] Deleting all connections");
+
+    await webSocketActions.disconnectAll();
+    WsStore.clear();
+    persistentStore.setLiveSearches([]);
+
+    persistentStore.addLog("[WebSocket] Deleted all connections");
+
+    return [];
+  });
 
   ipcMain.handle(
     WS_EVENTS.WS_ADD,
@@ -42,9 +63,7 @@ export const setupWebSocketHandlers = () => {
         `[WebSocket] Adding connection: ${liveSearchDetails.label}`
       );
 
-      const newId = `search-${Date.now()}-${Math.random()
-        .toString(36)
-        .substr(2, 9)}`;
+      const newId = generateId();
 
       const newLiveSearch: LiveSearch = {
         ...liveSearchDetails,
@@ -152,5 +171,41 @@ export const setupWebSocketHandlers = () => {
 
   ipcMain.handle(WS_EVENTS.WS_DISCONNECT_SOCKET, async (event, id: string) => {
     return await webSocketActions.disconnect(id);
+  });
+
+  // Add handler for canceling all queues and disconnecting all sockets
+  ipcMain.handle("cancel-all-and-disconnect", async () => {
+    try {
+      persistentStore.addLog(
+        "[WebSocket] Canceling all queues and disconnecting all sockets"
+      );
+
+      // Cancel all queued operations (both HTTP and WebSocket)
+      await webSocketActions.cancelAllQueues();
+
+      // Disconnect all WebSocket connections
+      await webSocketActions.disconnectAll();
+
+      persistentStore.addLog(
+        "[WebSocket] Successfully canceled all operations and disconnected all sockets"
+      );
+
+      return {
+        success: true,
+        message: "All operations canceled and sockets disconnected",
+      };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      persistentStore.addLog(
+        `[WebSocket] Error during cancel and disconnect: ${errorMessage}`
+      );
+
+      return {
+        success: false,
+        error: errorMessage,
+        message: "Failed to cancel operations or disconnect sockets",
+      };
+    }
   });
 };

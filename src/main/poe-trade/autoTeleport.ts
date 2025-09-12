@@ -23,8 +23,8 @@ export const poe2SearchUrl =
   "https://www.pathofexile.com/api/trade2/search/poe2/Dawn%20of%20the%20Hunt";
 
 export interface WhisperRequest {
-  itemId: string;
-  hideoutToken: string;
+  itemId?: string;
+  hideoutToken?: string;
   searchQueryId?: string;
 }
 
@@ -39,27 +39,46 @@ export const autoTeleport = async ({
   hideoutToken,
   searchQueryId,
 }: WhisperRequest): Promise<WhisperResponse> => {
-  const url = "https://www.pathofexile.com/api/trade2/whisper";
+  try {
+    console.log("autoTeleport", itemId, hideoutToken, searchQueryId);
 
-  const requestBody = {
-    item: itemId,
-    token: hideoutToken,
-    continue: true,
-    ...(searchQueryId && { query: searchQueryId }),
-  };
+    if (!itemId || !hideoutToken) {
+      return {
+        success: false,
+        message: "Item ID and hideout token are required",
+        error: "Item ID and hideout token are required",
+      };
+    }
 
-  const headers = createHeaders(persistentStore.getState().poeSessionid);
+    const url = "https://www.pathofexile.com/api/trade2/whisper";
 
-  const response = await apiNoLimiter({
-    url,
-    method: "POST",
-    headers,
-    data: requestBody,
-  });
+    const requestBody = {
+      item: itemId,
+      token: hideoutToken,
+      continue: true,
+      ...(searchQueryId && { query: searchQueryId }),
+    };
 
-  return {
-    success: !response.error,
-    message: response.data?.message,
-    error: response.error?.message,
-  };
+    const headers = createHeaders(persistentStore.getState().poeSessionid);
+
+    const response = await apiNoLimiter({
+      url,
+      method: "POST",
+      headers,
+      data: requestBody,
+    });
+
+    return {
+      success: !response.error,
+      message: response.data?.message,
+      error: response.error?.message,
+    };
+  } catch (error) {
+    console.error("autoTeleport error", error);
+    return {
+      success: false,
+      message: "Error sending whisper",
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
 };

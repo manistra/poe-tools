@@ -16,7 +16,12 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 }) => {
   const [importData, setImportData] = useState("");
   const [importError, setImportError] = useState("");
-  const { liveSearches, setLiveSearches } = useLiveSearchContext();
+  const {
+    liveSearches,
+    deleteAllLiveSearches,
+    importLiveSearches,
+    ws: { disconnectAll },
+  } = useLiveSearchContext();
 
   const handleImport = () => {
     setImportError("");
@@ -35,8 +40,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
         }
       }
 
-      // Add each live search
-      setLiveSearches(parsedData);
+      importLiveSearches(parsedData);
 
       setImportData("");
       setImportError("");
@@ -44,7 +48,6 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
       // Close modal and force refresh the page
       setIsImportExportOpen(false);
-      window.location.reload();
     } catch (error) {
       setImportError(
         error instanceof Error ? error.message : "Invalid JSON format"
@@ -68,7 +71,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
     }
   };
 
-  const handleDeleteAll = () => {
+  const handleDeleteAll = async () => {
     if (liveSearches.length === 0) {
       alert("No live searches to delete!");
       return;
@@ -79,17 +82,21 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
     );
 
     if (confirmed) {
-      setLiveSearches([]);
+      await deleteAllLiveSearches();
 
-      // Close modal and force refresh the page
       setIsImportExportOpen(false);
-      window.location.reload();
     }
   };
 
   const handleClose = () => {
     setImportData("");
     setImportError("");
+    setIsImportExportOpen(false);
+  };
+
+  const handleForceStopAll = async () => {
+    await disconnectAll();
+
     setIsImportExportOpen(false);
   };
 
@@ -118,33 +125,42 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
             error={importError}
           />
 
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              size="small"
-              variant="outline"
-              onClick={handleImport}
-              disabled={!importData.trim()}
-            >
-              Import
-            </Button>
-            <Button size="small" variant="success" onClick={handleExport}>
-              Export All Live Searches
-            </Button>
-            <Button size="small" variant="danger" onClick={handleDeleteAll}>
-              Delete All Live Searches
-            </Button>
-          </div>
-        </div>
+          <div className="flex gap-2 flex-wrap justify-between">
+            <div className="flex flex-col gap-1">
+              <Button size="small" variant="outline" onClick={handleExport}>
+                Export All Live Searches
+              </Button>
+              <Button size="small" variant="danger" onClick={handleDeleteAll}>
+                Delete All Live Searches
+              </Button>
+              <Button
+                size="small"
+                variant="danger"
+                onClick={handleForceStopAll}
+              >
+                Force Stop All Live Searches
+              </Button>
+            </div>
 
-        <div className="ml-auto flex gap-2 pt-2">
-          <Button
-            size="small"
-            variant="outline"
-            className="ml-auto"
-            onClick={handleClose}
-          >
-            Close
-          </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                size="small"
+                variant="success"
+                onClick={handleImport}
+                disabled={!importData.trim()}
+              >
+                Import Live Searches
+              </Button>
+              <Button
+                size="small"
+                variant="outline"
+                className="ml-auto"
+                onClick={handleClose}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </ModalBase>
