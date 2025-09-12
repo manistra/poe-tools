@@ -67,8 +67,8 @@ export const setupWebSocketHandlers = () => {
       // Remove from store
       WsStore.remove(liveSearchDetails.id);
 
-      // Update persistent store with sanitized connections
-      persistentStore.setLiveSearches(WsStore.sanitized());
+      // Use the proper delete method instead of overwriting the entire array
+      persistentStore.deleteLiveSearch(liveSearchDetails.id);
     }
   );
 

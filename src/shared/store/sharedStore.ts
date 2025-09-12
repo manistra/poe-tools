@@ -78,7 +78,11 @@ export class PersistentSharedStore {
 
   addLiveSearch(liveSearch: LiveSearch): LiveSearch {
     this.setState((state) => {
-      state.liveSearches.push(liveSearch);
+      state.liveSearches.unshift(liveSearch); // Add to beginning
+      // Keep only last 20 results to prevent memory issues
+      if (state.liveSearches.length > 20) {
+        state.results = state.results.slice(0, 20);
+      }
     });
 
     return liveSearch;
