@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 
 import clsx from "clsx";
 import ItemMods from "./ItemMods";
-import { autoTeleport } from "../../../api/poe-trade/autoTeleport";
+import { autoTeleport } from "../../../../main/poe-trade/autoTeleport";
 import StashVisualization from "./StashVisualization";
 
 // Import currency images

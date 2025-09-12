@@ -12,9 +12,9 @@ export type LiveSearchContextType = {
   setLiveSearches: (liveSearchDetails: LiveSearch[]) => void;
 
   ws: {
-    connectAll: () => void;
-    disconnectAll: () => void;
-    connectIndividual: (id: string) => void;
+    connectAll: () => Promise<void>;
+    disconnectAll: () => Promise<void>;
+    connectIndividual: (id: string) => Promise<void>;
     disconnectIndividual: (id: string) => void;
   };
 };

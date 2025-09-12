@@ -1,5 +1,10 @@
 import { createSharedStore } from "electron-shared-state";
-import { AppState, getInitialState, saveStateToStorage } from "./storeUtils";
+import {
+  AppState,
+  getInitialState,
+  saveStateToStorage,
+  Log,
+} from "./storeUtils";
 import { LiveSearch, TransformedItemData } from "../types";
 
 // Create the shared store with data loaded from electron-store
@@ -15,6 +20,7 @@ const getInitialStoreState = (): AppState => {
       results: [],
       autoWhisper: false,
       rateLimiterTokens: 6,
+      logs: [],
     };
   }
 };
@@ -41,10 +47,7 @@ export class PersistentSharedStore {
   // Initialize store (data already loaded from electron-store)
   initialize() {
     if (this.isInitialized) return;
-    console.log(
-      "PersistentSharedStore initialized with state:",
-      this.store.getState()
-    );
+
     this.isInitialized = true;
   }
 
@@ -98,7 +101,7 @@ export class PersistentSharedStore {
         if (existingLiveSearch) {
           // Filter out undefined values from updates
           const filteredUpdates = Object.fromEntries(
-            Object.entries(updates).filter(([_, value]) => value !== undefined)
+            Object.entries(updates).filter(([, value]) => value !== undefined)
           ) as Partial<Omit<LiveSearch, "id">>;
 
           state.liveSearches[liveSearchIndex] = {
@@ -150,6 +153,36 @@ export class PersistentSharedStore {
   setRateLimiterTokens(tokens: number): void {
     this.setState((state) => {
       state.rateLimiterTokens = tokens;
+    });
+  }
+
+  // Log management methods
+  addLog(message: string): void {
+    const now = new Date().toISOString();
+
+    console.log(`[${now}] - ${message}`);
+    this.setState((state) => {
+      const log: Log = {
+        message,
+        timestamp: now,
+      };
+      state.logs.unshift(log); // Add to beginning
+      // Keep only last 1000 logs to prevent memory issues
+      if (state.logs.length > 1000) {
+        state.logs = state.logs.slice(0, 1000);
+      }
+    });
+  }
+
+  setLogs(logs: Log[]): void {
+    this.setState((state) => {
+      state.logs = logs;
+    });
+  }
+
+  clearLogs(): void {
+    this.setState((state) => {
+      state.logs = [];
     });
   }
 

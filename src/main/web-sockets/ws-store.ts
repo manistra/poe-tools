@@ -54,9 +54,6 @@ export default class WsStore {
   static load() {
     const state = persistentStore.getState();
 
-    console.log("Loading WS Store");
-    console.log(state);
-
     const liveSearches = state.liveSearches;
 
     liveSearches.forEach((searchDetails) => {

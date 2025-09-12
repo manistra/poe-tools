@@ -11,13 +11,24 @@ import { isWsStateAnyOf } from "src/renderer/helpers/isWsStateAnyOf";
 
 interface LiveSearchItemProps {
   liveSearch: LiveSearch;
+  connectDisabled: boolean;
 }
 
-const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
+const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
+  liveSearch,
+  connectDisabled,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editLabel, setEditLabel] = useState(liveSearch.label);
   const [editUrl, setEditUrl] = useState(liveSearch.url);
   const { updateLiveSearch, deleteLiveSearch, ws } = useLiveSearchContext();
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  const handleConnect = async (id: string) => {
+    setIsConnecting(true);
+    await ws.connectIndividual(liveSearch.id);
+    setIsConnecting(false);
+  };
 
   const handleUrlClick = async (url: string) => {
     try {
@@ -103,6 +114,10 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
           </svg>
         </button>
 
+        <div className="text-xs text-red-500">
+          {liveSearch?.ws?.error?.code} {liveSearch?.ws?.error?.reason}
+        </div>
+
         <div className="ml-2 flex items-center gap-2">
           <div className="flex gap-2 mx-2">
             {isWsStateAnyOf(
@@ -132,9 +147,11 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
               <Button
                 size="small"
                 variant="text"
-                onClick={() => ws.connectIndividual(liveSearch.id)}
+                onClick={() => handleConnect(liveSearch.id)}
                 disabled={
                   isOpen ||
+                  isConnecting ||
+                  connectDisabled ||
                   isWsStateAnyOf(
                     liveSearch?.ws?.readyState,
                     WebSocketState.OPEN,
@@ -148,12 +165,16 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
             )}
 
             <Button
-              disabled={isWsStateAnyOf(
-                liveSearch?.ws?.readyState,
-                WebSocketState.OPEN,
-                WebSocketState.CLOSING,
-                WebSocketState.CONNECTING
-              )}
+              disabled={
+                isConnecting ||
+                connectDisabled ||
+                isWsStateAnyOf(
+                  liveSearch?.ws?.readyState,
+                  WebSocketState.OPEN,
+                  WebSocketState.CLOSING,
+                  WebSocketState.CONNECTING
+                )
+              }
               size="small"
               variant="outline"
               onClick={() => setIsOpen(!isOpen)}

@@ -1,12 +1,18 @@
 import { LiveSearch, TransformedItemData } from "../types";
 import Store from "electron-store";
 
+export interface Log {
+  message: string;
+  timestamp: string;
+}
+
 export interface AppState {
   poeSessionid: string;
   liveSearches: LiveSearch[];
   results: TransformedItemData[];
   autoWhisper: boolean;
   rateLimiterTokens: number;
+  logs: Log[];
 }
 
 export const initialState: AppState = {
@@ -15,6 +21,7 @@ export const initialState: AppState = {
   results: [],
   autoWhisper: false,
   rateLimiterTokens: 6,
+  logs: [],
 };
 
 // Create electron-store instance
@@ -26,6 +33,7 @@ const store = new Store<AppState>({
     results: [],
     autoWhisper: false,
     rateLimiterTokens: 6,
+    logs: [],
   },
 });
 

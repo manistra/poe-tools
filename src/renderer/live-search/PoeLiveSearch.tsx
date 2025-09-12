@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "src/renderer/components/Button";
 import RateLimiterTokens from "src/renderer/components/RateLimiterTokens";
 
@@ -7,14 +7,38 @@ import LiveSearchesList from "./components/LiveSearchesList";
 
 import AutoTeleportToggle from "./components/AutoTeleportToggle";
 import Logs from "./components/Logs";
-import { useResults } from "src/shared/store/hooks";
+import { usePoeSessionId, useResults } from "src/shared/store/hooks";
+import { useLiveSearchContext } from "./components/context/hooks/useLiveSearchContext";
+import { isWsStateAnyOf } from "src/renderer/helpers/isWsStateAnyOf";
+import { WebSocketState } from "src/shared/types";
 
 const PoELiveSearch = () => {
   const { clearResults } = useResults();
 
+  const { liveSearches, ws } = useLiveSearchContext();
+  const [sessionId] = usePoeSessionId();
+
+  const [isConnectingAll, setIsConnectingAll] = useState(false);
+  const [isDisconnectingAll, setIsDisconnectingAll] = useState(false);
+
+  const handleConnectAll = async () => {
+    setIsConnectingAll(true);
+    await ws.connectAll();
+    setIsConnectingAll(false);
+  };
+  const handleDisconnectAll = async () => {
+    setIsDisconnectingAll(true);
+    await ws.disconnectAll();
+    setIsDisconnectingAll(false);
+  };
+
   const handleClearListings = () => {
     clearResults();
   };
+
+  const hasActiveConnections = liveSearches.some(
+    (search) => !isWsStateAnyOf(search.ws?.readyState, WebSocketState.CLOSED)
+  );
 
   return (
     <div className="w-full overflow-hidden flex flex-col gap-5 card max-w-[1000px] mx-auto">
@@ -24,37 +48,37 @@ const PoELiveSearch = () => {
       </div>
 
       <div className="flex gap-2 items-end justify-between">
-        <LiveSearchesList />
+        <LiveSearchesList connectDisabled={isConnectingAll} />
 
         <div className="flex flex-col gap-1">
-          <div className="flex flex-col">
-            {/* Error */}
-            {/* Debug information */}
-          </div>
-
-          {/* Auto-whisper controls */}
           <AutoTeleportToggle />
 
-          {/* {!hasActiveConnections && !hasConnectingSearches ? ( */}
-          <Button
-            variant="success"
-            // onClick={connect}
-            // disabled={!sessionId || allLiveSearches.length === 0}
-          >
-            Start Sniping
-          </Button>
-          {/* ) : ( */}
-          <Button
-            variant="danger"
-            // onClick={disconnect}
-          >
-            Stop Sniping
-          </Button>
-          {/* )} */}
+          {!hasActiveConnections || isConnectingAll ? (
+            <Button
+              variant="success"
+              onClick={handleConnectAll}
+              disabled={
+                hasActiveConnections ||
+                liveSearches.length === 0 ||
+                !sessionId ||
+                isConnectingAll
+              }
+            >
+              Start Sniping
+            </Button>
+          ) : (
+            <Button
+              variant="danger"
+              disabled={isDisconnectingAll}
+              onClick={handleDisconnectAll}
+            >
+              Stop Sniping
+            </Button>
+          )}
         </div>
       </div>
 
-      <Logs logs={[]} />
+      <Logs />
 
       <div>
         <div className="flex justify-between items-center">

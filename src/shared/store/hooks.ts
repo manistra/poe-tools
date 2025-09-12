@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { AppState } from "./storeUtils";
+import { AppState, Log } from "./storeUtils";
 import { LiveSearch, TransformedItemData } from "../types";
 import { persistentStore } from "../store/sharedStore";
 
@@ -24,6 +24,9 @@ export const useAppStore = () => {
     addResult: persistentStore.addResult.bind(persistentStore),
     clearResults: persistentStore.clearResults.bind(persistentStore),
     setAutoWhisper: persistentStore.setAutoWhisper.bind(persistentStore),
+    addLog: persistentStore.addLog.bind(persistentStore),
+    setLogs: persistentStore.setLogs.bind(persistentStore),
+    clearLogs: persistentStore.clearLogs.bind(persistentStore),
     reset: persistentStore.reset.bind(persistentStore),
   };
 };
@@ -173,6 +176,36 @@ export const useRateLimiterTokens = () => {
   return [tokens, updateTokens] as const;
 };
 
+export const useLogs = () => {
+  const [logs, setLogsState] = useState<Log[]>(persistentStore.getState().logs);
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setLogsState(state.logs);
+    });
+    return unsubscribe;
+  }, []);
+
+  const addLog = useCallback((message: string) => {
+    persistentStore.addLog(message);
+  }, []);
+
+  const setLogs = useCallback((newLogs: Log[]) => {
+    persistentStore.setLogs(newLogs);
+  }, []);
+
+  const clearLogs = useCallback(() => {
+    persistentStore.clearLogs();
+  }, []);
+
+  return {
+    logs,
+    addLog,
+    setLogs,
+    clearLogs,
+  };
+};
+
 // Hook for synchronous access to current state (useful for event handlers)
 export const useAppStoreSync = () => {
   return {
@@ -186,6 +219,9 @@ export const useAppStoreSync = () => {
     addResult: persistentStore.addResult.bind(persistentStore),
     clearResults: persistentStore.clearResults.bind(persistentStore),
     setAutoWhisper: persistentStore.setAutoWhisper.bind(persistentStore),
+    addLog: persistentStore.addLog.bind(persistentStore),
+    setLogs: persistentStore.setLogs.bind(persistentStore),
+    clearLogs: persistentStore.clearLogs.bind(persistentStore),
     reset: persistentStore.reset.bind(persistentStore),
   };
 };

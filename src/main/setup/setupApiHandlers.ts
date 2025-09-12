@@ -1,10 +1,10 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { ipcMain } from "electron";
 
 import { ApiResponse } from "../../shared/types";
-import HttpRequestLimiter from "../rate-limited-fetch/HttpRequestLimiter";
+import HttpRequestLimiter from "../api/HttpRequestLimiter";
 import { persistentStore } from "../../shared/store/sharedStore";
-import { rateLimitedApi } from "../rate-limited-fetch/rateLimitedApi";
+import { apiNoLimiter, rateLimitedApi } from "../api/apis";
+import { autoTeleport } from "../poe-trade/autoTeleport";
 
 export function setupApiHandlers() {
   // Initialize with defaults
@@ -44,52 +44,7 @@ export function setupApiHandlers() {
         params?: Record<string, string>;
       }
     ): Promise<ApiResponse> => {
-      try {
-        const { url, method, headers, data, params } = options;
-
-        const config: AxiosRequestConfig = {
-          url,
-          method,
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-            "Content-Type": "application/json",
-            ...headers,
-          },
-          data,
-          params,
-        };
-        const startTime = Date.now();
-        console.log(
-          `[${startTime}] - Making API request (no limiter) to: ${url}`
-        );
-        const response: AxiosResponse = await axios(config);
-
-        const endTime = Date.now();
-        const duration = endTime - startTime;
-        console.log(
-          `[${endTime}] - API request (no limiter) to: ${url} completed in ${duration}ms`
-        );
-
-        return {
-          data: response.data,
-          headers: response.headers as Record<string, string>,
-          status: response.status,
-        };
-      } catch (error: any) {
-        console.error("API request error (no limiter):", error);
-
-        return {
-          error: {
-            message: error.message,
-            status: error.response?.status,
-            headers: error.response?.headers as Record<string, string>,
-          },
-          headers: error.response?.headers as Record<string, string>,
-        };
-      } finally {
-        HttpRequestLimiter.incrementReservoir(-1);
-      }
+      return apiNoLimiter(options);
     }
   );
 
@@ -97,4 +52,19 @@ export function setupApiHandlers() {
   ipcMain.handle("get-rate-limiter-tokens", async () => {
     return await HttpRequestLimiter.currentReservoir();
   });
+
+  // Add handler for autoTeleport
+  ipcMain.handle(
+    "auto-teleport",
+    async (
+      _,
+      request: {
+        itemId: string;
+        hideoutToken: string;
+        searchQueryId?: string;
+      }
+    ) => {
+      return autoTeleport(request);
+    }
+  );
 }

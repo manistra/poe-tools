@@ -1,5 +1,5 @@
-import { getPoeSessionId } from "../../helpers/getPoeSessionId";
-import { electronAPI } from "../electronAPI";
+import { persistentStore } from "src/shared/store/sharedStore";
+import { apiNoLimiter } from "../api/apis";
 
 const createHeaders = (poesessid: string) => {
   return {
@@ -48,14 +48,18 @@ export const autoTeleport = async ({
     ...(searchQueryId && { query: searchQueryId }),
   };
 
-  const headers = createHeaders(getPoeSessionId());
+  const headers = createHeaders(persistentStore.getState().poeSessionid);
 
-  const data = await electronAPI.api.requestNoLimiter({
+  const response = await apiNoLimiter({
     url,
     method: "POST",
     headers,
     data: requestBody,
   });
 
-  return data;
+  return {
+    success: !response.error,
+    message: response.data?.message,
+    error: response.error?.message,
+  };
 };

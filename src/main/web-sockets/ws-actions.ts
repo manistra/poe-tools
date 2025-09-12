@@ -1,5 +1,5 @@
 import { persistentStore } from "src/shared/store/sharedStore";
-import { LiveSearchWithSocket } from "src/shared/types";
+import { LiveSearchWithSocket, WebSocketState } from "src/shared/types";
 import { Mutex } from "async-mutex";
 import Bottleneck from "bottleneck";
 import { randomInt } from "src/shared/utils/randomInt";
@@ -33,11 +33,11 @@ const pingAllowedDelaySeconds = 1;
 
 const updateWsConnectionState = (
   id: string,
-  liveSearch: LiveSearchWithSocket
+  newReadyState?: WebSocketState
 ) => {
   persistentStore.updateLiveSearch(id, {
     ws: {
-      readyState: liveSearch.socket?.readyState ?? WebSocket.CLOSED,
+      readyState: newReadyState ?? WebSocket.CLOSED,
     },
   });
 };
@@ -51,20 +51,34 @@ const heartbeat = (liveSearch: LiveSearchWithSocket) => {
   }, (serverPingTimeframeSeconds + pingAllowedDelaySeconds) * 1000);
 };
 
-export const connect = (id: string) =>
-  ConcurrentConnectionMutex.acquire().then((release) => {
+export const connect = async (id: string) =>
+  ConcurrentConnectionMutex.acquire().then(async (release) => {
     const ws = WsStore.find(id);
 
-    if (!ws) return release();
+    persistentStore.addLog(`[WebSocket] Starting connection to ${ws?.label}`);
 
-    if (ws.socket && ws.socket.readyState !== WebSocket.CLOSED)
+    if (!ws) {
+      persistentStore.addLog(`[WebSocket] No connection found: id=${id}`);
+
       return release();
+    }
 
-    return WsRequestLimiter.schedule(async () => {
+    if (ws.socket && ws.socket.readyState !== WebSocket.CLOSED) {
+      persistentStore.addLog(
+        `[WebSocket] Connection already open: ${ws.label}`
+      );
+
+      return release();
+    }
+
+    return await WsRequestLimiter.schedule(async () => {
       const webSocketUri = getWebSocketUri(ws.url);
       const game = webSocketUri.includes("poe2") ? "poe2" : "poe";
 
-      console.log(`[WS] Connecting to id:  ${ws.label} - ${ws.id}`);
+      persistentStore.addLog(`[WebSocket] Connecting to ${ws.label}`);
+
+      // Update state immediately to CONNECTING
+      updateWsConnectionState(ws.id, WebSocketState.CONNECTING);
 
       ws.socket = new WebSocket(webSocketUri, {
         headers: Object.assign(apiHeaders(), {
@@ -77,21 +91,24 @@ export const connect = (id: string) =>
       });
 
       ws.socket.on("open", () => {
-        console.log(`[WS] SOCKET OPEN - ${ws.url} / ${ws.id}`);
+        persistentStore.addLog(`[WebSocket] Socket open - ${ws.label}`);
 
         heartbeat(ws);
 
-        updateWsConnectionState(ws.id, ws);
+        updateWsConnectionState(ws.id, ws?.socket?.readyState);
       });
 
       ws.socket.on("message", (response) => {
-        console.log(`[WS] SOCKET MESSAGE - ${ws.url} / ${ws.id} - ${response}`);
         const parsedResponse = JSON.parse(response.toString());
 
         const itemIds = parsedResponse.new;
-
+        persistentStore.addLog(
+          `[WebSocket] Socket message received: Found ${
+            itemIds?.length || 0
+          } items - ${ws.label}`
+        );
         if (itemIds) {
-          processItems(itemIds, game);
+          processItems(itemIds, game, ws.label);
         }
       });
 
@@ -103,7 +120,9 @@ export const connect = (id: string) =>
 
       ws.socket.on("error", (error) => {
         const errorMessage = error?.message || "Unknown error";
-        console.log(`[WS] SOCKET ERROR - ${ws.url} / ${ws.id} ${errorMessage}`);
+        persistentStore.addLog(
+          `[WebSocket] Socket error - ${ws.label} - ${errorMessage}`
+        );
 
         const [reason, code] = errorMessage.split(": ");
         if (code && reason)
@@ -117,35 +136,40 @@ export const connect = (id: string) =>
             },
           });
 
-        updateWsConnectionState(ws.id, ws);
+        updateWsConnectionState(ws.id, ws?.socket?.readyState);
 
         ws.socket?.close();
       });
 
       ws.socket.on("close", () => {
-        console.log(
-          `[WS] SOCKET CLOSE - ${ws.url} / ${ws.id} ${ws.ws?.error?.code} ${ws.ws?.error?.reason}`
+        const errorInfo =
+          ws.ws?.error?.code || ws.ws?.error?.reason
+            ? ` [Code: ${ws.ws?.error?.code} | Reason: ${ws.ws?.error?.reason}]`
+            : "";
+
+        persistentStore.addLog(
+          `[WebSocket] Socket close - ${ws.label}${errorInfo}`
         );
 
-        updateWsConnectionState(ws.id, ws);
+        updateWsConnectionState(ws.id, ws?.socket?.readyState);
 
         if (ws.ws?.error?.code === 429) {
-          console.log(
-            `[WS] Rate limit exceded! Closing connection for ${ws.url}. This should not happen, please open an issue.`
+          persistentStore.addLog(
+            `[WebSocket] Rate limit exceded! Closing connection - ${ws.label}.`
           );
           return;
         }
 
         if (ws.ws?.error?.code === 404) {
-          console.log(
-            `[WS] Search not found. Closing connection for ${ws.url}.`
+          persistentStore.addLog(
+            `[WebSocket] Search not found. Closing connection - ${ws.label}.`
           );
           return;
         }
 
         if (ws.ws?.error?.code === 401) {
-          console.log(
-            `[WS] Unauthorized. Closing connection for ${ws.url}. Check Session ID.`
+          persistentStore.addLog(
+            `[WebSocket] Unauthorized. Closing connection - ${ws.label}. Check Session ID.`
           );
           return;
         }
@@ -164,14 +188,14 @@ export const connect = (id: string) =>
     });
   });
 
-export const disconnect = (id: string) => {
+export const disconnect = async (id: string) => {
   const ws = WsStore.find(id);
 
   if (!ws) {
-    console.log(
-      `[WS] No disconnect initiated (no such object in store) - ${id}`
+    persistentStore.addLog(
+      `[WebSocket] No disconnect initiated (no such object in store) - ${id}`
     );
-    return;
+    return false;
   }
 
   if (
@@ -179,28 +203,51 @@ export const disconnect = (id: string) => {
     (ws.socket.readyState === WebSocket.OPEN ||
       ws.socket.readyState === WebSocket.CONNECTING)
   ) {
-    console.log(`[WS] Disconnect initiated - ${id}`);
-    ws.socket.close();
+    persistentStore.addLog(`[WebSocket] Disconnect initiated - ${ws.label}`);
 
-    updateWsConnectionState(ws.id, ws);
+    // Update state to CLOSING before closing
+    updateWsConnectionState(ws.id, WebSocketState.CLOSING);
+
+    ws.socket.close();
+    persistentStore.addLog(`[WebSocket] Disconnect closed - ${ws.label}`);
   } else if (!ws.socket) {
-    console.log(`[WS] No disconnect initiated (no socket) - ${id}`);
-  } else {
-    console.log(
-      `No disconnect initiated (socket in wrong state) - ${ws.socket.readyState}`
+    persistentStore.addLog(
+      `[WebSocket] No disconnect initiated (no socket) - ${ws.label}`
     );
+    return false;
+  } else {
+    persistentStore.addLog(
+      `[WebSocket] No disconnect initiated (socket in wrong state) - ${ws.label} - ${ws.socket.readyState}`
+    );
+
+    return false;
   }
+
+  return true;
 };
 
-const connectAll = () =>
-  WsStore.liveSearches.forEach((liveSearch) => connect(liveSearch.id));
+const connectAll = async () =>
+  await Promise.all(
+    WsStore.liveSearches.map((liveSearch) => {
+      persistentStore.addLog(`[WebSocket] Connecting all sockets`);
+      return connect(liveSearch.id);
+    })
+  );
 
-export const disconnectAll = () =>
-  WsStore.liveSearches.forEach((liveSearch) => disconnect(liveSearch.id));
+export const disconnectAll = async () =>
+  await Promise.all(
+    WsStore.liveSearches.map((liveSearch) => {
+      persistentStore.addLog(`[WebSocket] Disconnecting all sockets`);
+      return disconnect(liveSearch.id);
+    })
+  );
 
-export const reconnectAll = () => {
-  disconnectAll();
+export const reconnectAll = async () => {
+  persistentStore.addLog(`[WebSocket] Reconnecting all sockets`);
+  await disconnectAll();
   // Disconnect triggers a re-connect in case the socket was already open.
   // In case sockets were not open before we also call connect
-  connectAll();
+  await connectAll();
+
+  return true;
 };

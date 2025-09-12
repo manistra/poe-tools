@@ -1,6 +1,9 @@
 import Bottleneck from "bottleneck";
 import { HEADER_KEYS } from "../../shared/constants/headerKeys";
-import { ApiResponse } from "../../shared/types";
+import { persistentStore } from "src/shared/store/sharedStore";
+
+import { fetchItemDetails } from "../web-sockets/utils/itemDetails";
+import { AxiosResponse } from "axios";
 
 export default class HttpRequestLimiter {
   static config = {
@@ -31,26 +34,28 @@ export default class HttpRequestLimiter {
     }
   }
 
-  static initialize(initialResponse?: ApiResponse): Promise<void> {
+  static initialize(): Promise<void> {
     if (this.isInitialized) {
       return Promise.resolve();
     }
 
-    return this.rateLimitFromHeaders(initialResponse)
-      .then(({ requestLimit, interval }) => {
-        console.log(
-          `Rate limit: ${requestLimit} requests / ${interval} seconds`
-        );
-        return this.updateSettings(requestLimit, interval);
-      })
-      .then(() => {
-        this.isInitialized = true;
-        this.notifyTokensChange();
-      });
+    return fetchItemDetails(["1"], "poe2").then((response) => {
+      return this.rateLimitFromHeaders(response as AxiosResponse)
+        .then(({ requestLimit, interval }) => {
+          persistentStore.addLog(
+            `Rate limit from reuqest: ${requestLimit} requests / ${interval} seconds`
+          );
+          return this.updateSettings(requestLimit, interval);
+        })
+        .then(() => {
+          this.isInitialized = true;
+          this.notifyTokensChange();
+        });
+    });
   }
 
   static rateLimitFromHeaders(
-    response?: ApiResponse
+    response?: AxiosResponse
   ): Promise<{ requestLimit: number; interval: number }> {
     return new Promise((resolve) => {
       if (!response) {

@@ -7,12 +7,14 @@ import { toast } from "react-hot-toast";
 import LiveSearchItem from "./LiveSearchItem";
 import { useLiveSearchContext } from "./context/hooks/useLiveSearchContext";
 
-const LiveSearchesList: React.FC = () => {
+const LiveSearchesList: React.FC<{ connectDisabled: boolean }> = ({
+  connectDisabled,
+}) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newConfig, setNewConfig] = useState({ label: "", url: "" });
   const { liveSearches, addLiveSearch } = useLiveSearchContext();
 
-  const handleAddConfig = () => {
+  const handleAddConfig = async () => {
     if (!newConfig.label.trim() || !newConfig.url.trim()) {
       toast.error("Please provide both label and URL");
       return;
@@ -99,7 +101,13 @@ const LiveSearchesList: React.FC = () => {
 
       {/* Existing Search Items */}
       {liveSearches.map((liveSearch) => {
-        return <LiveSearchItem key={liveSearch.id} liveSearch={liveSearch} />;
+        return (
+          <LiveSearchItem
+            key={liveSearch.id}
+            liveSearch={liveSearch}
+            connectDisabled={connectDisabled}
+          />
+        );
       })}
     </div>
   );

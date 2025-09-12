@@ -25,17 +25,17 @@ export const LiveSearchProvider = ({ children }: PropsWithChildren) => {
     electronAPI.websocket.remove(liveSearchDetails);
   };
 
-  const handleConnectAll = () => {
-    electronAPI.websocket.connectAll();
+  const handleConnectAll = async () => {
+    await electronAPI.websocket.connectAll();
   };
-  const handleDisconnectAll = () => {
-    electronAPI.websocket.disconnectAll();
+  const handleDisconnectAll = async () => {
+    await electronAPI.websocket.disconnectAll();
   };
-  const handleConnectIndividual = (id: string) => {
-    electronAPI.websocket.connect(id);
+  const handleConnectIndividual = async (id: string) => {
+    await electronAPI.websocket.connect(id);
   };
-  const handleDisconnectIndividual = (id: string) => {
-    electronAPI.websocket.disconnect(id);
+  const handleDisconnectIndividual = async (id: string) => {
+    await electronAPI.websocket.disconnect(id);
   };
 
   return (

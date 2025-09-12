@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import { websocketAPI } from "./websockets/websocketsApi";
+import { websocketAPI } from "./websocketsApi";
 
 // API request handler
 export const apiRequest = (options: {
@@ -47,6 +47,15 @@ export const rateLimiterAPI = {
   getCurrentTokens: () => ipcRenderer.invoke("get-rate-limiter-tokens"),
 };
 
+// Auto teleport API
+export const autoTeleportAPI = {
+  teleport: (request: {
+    itemId: string;
+    hideoutToken: string;
+    searchQueryId?: string;
+  }) => ipcRenderer.invoke("auto-teleport", request),
+};
+
 // Combined API object for easy access
 export const electronAPI = {
   websocket: websocketAPI,
@@ -57,4 +66,5 @@ export const electronAPI = {
   updates: updatesAPI,
   shell: shellAPI,
   rateLimiter: rateLimiterAPI,
+  autoTeleport: autoTeleportAPI,
 };
