@@ -1,17 +1,14 @@
 import React from "react";
 import Item from "./Item";
-import { TransformedItemData } from "src/shared/types";
 
-interface ItemsProps {
-  items: TransformedItemData[];
-}
+import { useResults } from "src/shared/store/hooks";
 
-const Items: React.FC<ItemsProps> = ({ items }) => {
+const Items: React.FC = () => {
+  const { results: items } = useResults();
+
   if (!items || items.length === 0) {
     return <p>No item details available</p>;
   }
-
-  // Transform the raw items into our cleaner structure
 
   return (
     <ul className="space-y-4">

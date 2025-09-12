@@ -50,17 +50,12 @@ export class PersistentSharedStore {
     });
   }
 
-  addLiveSearch(liveSearch: Omit<LiveSearch, "id">): LiveSearch {
-    const newLiveSearch: LiveSearch = {
-      ...liveSearch,
-      id: `search-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    };
-
+  addLiveSearch(liveSearch: LiveSearch): LiveSearch {
     this.setState((state) => {
-      state.liveSearches.push(newLiveSearch);
+      state.liveSearches.push(liveSearch);
     });
 
-    return newLiveSearch;
+    return liveSearch;
   }
 
   updateLiveSearch(id: string, updates: Partial<Omit<LiveSearch, "id">>): void {

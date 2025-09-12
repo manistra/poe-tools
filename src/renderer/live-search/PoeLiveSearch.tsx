@@ -5,14 +5,15 @@ import RateLimiterTokens from "src/renderer/components/RateLimiterTokens";
 import Items from "./components/Item/Items";
 import LiveSearchesList from "./components/LiveSearchesList";
 
-import { transformItemData } from "../helpers/transformItemData";
 import AutoTeleportToggle from "./components/AutoTeleportToggle";
 import Logs from "./components/Logs";
-import { mockData } from "../mocks/mockData";
+import { useResults } from "src/shared/store/hooks";
 
 const PoELiveSearch = () => {
+  const { clearResults } = useResults();
+
   const handleClearListings = () => {
-    alert("Clear Listings");
+    clearResults();
   };
 
   return (
@@ -68,7 +69,7 @@ const PoELiveSearch = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Items items={mockData.map(transformItemData)} />
+        <Items />
       </div>
 
       {/* <CooldownModal

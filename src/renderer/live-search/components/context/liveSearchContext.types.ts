@@ -3,13 +3,13 @@ import { LiveSearch } from "src/shared/types";
 
 export type LiveSearchContextType = {
   liveSearches: LiveSearch[];
-  addLiveSearch: (liveSearch: Omit<LiveSearch, "id">) => void;
+  addLiveSearch: (liveSearchDetails: Omit<LiveSearch, "id">) => void;
   updateLiveSearch: (
     id: string,
-    updates: Partial<Omit<LiveSearch, "id">>
+    liveSearchDetails: Partial<Omit<LiveSearch, "id">>
   ) => void;
-  deleteLiveSearch: (id: string) => void;
-  setLiveSearches: (liveSearches: LiveSearch[]) => void;
+  deleteLiveSearch: (liveSearchDetails: LiveSearch) => void;
+  setLiveSearches: (liveSearchDetails: LiveSearch[]) => void;
 
   ws: {
     connectAll: () => void;

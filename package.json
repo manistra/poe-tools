@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.1",
+    "async-mutex": "^0.5.0",
     "axios": "^1.8.4",
     "clsx": "^2.1.1",
     "electron-shared-state": "^1.1.0",

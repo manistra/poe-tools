@@ -60,7 +60,7 @@ export const useLiveSearches = () => {
     return unsubscribe;
   }, []);
 
-  const addLiveSearch = useCallback((liveSearch: Omit<LiveSearch, "id">) => {
+  const addLiveSearch = useCallback((liveSearch: LiveSearch) => {
     return persistentStore.addLiveSearch(liveSearch);
   }, []);
 

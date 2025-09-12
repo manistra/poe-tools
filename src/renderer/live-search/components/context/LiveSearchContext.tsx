@@ -1,41 +1,49 @@
 import React, { PropsWithChildren } from "react";
 import { LiveSearchContext } from "./liveSearchContext.types";
 import { useLiveSearches } from "src/shared/store/hooks";
+import { electronAPI } from "src/renderer/api/electronAPI";
+import { LiveSearchDetails } from "src/shared/types";
 
 export const LiveSearchProvider = ({ children }: PropsWithChildren) => {
-  const {
-    liveSearches,
-    addLiveSearch,
-    updateLiveSearch,
-    deleteLiveSearch,
-    setLiveSearches,
-  } = useLiveSearches();
+  const { liveSearches } = useLiveSearches();
 
-  // TODO: Implement WebSocket connection handlers
+  const handleAddLiveSearch = (liveSearchDetails: LiveSearchDetails) => {
+    electronAPI.websocket.add(liveSearchDetails);
+  };
+  const handleSetAllLiveSearches = (liveSearchDetails: LiveSearchDetails[]) => {
+    electronAPI.websocket.setAll(liveSearchDetails);
+  };
+  const handleUpdateLiveSearch = (
+    id: string,
+    liveSearchDetails: Partial<LiveSearchDetails>
+  ) => {
+    electronAPI.websocket.update(id, liveSearchDetails);
+  };
+  const handleDeleteLiveSearch = (liveSearchDetails: LiveSearchDetails) => {
+    electronAPI.websocket.remove(liveSearchDetails);
+  };
+
   const handleConnectAll = () => {
-    // Connect all live searches to WebSocket
+    electronAPI.websocket.connectAll();
   };
-
   const handleDisconnectAll = () => {
-    // Disconnect all live searches from WebSocket
+    electronAPI.websocket.disconnectAll();
   };
-
   const handleConnectIndividual = (id: string) => {
-    // Connect individual live search by ID to WebSocket
+    electronAPI.websocket.connect(id);
   };
-
   const handleDisconnectIndividual = (id: string) => {
-    // Disconnect individual live search by ID from WebSocket
+    electronAPI.websocket.disconnect(id);
   };
 
   return (
     <LiveSearchContext.Provider
       value={{
         liveSearches,
-        addLiveSearch,
-        updateLiveSearch,
-        deleteLiveSearch,
-        setLiveSearches,
+        addLiveSearch: handleAddLiveSearch,
+        updateLiveSearch: handleUpdateLiveSearch,
+        deleteLiveSearch: handleDeleteLiveSearch,
+        setLiveSearches: handleSetAllLiveSearches,
 
         ws: {
           connectAll: handleConnectAll,

@@ -5,8 +5,9 @@ import Input from "src/renderer/components/Input";
 import { electronAPI } from "src/renderer/api/electronAPI";
 
 import { toast } from "react-hot-toast";
-import { LiveSearch } from "src/shared/types";
+import { LiveSearch, WebSocketState } from "src/shared/types";
 import { useLiveSearchContext } from "./context/hooks/useLiveSearchContext";
+import { isWsStateAnyOf } from "src/renderer/helpers/isWsStateAnyOf";
 
 interface LiveSearchItemProps {
   liveSearch: LiveSearch;
@@ -16,7 +17,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editLabel, setEditLabel] = useState(liveSearch.label);
   const [editUrl, setEditUrl] = useState(liveSearch.url);
-  const { updateLiveSearch, deleteLiveSearch } = useLiveSearchContext();
+  const { updateLiveSearch, deleteLiveSearch, ws } = useLiveSearchContext();
 
   const handleUrlClick = async (url: string) => {
     try {
@@ -60,9 +61,9 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
       )
     ) {
       try {
-        deleteLiveSearch(liveSearch.id);
+        deleteLiveSearch(liveSearch);
 
-        toast.success("Search configuration deleted");
+        toast.success("Live Search deleted");
       } catch (error) {
         toast.error("Failed to delete search configuration");
       }
@@ -104,29 +105,55 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
 
         <div className="ml-2 flex items-center gap-2">
           <div className="flex gap-2 mx-2">
-            {/* {isConnected ? (
+            {isWsStateAnyOf(
+              liveSearch?.ws?.readyState,
+              WebSocketState.OPEN,
+              WebSocketState.CONNECTING
+            ) && (
               <Button
                 size="small"
                 variant="text"
-                // onClick={() => onDisconnect(liveSearchId.id)}
+                disabled={isWsStateAnyOf(
+                  liveSearch?.ws?.readyState,
+                  WebSocketState.CLOSED,
+                  WebSocketState.CLOSING
+                )}
+                onClick={() => ws.disconnectIndividual(liveSearch.id)}
                 className="text-xs text-red-900/20 border border-red-900/20 p-2 hover:text-red-500 hover:border-red-500"
               >
                 Disconnect
               </Button>
-            ) : (
+            )}
+            {isWsStateAnyOf(
+              liveSearch?.ws?.readyState,
+              WebSocketState.CLOSED,
+              WebSocketState.CLOSING
+            ) && (
               <Button
                 size="small"
                 variant="text"
-                // onClick={() => onConnect(liveSearchId)}
-                disabled={isOpen}
+                onClick={() => ws.connectIndividual(liveSearch.id)}
+                disabled={
+                  isOpen ||
+                  isWsStateAnyOf(
+                    liveSearch?.ws?.readyState,
+                    WebSocketState.OPEN,
+                    WebSocketState.CONNECTING
+                  )
+                }
                 className="text-xs text-green-700 border border-green-700 p-2 hover:text-green-500 hover:border-green-500"
               >
                 Connect
               </Button>
-            )} */}
+            )}
 
             <Button
-              // disabled={isConnected}
+              disabled={isWsStateAnyOf(
+                liveSearch?.ws?.readyState,
+                WebSocketState.OPEN,
+                WebSocketState.CLOSING,
+                WebSocketState.CONNECTING
+              )}
               size="small"
               variant="outline"
               onClick={() => setIsOpen(!isOpen)}
@@ -151,18 +178,40 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({ liveSearch }) => {
           </div>
 
           <div
-            className={clsx(
-              "w-2 h-2 rounded-full"
-              // isConnected
-              //   ? "bg-green-400"
-              //   : isLoading
-              //   ? "bg-yellow-400 animate-pulse"
-              //   : "bg-red-400"
-            )}
+            className={clsx("w-2 h-2 rounded-full", {
+              "bg-green-400": isWsStateAnyOf(
+                liveSearch?.ws?.readyState,
+                WebSocketState.OPEN
+              ),
+              "bg-red-400": isWsStateAnyOf(
+                liveSearch?.ws?.readyState,
+                WebSocketState.CLOSED
+              ),
+              "bg-yellow-400 animate-pulse": isWsStateAnyOf(
+                liveSearch?.ws?.readyState,
+                WebSocketState.CONNECTING
+              ),
+              "bg-red-300 animate-pulse": isWsStateAnyOf(
+                liveSearch?.ws?.readyState,
+                WebSocketState.CLOSING
+              ),
+            })}
           />
-          {/* <span className="text-xs text-gray-400 mr-2">
-            {isConnected ? "Live" : isLoading ? "Connecting..." : "Offline"}
-          </span> */}
+          <span className="text-xs text-gray-400 mr-2">
+            {isWsStateAnyOf(liveSearch?.ws?.readyState, WebSocketState.OPEN)
+              ? "Live"
+              : isWsStateAnyOf(
+                  liveSearch?.ws?.readyState,
+                  WebSocketState.CONNECTING
+                )
+              ? "Connecting..."
+              : isWsStateAnyOf(
+                  liveSearch?.ws?.readyState,
+                  WebSocketState.CLOSING
+                )
+              ? "Closing..."
+              : "Offline"}
+          </span>
         </div>
       </div>
 

@@ -1,3 +1,12 @@
+import { WebSocket as WsWebSocket } from "ws";
+
+export enum WebSocketState {
+  OPEN = 1,
+  CONNECTING = 0,
+  CLOSED = 3,
+  CLOSING = 2,
+}
+
 export interface LiveSearch {
   id: string;
   label: string; // This maps to 'name' in the original implementation
@@ -10,9 +19,15 @@ export interface LiveSearch {
       code: number;
       reason: string;
       // Computed connection state - derived from socket.readyState
-      isConnected?: boolean; // Optional - computed property, not always present
     };
+    readyState?: WebSocketState; // WebSocket.OPEN | CONNECTING | CLOSED | CLOSING
   };
+}
+export type LiveSearchDetails = Omit<LiveSearch, "ws">;
+
+export interface LiveSearchWithSocket extends LiveSearch {
+  socket?: WsWebSocket | null;
+  pingTimeout?: NodeJS.Timeout | null;
 }
 
 export interface ItemData {
