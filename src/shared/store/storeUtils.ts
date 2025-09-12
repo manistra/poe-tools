@@ -25,12 +25,24 @@ const STORAGE_KEYS = {
   RATE_LIMITER_TOKENS: "poe-rate-limiter-tokens",
 } as const;
 
+// Helper function to sanitize liveSearches by removing non-persistable ws properties
+const sanitizeLiveSearchesForPersistence = (
+  liveSearches: LiveSearch[]
+): Omit<LiveSearch, "ws">[] => {
+  return liveSearches.map((liveSearch) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { ws, ...details } = liveSearch;
+
+    return details;
+  });
+};
+
 // Helper functions for localStorage persistence
 export const loadStateFromStorage = (): Partial<AppState> => {
   try {
     const poeSessionid =
       localStorage.getItem(STORAGE_KEYS.POE_SESSION_ID) || "";
-    const liveSearches = JSON.parse(
+    const liveSearchDetails = JSON.parse(
       localStorage.getItem(STORAGE_KEYS.LIVE_SEARCHES) || "[]"
     );
     const results = JSON.parse(
@@ -44,7 +56,7 @@ export const loadStateFromStorage = (): Partial<AppState> => {
 
     return {
       poeSessionid,
-      liveSearches,
+      liveSearches: liveSearchDetails as LiveSearch[],
       results,
       autoWhisper,
       rateLimiterTokens,
@@ -61,9 +73,13 @@ export const saveStateToStorage = (state: Partial<AppState>): void => {
       localStorage.setItem(STORAGE_KEYS.POE_SESSION_ID, state.poeSessionid);
     }
     if (state.liveSearches !== undefined) {
+      // Sanitize liveSearches to remove ws property before saving
+      const sanitizedLiveSearches = sanitizeLiveSearchesForPersistence(
+        state.liveSearches
+      );
       localStorage.setItem(
         STORAGE_KEYS.LIVE_SEARCHES,
-        JSON.stringify(state.liveSearches)
+        JSON.stringify(sanitizedLiveSearches)
       );
     }
     if (state.results !== undefined) {

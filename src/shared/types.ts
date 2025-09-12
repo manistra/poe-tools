@@ -2,18 +2,17 @@ export interface LiveSearch {
   id: string;
   label: string; // This maps to 'name' in the original implementation
   url: string; // This maps to 'searchUrl' in the original implementation
-  // WebSocket instance - the actual WebSocket connection
-  isConnected?: boolean; // This maps to 'isConnected' in the original implementation
-  socket?: WebSocket | null; // Can be null when not connected
 
-  // Error state - only present when WebSocket errors occur
-  error?: {
-    code: number;
-    reason: string;
+  ws?: {
+    // Runtime state properties
+    error?: {
+      // Optional - only present when WebSocket errors occur
+      code: number;
+      reason: string;
+      // Computed connection state - derived from socket.readyState
+      isConnected?: boolean; // Optional - computed property, not always present
+    };
   };
-
-  // Custom properties added by the application
-  pingTimeout?: NodeJS.Timeout; // Timeout ID for heartbeat mechanism
 }
 
 export interface ItemData {
