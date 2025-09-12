@@ -7,7 +7,7 @@ export const websocketAPI = {
   setAll: (liveSearchDetails: LiveSearchDetails[]) =>
     ipcRenderer.send(WS_EVENTS.WS_SET_ALL, liveSearchDetails),
 
-  add: (liveSearchDetails: LiveSearchDetails) =>
+  add: (liveSearchDetails: Omit<LiveSearchDetails, "id">) =>
     ipcRenderer.send(WS_EVENTS.WS_ADD, liveSearchDetails),
   update: (id: string, liveSearchDetails: Partial<LiveSearchDetails>) =>
     ipcRenderer.send(WS_EVENTS.WS_UPDATE, { id, liveSearchDetails }),

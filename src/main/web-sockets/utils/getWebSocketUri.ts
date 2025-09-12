@@ -6,7 +6,7 @@ export const poeTradeUrl =
 const getWebSocketUri = (url: string) => {
   const matchDetails = url.match(poeTradeUrl);
 
-  const [, game, league, id] = matchDetails;
+  const [, game, league, id] = matchDetails ?? [];
 
   if (game === "trade") {
     return `${poeWsUri}/${league}/${id}`;

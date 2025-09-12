@@ -27,7 +27,10 @@ export function transformItemData(rawItem: ItemData): TransformedItemData {
     searchLabel: rawItem?.searchLabel,
     listedAt: rawItem?.listing?.indexed,
     icon: rawItem?.item.icon,
-    stash: { x: rawItem?.listing?.stash?.x, y: rawItem?.listing?.stash?.y },
+    stash: {
+      x: rawItem?.listing?.stash?.x,
+      y: rawItem?.listing?.stash?.y,
+    },
   };
 
   return transformedItem;

@@ -45,7 +45,8 @@ const ItemMods: React.FC<ItemModsProps> = ({ item }) => {
               Runes sockets: {item.runeSockets}
             </h4>
             <div className="flex-col flex">
-              {item.runeMods.length > 0 &&
+              {item.runeMods &&
+                item.runeMods.length > 0 &&
                 item.runeMods.map((mod: string, i: number) => (
                   <div key={i} className="text-sm text-poe-mods-enchanted">
                     {mod}

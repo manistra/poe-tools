@@ -7,7 +7,7 @@ export function setupAutoUpdater() {
   // Create a function to send update status to renderer
   const sendStatusToWindow = (status: string) => {
     const windows = BrowserWindow.getAllWindows();
-    if (windows.length > 0) {
+    if (windows.length > 0 && windows[0]) {
       windows[0].webContents.send("update-status", status);
     }
   };

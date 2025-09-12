@@ -16,9 +16,10 @@ export const setupWebSocketHandlers = () => {
       if (
         wsStoreLiveSearches.some(
           (ws) =>
-            ws.socket.readyState === WebSocket.OPEN ||
-            ws.socket.readyState === WebSocket.CONNECTING ||
-            ws.socket.readyState === WebSocket.CLOSING
+            ws.socket != null &&
+            (ws.socket.readyState === WebSocket.OPEN ||
+              ws.socket.readyState === WebSocket.CONNECTING ||
+              ws.socket.readyState === WebSocket.CLOSING)
         )
       ) {
         console.log(
@@ -42,8 +43,8 @@ export const setupWebSocketHandlers = () => {
         .substr(2, 9)}`;
 
       const newLiveSearch: LiveSearch = {
-        id: newId,
         ...liveSearchDetails,
+        id: newId,
       };
 
       WsStore.add(newLiveSearch);
@@ -90,7 +91,7 @@ export const setupWebSocketHandlers = () => {
       }
 
       if (
-        ws.socket &&
+        ws.socket != null &&
         (ws.socket.readyState === WebSocket.OPEN ||
           ws.socket.readyState === WebSocket.CONNECTING)
       ) {

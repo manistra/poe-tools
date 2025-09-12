@@ -55,6 +55,7 @@ export const useLiveSearches = () => {
 
   useEffect(() => {
     const unsubscribe = persistentStore.subscribe((state) => {
+      console.log("useLiveSearches: State updated:", state.liveSearches);
       setLiveSearches(state.liveSearches);
     });
     return unsubscribe;

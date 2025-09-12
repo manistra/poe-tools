@@ -25,7 +25,9 @@ export default class HttpRequestLimiter {
     if (this.onTokensChange) {
       const currentTokens = await this.bottleneck.currentReservoir();
       console.log(`Reservoir tokens: ${currentTokens}`);
-      this.onTokensChange(currentTokens);
+      if (currentTokens !== null) {
+        this.onTokensChange(currentTokens);
+      }
     }
   }
 
@@ -64,14 +66,17 @@ export default class HttpRequestLimiter {
       }
 
       if (response.headers?.[HEADER_KEYS.X_RATE_LIMIT_ACCOUNT]) {
-        const values =
-          response.headers[HEADER_KEYS.X_RATE_LIMIT_ACCOUNT].split(":");
-        const requestLimit =
-          Number(values[0]) || this.config.defaultReservoirValues.requestLimit;
-        const interval =
-          Number(values[1]) || this.config.defaultReservoirValues.interval;
-        resolve({ requestLimit, interval });
-        return;
+        const headerValue = response.headers[HEADER_KEYS.X_RATE_LIMIT_ACCOUNT];
+        if (headerValue) {
+          const values = headerValue.split(":");
+          const requestLimit =
+            Number(values[0]) ||
+            this.config.defaultReservoirValues.requestLimit;
+          const interval =
+            Number(values[1]) || this.config.defaultReservoirValues.interval;
+          resolve({ requestLimit, interval });
+          return;
+        }
       }
 
       console.log("Using default rate limits");
@@ -94,8 +99,9 @@ export default class HttpRequestLimiter {
     this.notifyTokensChange();
   }
 
-  static currentReservoir(): Promise<number> {
-    return Promise.resolve(this.bottleneck.currentReservoir());
+  static async currentReservoir(): Promise<number> {
+    const tokens = await this.bottleneck.currentReservoir();
+    return tokens ?? 0;
   }
 
   static schedule<T>(cb: () => Promise<T>): Promise<T> {

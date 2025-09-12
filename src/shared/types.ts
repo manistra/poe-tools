@@ -20,7 +20,7 @@ export interface LiveSearch {
       reason: string;
       // Computed connection state - derived from socket.readyState
     };
-    readyState?: WebSocketState; // WebSocket.OPEN | CONNECTING | CLOSED | CLOSING
+    readyState?: WebSocketState | null; // WebSocket.OPEN | CONNECTING | CLOSED | CLOSING
   };
 }
 export type LiveSearchDetails = Omit<LiveSearch, "ws">;
@@ -80,7 +80,7 @@ export interface TransformedItemData {
   name: string;
   typeLine: string;
   time: string;
-  listedAt: string;
+  listedAt?: string;
   explicitMods?: string[];
   runeMods?: string[];
   fracturedMods?: string[];
@@ -97,8 +97,8 @@ export interface TransformedItemData {
   searchLabel?: string;
 
   stash?: {
-    x: number;
-    y: number;
+    x?: number;
+    y?: number;
   };
   icon?: string;
 }

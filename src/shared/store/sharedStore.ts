@@ -2,24 +2,50 @@ import { createSharedStore } from "electron-shared-state";
 import { AppState, getInitialState, saveStateToStorage } from "./storeUtils";
 import { LiveSearch, TransformedItemData } from "../types";
 
-// Create the shared store with initial state loaded from localStorage
-const sharedStore = createSharedStore<AppState>(getInitialState(), {
+// Create the shared store with data loaded from electron-store
+const getInitialStoreState = (): AppState => {
+  try {
+    const loadedState = getInitialState();
+    return loadedState;
+  } catch (error) {
+    console.error("Error loading initial state:", error);
+    return {
+      poeSessionid: "",
+      liveSearches: [],
+      results: [],
+      autoWhisper: false,
+      rateLimiterTokens: 6,
+    };
+  }
+};
+
+const sharedStore = createSharedStore<AppState>(getInitialStoreState(), {
   name: "poe-tools-store",
 });
 
-// Enhanced store with localStorage persistence
+// Enhanced store with electron-store persistence
 export class PersistentSharedStore {
   private store = sharedStore;
-  private isRenderer = typeof window !== "undefined";
+
+  private isInitialized = false;
 
   constructor() {
-    // Set up automatic persistence to localStorage
+    // Set up automatic persistence to electron-store
     this.store.subscribe((state) => {
-      if (this.isRenderer) {
-        // Only save to localStorage from renderer process
+      if (this.isInitialized)
+        // Save to electron-store from both main and renderer processes
         saveStateToStorage(state);
-      }
     });
+  }
+
+  // Initialize store (data already loaded from electron-store)
+  initialize() {
+    if (this.isInitialized) return;
+    console.log(
+      "PersistentSharedStore initialized with state:",
+      this.store.getState()
+    );
+    this.isInitialized = true;
   }
 
   // Get current state synchronously
@@ -64,10 +90,19 @@ export class PersistentSharedStore {
         (liveSearch) => liveSearch.id === id
       );
       if (liveSearchIndex !== -1) {
-        state.liveSearches[liveSearchIndex] = {
-          ...state.liveSearches[liveSearchIndex],
-          ...updates,
-        };
+        const existingLiveSearch = state.liveSearches[liveSearchIndex];
+        if (existingLiveSearch) {
+          // Filter out undefined values from updates
+          const filteredUpdates = Object.fromEntries(
+            Object.entries(updates).filter(([_, value]) => value !== undefined)
+          ) as Partial<Omit<LiveSearch, "id">>;
+
+          state.liveSearches[liveSearchIndex] = {
+            ...existingLiveSearch,
+            ...filteredUpdates,
+            id: existingLiveSearch.id, // Ensure id is never overwritten
+          };
+        }
       }
     });
   }

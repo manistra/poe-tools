@@ -28,8 +28,8 @@ export const extractSearchQueryId = (url: string): string | null => {
     if (filteredParts.length > 0) {
       const lastPart = filteredParts[filteredParts.length - 1];
       // Verify it looks like a search ID (alphanumeric, typically 8+ chars)
-      if (/^[a-zA-Z0-9]{8,}$/.test(lastPart)) {
-        return lastPart;
+      if (/^[a-zA-Z0-9]{8,}$/.test(lastPart ?? "")) {
+        return lastPart ?? null;
       }
     }
 

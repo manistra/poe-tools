@@ -1,13 +1,17 @@
 import React from "react";
 
 interface StashVisualizationProps {
-  x: number;
-  y: number;
+  x?: number;
+  y?: number;
 }
 
 const StashVisualization: React.FC<StashVisualizationProps> = ({ x, y }) => {
   const gridSize = 12;
   const cellSize = 170 / gridSize; // 170px divided by 12 cells
+
+  if (!x || !y) {
+    return null;
+  }
 
   return (
     <div className="w-[170px] h-[170px] border mx-auto border-poe-mods-fractured border-opacity-25">

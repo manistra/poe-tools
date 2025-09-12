@@ -7,7 +7,9 @@ import { LiveSearchDetails } from "src/shared/types";
 export const LiveSearchProvider = ({ children }: PropsWithChildren) => {
   const { liveSearches } = useLiveSearches();
 
-  const handleAddLiveSearch = (liveSearchDetails: LiveSearchDetails) => {
+  const handleAddLiveSearch = (
+    liveSearchDetails: Omit<LiveSearchDetails, "id">
+  ) => {
     electronAPI.websocket.add(liveSearchDetails);
   };
   const handleSetAllLiveSearches = (liveSearchDetails: LiveSearchDetails[]) => {

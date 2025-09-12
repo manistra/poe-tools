@@ -37,13 +37,13 @@ const updateWsConnectionState = (
 ) => {
   persistentStore.updateLiveSearch(id, {
     ws: {
-      readyState: liveSearch.socket.readyState,
+      readyState: liveSearch.socket?.readyState ?? WebSocket.CLOSED,
     },
   });
 };
 
 const heartbeat = (liveSearch: LiveSearchWithSocket) => {
-  clearTimeout(liveSearch.pingTimeout);
+  clearTimeout(liveSearch.pingTimeout ?? 0);
 
   // eslint-disable-next-line no-param-reassign
   liveSearch.pingTimeout = setTimeout(() => {
@@ -91,7 +91,7 @@ export const connect = (id: string) =>
         const itemIds = parsedResponse.new;
 
         if (itemIds) {
-          processItems(itemIds, ws, game);
+          processItems(itemIds, game);
         }
       });
 
@@ -102,48 +102,48 @@ export const connect = (id: string) =>
       });
 
       ws.socket.on("error", (error) => {
-        console.log(
-          `[WS] SOCKET ERROR - ${ws.url} / ${ws.id} ${error.message}`
-        );
+        const errorMessage = error?.message || "Unknown error";
+        console.log(`[WS] SOCKET ERROR - ${ws.url} / ${ws.id} ${errorMessage}`);
 
-        const [reason, code] = error.message.split(": ");
-        persistentStore.updateLiveSearch(ws.id, {
-          ws: {
-            ...ws.ws,
-            error: {
-              code: parseInt(code, 10),
-              reason,
+        const [reason, code] = errorMessage.split(": ");
+        if (code && reason)
+          persistentStore.updateLiveSearch(ws.id, {
+            ws: {
+              ...ws.ws,
+              error: {
+                code: parseInt(code, 10),
+                reason,
+              },
             },
-          },
-        });
+          });
 
         updateWsConnectionState(ws.id, ws);
 
-        ws.socket.close();
+        ws.socket?.close();
       });
 
       ws.socket.on("close", () => {
         console.log(
-          `[WS] SOCKET CLOSE - ${ws.url} / ${ws.id} ${ws.ws.error.code} ${ws.ws.error.reason}`
+          `[WS] SOCKET CLOSE - ${ws.url} / ${ws.id} ${ws.ws?.error?.code} ${ws.ws?.error?.reason}`
         );
 
         updateWsConnectionState(ws.id, ws);
 
-        if (ws.ws.error.code === 429) {
+        if (ws.ws?.error?.code === 429) {
           console.log(
             `[WS] Rate limit exceded! Closing connection for ${ws.url}. This should not happen, please open an issue.`
           );
           return;
         }
 
-        if (ws.ws.error.code === 404) {
+        if (ws.ws?.error?.code === 404) {
           console.log(
             `[WS] Search not found. Closing connection for ${ws.url}.`
           );
           return;
         }
 
-        if (ws.ws.error.code === 401) {
+        if (ws.ws?.error?.code === 401) {
           console.log(
             `[WS] Unauthorized. Closing connection for ${ws.url}. Check Session ID.`
           );

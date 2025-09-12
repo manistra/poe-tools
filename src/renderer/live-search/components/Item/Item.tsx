@@ -113,7 +113,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
   }, [item.listedAt]);
 
   const handleCopyWhisper = async () => {
-    await copyToClipboard(item.whisper);
+    await copyToClipboard(item.whisper ?? "");
     toast.success("Whisper copied to clipboard");
   };
 
