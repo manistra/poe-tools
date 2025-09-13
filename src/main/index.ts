@@ -24,8 +24,8 @@ let mainWindow: BrowserWindow;
 const createWindow = (): void => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    height: 600,
-    width: 800,
+    height: 900,
+    width: 1400,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -34,7 +34,7 @@ const createWindow = (): void => {
     frame: true,
     autoHideMenuBar: true,
     fullscreen: true,
-    show: false,
+    show: true,
     icon: path.join(__dirname, "../renderer/assets/icon.ico"),
   });
 
@@ -82,10 +82,36 @@ const createWindow = (): void => {
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
+  // Show window when ready to prevent visual flash
+  mainWindow.once("ready-to-show", () => {
+    mainWindow.show();
+  });
+
+  // Handle window closed
+  mainWindow.on("closed", () => {
+    mainWindow = null as any;
+  });
+
+  // Handle web contents errors
+  mainWindow.webContents.on(
+    "did-fail-load",
+    (event, errorCode, errorDescription, validatedURL) => {
+      console.error(
+        "Failed to load:",
+        errorCode,
+        errorDescription,
+        validatedURL
+      );
+    }
+  );
+
   // Open the DevTools.
   // Comment this out for production
   if (process.env.NODE_ENV === "development")
     mainWindow.webContents.openDevTools();
+
+  // Temporary: Always open DevTools for debugging
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
