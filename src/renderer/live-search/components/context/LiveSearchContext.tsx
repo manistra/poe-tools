@@ -41,6 +41,10 @@ export const LiveSearchProvider = ({ children }: PropsWithChildren) => {
     await electronAPI.websocket.disconnect(id);
   };
 
+  const handleCancelAllAndDisconnect = async () => {
+    await electronAPI.websocket.cancelAllAndDisconnect();
+  };
+
   return (
     <LiveSearchContext.Provider
       value={{
@@ -56,6 +60,7 @@ export const LiveSearchProvider = ({ children }: PropsWithChildren) => {
           disconnectAll: handleDisconnectAll,
           connectIndividual: handleConnectIndividual,
           disconnectIndividual: handleDisconnectIndividual,
+          cancelAllAndDisconnect: handleCancelAllAndDisconnect,
         },
       }}
     >

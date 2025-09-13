@@ -27,6 +27,11 @@ const PoELiveSearch = () => {
     await ws.connectAll();
     setIsConnectingAll(false);
   };
+  const handleConnectAllAndDisconnect = async () => {
+    setIsDisconnectingAll(true);
+    await ws.cancelAllAndDisconnect();
+    setIsDisconnectingAll(false);
+  };
   const handleDisconnectAll = async () => {
     setIsDisconnectingAll(true);
     await ws.disconnectAll();
@@ -55,18 +60,27 @@ const PoELiveSearch = () => {
           <AutoTeleportToggle />
 
           {!hasActiveConnections || isConnectingAll ? (
-            <Button
-              variant="success"
-              onClick={handleConnectAll}
-              disabled={
-                hasActiveConnections ||
-                liveSearches.length === 0 ||
-                !sessionId ||
-                isConnectingAll
-              }
-            >
-              Start Sniping
-            </Button>
+            <div className="flex gap-2 flex-col">
+              <Button
+                variant="danger"
+                className="w-full !p-0"
+                onClick={handleConnectAllAndDisconnect}
+              >
+                Force Stop All
+              </Button>
+              <Button
+                variant="success"
+                onClick={handleConnectAll}
+                disabled={
+                  hasActiveConnections ||
+                  liveSearches.length === 0 ||
+                  !sessionId ||
+                  isConnectingAll
+                }
+              >
+                Start Sniping
+              </Button>
+            </div>
           ) : (
             <Button
               variant="danger"

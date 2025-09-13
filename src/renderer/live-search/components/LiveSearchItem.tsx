@@ -84,7 +84,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
   return (
     <div
       className={clsx(
-        "flex-col items-center justify-between rounded border border-gray-900 bg-gray-900",
+        "flex-col items-center justify-between rounded border bg-gray-900",
         isWsStateAnyOf(liveSearch?.ws?.readyState, WebSocketState.OPEN)
           ? "border-[#0d311e]/70"
           : isWsStateAnyOf(

@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
 import ModalBase from "src/renderer/components/Modal";
 
-import { useLastTeleportedItem } from "src/shared/store/hooks";
+import {
+  useIsTeleportingBlocked,
+  useLastTeleportedItem,
+} from "src/shared/store/hooks";
 import Item from "../Item/Item";
 import { TransformedItemData } from "src/shared/types";
 
 const LastTeleportedItemModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [lastTeleportedItem, setLastTeleportedItem] = useLastTeleportedItem();
+  const [, setIsTeleportingBlocked] = useIsTeleportingBlocked();
 
   const handleClose = () => {
+    setIsTeleportingBlocked(false);
     setLastTeleportedItem({
       ...lastTeleportedItem,
       alreadyTeleported: true,
@@ -18,6 +23,7 @@ const LastTeleportedItemModal: React.FC = () => {
   };
 
   useEffect(() => {
+    setIsTeleportingBlocked(true);
     setIsOpen(!lastTeleportedItem?.alreadyTeleported);
   }, [lastTeleportedItem]);
 

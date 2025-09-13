@@ -29,6 +29,8 @@ export const useAppStore = () => {
     addResult: persistentStore.addResult.bind(persistentStore),
     clearResults: persistentStore.clearResults.bind(persistentStore),
     setAutoWhisper: persistentStore.setAutoWhisper.bind(persistentStore),
+    setIsTeleportingBlocked:
+      persistentStore.setIsTeleportingBlocked.bind(persistentStore),
     addLog: persistentStore.addLog.bind(persistentStore),
     setLogs: persistentStore.setLogs.bind(persistentStore),
     clearLogs: persistentStore.clearLogs.bind(persistentStore),
@@ -187,13 +189,13 @@ export const useResults = () => {
 };
 
 export const useAutoWhisper = () => {
-  const [autoWhisper, setAutoWhisper] = useState<boolean>(
-    persistentStore.getState().autoWhisper
+  const [autoTeleport, setAutoWhisper] = useState<boolean>(
+    persistentStore.getState().autoTeleport
   );
 
   useEffect(() => {
     const unsubscribe = persistentStore.subscribe((state) => {
-      setAutoWhisper(state.autoWhisper);
+      setAutoWhisper(state.autoTeleport);
     });
     return unsubscribe;
   }, []);
@@ -202,7 +204,26 @@ export const useAutoWhisper = () => {
     persistentStore.setAutoWhisper(enabled);
   }, []);
 
-  return [autoWhisper, updateAutoWhisper] as const;
+  return [autoTeleport, updateAutoWhisper] as const;
+};
+
+export const useIsTeleportingBlocked = () => {
+  const [isTeleportingBlocked, setIsTeleportingBlocked] = useState<boolean>(
+    persistentStore.getState().isTeleportingBlocked
+  );
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setIsTeleportingBlocked(state.isTeleportingBlocked);
+    });
+    return unsubscribe;
+  }, []);
+
+  const updateIsTeleportingBlocked = useCallback((blocked: boolean) => {
+    persistentStore.setIsTeleportingBlocked(blocked);
+  }, []);
+
+  return [isTeleportingBlocked, updateIsTeleportingBlocked] as const;
 };
 
 export const useRateLimiterTokens = () => {
@@ -295,6 +316,8 @@ export const useAppStoreSync = () => {
     addResult: persistentStore.addResult.bind(persistentStore),
     clearResults: persistentStore.clearResults.bind(persistentStore),
     setAutoWhisper: persistentStore.setAutoWhisper.bind(persistentStore),
+    setIsTeleportingBlocked:
+      persistentStore.setIsTeleportingBlocked.bind(persistentStore),
     addLog: persistentStore.addLog.bind(persistentStore),
     setLogs: persistentStore.setLogs.bind(persistentStore),
     clearLogs: persistentStore.clearLogs.bind(persistentStore),

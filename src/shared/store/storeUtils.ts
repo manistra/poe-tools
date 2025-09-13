@@ -10,11 +10,12 @@ export interface AppState {
   poeSessionid: string;
   webSocketSessionId: string;
 
-  lastTeleportedItem?: TransformedItemData & { alreadyTeleported?: boolean };
   liveSearches: LiveSearch[];
   results: TransformedItemData[];
 
-  autoWhisper: boolean;
+  lastTeleportedItem?: TransformedItemData & { alreadyTeleported?: boolean };
+  autoTeleport: boolean;
+  isTeleportingBlocked: boolean;
 
   rateLimitData: {
     requestLimit: number;
@@ -28,11 +29,12 @@ export const initialState: AppState = {
   poeSessionid: "",
   webSocketSessionId: "",
 
-  lastTeleportedItem: undefined,
   liveSearches: [],
   results: [],
 
-  autoWhisper: false,
+  lastTeleportedItem: undefined,
+  autoTeleport: false,
+  isTeleportingBlocked: false,
 
   rateLimiterTokens: 6,
   rateLimitData: {
@@ -51,10 +53,11 @@ const store = new Store<AppState>({
     webSocketSessionId: "",
 
     liveSearches: [],
-    lastTeleportedItem: undefined,
     results: [],
 
-    autoWhisper: false,
+    lastTeleportedItem: undefined,
+    autoTeleport: false,
+    isTeleportingBlocked: false,
 
     rateLimiterTokens: 6,
     rateLimitData: {

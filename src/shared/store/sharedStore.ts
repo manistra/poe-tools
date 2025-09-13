@@ -20,7 +20,8 @@ const getInitialStoreState = (): AppState => {
       lastTeleportedItem: undefined,
       liveSearches: [],
       results: [],
-      autoWhisper: false,
+      autoTeleport: false,
+      isTeleportingBlocked: false,
       rateLimiterTokens: 6,
       rateLimitData: {
         requestLimit: 6,
@@ -173,7 +174,13 @@ export class PersistentSharedStore {
 
   setAutoWhisper(enabled: boolean): void {
     this.setState((state) => {
-      state.autoWhisper = enabled;
+      state.autoTeleport = enabled;
+    });
+  }
+
+  setIsTeleportingBlocked(blocked: boolean): void {
+    this.setState((state) => {
+      state.isTeleportingBlocked = blocked;
     });
   }
 

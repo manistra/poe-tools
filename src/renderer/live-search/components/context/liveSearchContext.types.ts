@@ -17,6 +17,7 @@ export type LiveSearchContextType = {
     disconnectAll: () => Promise<void>;
     connectIndividual: (id: string) => Promise<void>;
     disconnectIndividual: (id: string) => void;
+    cancelAllAndDisconnect: () => Promise<void>;
   };
 };
 

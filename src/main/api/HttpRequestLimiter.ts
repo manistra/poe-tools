@@ -130,16 +130,27 @@ export default class HttpRequestLimiter {
 
   static async cancelAll(): Promise<void> {
     await this.bottleneck.stop({ dropWaitingJobs: true });
+    // Recreate the bottleneck to allow future operations
+    this.bottleneck = new Bottleneck();
+    // Reinitialize with current settings if they exist
+    if (this.isInitialized) {
+      const currentState = persistentStore.getState();
+      this.updateSettings(
+        currentState.rateLimitData.requestLimit,
+        currentState.rateLimitData.interval
+      );
+    }
     persistentStore.addLog(
-      "[HttpRequestLimiter] All queued requests cancelled"
+      "[HttpRequestLimiter] All queued requests cancelled and limiter recreated"
     );
   }
 
-  static getQueuedCount(): number {
-    return this.bottleneck.queued();
-  }
+  static getQueueStatus = async () => {
+    const wsQueued = this.bottleneck.queued();
+    const wsRunning = await this.bottleneck.running();
 
-  static async getRunningCount(): Promise<number> {
-    return await this.bottleneck.running();
-  }
+    return {
+      ws: { queued: wsQueued, running: wsRunning },
+    };
+  };
 }

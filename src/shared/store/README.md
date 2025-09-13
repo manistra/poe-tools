@@ -40,7 +40,7 @@ function LiveSearchesComponent() {
   const { liveSearches, addLiveSearch, updateLiveSearch, deleteLiveSearch } =
     useLiveSearches();
   const [sessionId, setSessionId] = usePoeSessionId();
-  const [autoWhisper, setAutoWhisper] = useAutoWhisper();
+  const [autoTeleport, setAutoWhisper] = useAutoWhisper();
 
   // Your component logic...
 }
@@ -99,7 +99,7 @@ interface AppState {
   poeSessionid: string; // POE session ID
   liveSearches: LiveSearch[]; // Array of live search configurations
   results: TransformedItemData[]; // Array of search results
-  autoWhisper: boolean; // Auto-whisper setting
+  autoTeleport: boolean; // Auto-whisper setting
 }
 ```
 
