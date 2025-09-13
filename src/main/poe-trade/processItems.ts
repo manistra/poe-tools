@@ -98,6 +98,21 @@ export const processItems = async (
       transformedItems.forEach((item) => {
         persistentStore.addResult(item);
       });
+
+      if (
+        !(
+          persistentStore.getState().autoTeleport &&
+          !persistentStore.getState().isTeleportingBlocked &&
+          itemToAutoBuy?.hideoutToken &&
+          itemToAutoBuy?.hideoutToken !== ""
+        ) &&
+        !(
+          persistentStore.getState().autoWhisper &&
+          itemToAutoBuy?.whisper_token &&
+          itemToAutoBuy?.whisper_token !== ""
+        )
+      )
+        playPingSound();
     } else {
       console.warn("API response data is not an array:", itemDetails?.data);
     }
