@@ -4,6 +4,7 @@ import { transformItemData } from "src/renderer/helpers/transformItemData";
 import { autoTeleport } from "./autoTeleport";
 import { sendWhisper } from "./sendWhisper";
 import { TransformedItemData } from "src/shared/types";
+import { playTeleportSound, playWhisperSound } from "../utils/soundUtils";
 
 export const processItems = async (
   itemIds: string[],
@@ -51,6 +52,8 @@ export const processItems = async (
         });
 
         if (whisperResponse.success) {
+          // Trigger success sound for whisper
+          playWhisperSound();
           transformedItems.shift(); // Remove first element
           transformedItems.unshift({ ...itemToAutoBuy, isWhispered: true }); // Add itemToAutoBuy at beginning
         } else {
@@ -79,6 +82,8 @@ export const processItems = async (
         });
 
         if (autoTeleportResponse.success) {
+          // Trigger success sound for teleport
+          playTeleportSound();
           transformedItems.shift(); // Remove first element
           transformedItems.unshift({ ...itemToAutoBuy, isWhispered: true }); // Add itemToAutoBuy at beginning
         } else {

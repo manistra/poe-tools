@@ -10,7 +10,7 @@ const PoELiveSearch = () => {
   const [poeSessionId] = usePoeSessionId();
 
   return (
-    <div className="w-full flex flex-col gap-5 p-5 max-w-[1250px] mx-auto">
+    <div className="w-full flex flex-col gap-5 p-5 max-w-[1450px] mx-auto">
       {!poeSessionId && (
         <div className="absolute top-0 left-0 w-full text-center text-red-500 text-sm py-3 bg-red-900 bg-opacity-25 z-50">
           ⚠️ POESESSIONID is not set. Please set the POESESSIONID in the

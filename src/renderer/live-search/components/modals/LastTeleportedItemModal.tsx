@@ -7,8 +7,10 @@ import {
 } from "src/shared/store/hooks";
 import Item from "../Listings/components/Item";
 import { TransformedItemData } from "src/shared/types";
+import { useLiveSearchContext } from "../../context/hooks/useLiveSearchContext";
 
 const LastTeleportedItemModal: React.FC = () => {
+  const { ws } = useLiveSearchContext();
   const [isOpen, setIsOpen] = useState(false);
   const [lastTeleportedItem, setLastTeleportedItem] = useLastTeleportedItem();
   const [, setIsTeleportingBlocked] = useIsTeleportingBlocked();
@@ -73,8 +75,8 @@ const LastTeleportedItemModal: React.FC = () => {
           Auto-Teleporting is <span className="text-red-500">BLOCKED</span>!{" "}
           <br />
           <span className="text-gray-400 text-xl">
-            Press the button below to continue or wait for for cooldown to
-            expire.
+            Click the button below (or anywhere around) to continue or wait for
+            for cooldown to expire.
           </span>
         </span>
         <button
@@ -82,6 +84,17 @@ const LastTeleportedItemModal: React.FC = () => {
           className="px-10 py-4 bg-gradient-to-br from-green-600 to-green-950 hover:from-green-700 hover:to-green-800 transition-colors text-white rounded text-4xl font-medium duration-300 w-[300px]"
         >
           Unblock
+        </button>
+
+        <button
+          onClick={ws.cancelAllAndDisconnect}
+          className="text-gray-400 hover:text-gray-200 transition-colors duration-200 opacity-40 hover:opacity-100"
+        >
+          🚫
+          <span className="underline">
+            Click here to stop all searches and close{" "}
+          </span>
+          🚫
         </button>
       </div>
     </ModalBase>

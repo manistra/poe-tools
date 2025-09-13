@@ -6,6 +6,7 @@ import { persistentStore } from "../../shared/store/sharedStore";
 import { apiNoLimiter, rateLimitedApi } from "../api/apis";
 import { autoTeleport } from "../poe-trade/autoTeleport";
 import { sendWhisper } from "../poe-trade/sendWhisper";
+import { playSound, SoundType } from "../utils/soundUtils";
 
 export function setupApiHandlers() {
   // Initialize with defaults
@@ -91,6 +92,20 @@ export function setupApiHandlers() {
       return { success: true };
     } catch (error) {
       console.error("Clipboard copy failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  });
+
+  // Sound handlers
+  ipcMain.handle("play-sound", async (_, soundType: SoundType) => {
+    try {
+      playSound(soundType);
+      return { success: true };
+    } catch (error) {
+      console.error("Sound playback failed:", error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",

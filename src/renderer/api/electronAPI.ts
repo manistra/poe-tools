@@ -1,5 +1,6 @@
 import { ipcRenderer } from "electron";
 import { websocketAPI } from "./websocketsApi";
+import { SoundType } from "src/main/utils/soundUtils";
 
 // API request handler
 export const apiRequest = (options: {
@@ -63,6 +64,12 @@ export const poeTradeAPI = {
   }) => ipcRenderer.invoke("send-whisper", request),
 };
 
+// Sound API
+const soundAPI = {
+  playSound: (soundType: SoundType) =>
+    ipcRenderer.invoke("play-sound", soundType),
+};
+
 // Combined API object for easy access
 export const electronAPI = {
   websocket: websocketAPI,
@@ -74,4 +81,5 @@ export const electronAPI = {
   shell: shellAPI,
   rateLimiter: rateLimiterAPI,
   poeTrade: poeTradeAPI,
+  sound: soundAPI,
 };
