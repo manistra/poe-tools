@@ -7,6 +7,7 @@ export function transformItemData(rawItem: ItemData): TransformedItemData {
     id: rawItem?.id || "",
     name: rawItem?.item?.name || "",
     typeLine: rawItem?.item?.typeLine || "",
+    rarity: rawItem?.item?.rarity || "",
     time: rawItem?.time || new Date().toLocaleTimeString(),
     explicitMods: rawItem?.item?.explicitMods || [],
     runeMods: rawItem?.item?.runeMods || [],
@@ -22,12 +23,17 @@ export function transformItemData(rawItem: ItemData): TransformedItemData {
           currency: rawItem?.listing?.price?.currency || "",
         }
       : undefined,
+    isWhispered: false,
     whisper: rawItem?.listing?.whisper,
+    whisper_token: rawItem?.listing?.whisper_token,
     hideoutToken: rawItem?.listing?.hideout_token,
     searchLabel: rawItem?.searchLabel,
     listedAt: rawItem?.listing?.indexed,
     icon: rawItem?.item.icon,
-    stash: { x: rawItem?.listing?.stash?.x, y: rawItem?.listing?.stash?.y },
+    stash: {
+      x: rawItem?.listing?.stash?.x,
+      y: rawItem?.listing?.stash?.y,
+    },
   };
 
   return transformedItem;

@@ -24,4 +24,8 @@ export const rendererConfig: Configuration = {
       src: path.resolve(__dirname, "src"),
     },
   },
+  target: "electron-renderer",
+  externals: {
+    "electron": "commonjs electron",
+  },
 };

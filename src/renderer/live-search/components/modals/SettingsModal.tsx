@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ModalBase from "src/renderer/components/Modal";
 import Input from "src/renderer/components/Input";
 import Button from "src/renderer/components/Button";
+import { usePoeSessionId, useWebSocketSessionId } from "src/shared/store/hooks";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -12,20 +13,30 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   setIsSettingsOpen,
 }) => {
-  const [sessionId, setSessionId] = useState(
-    window.localStorage.getItem("poeSessionId") || ""
-  );
+  const [storedSessionId, setStoredSessionId] = usePoeSessionId();
+  const [localSessionId, setLocalSessionId] = useState("");
 
-  const handleSessionIdSet = (id: string) => {
-    window.localStorage.setItem("poeSessionId", id);
+  const [storedWebSocketSessionId, setStoredWebSocketSessionId] =
+    useWebSocketSessionId();
+  const [localWebSocketSessionId, setLocalWebSocketSessionId] = useState("");
+
+  // Load the stored session ID into local state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setLocalSessionId(storedSessionId);
+      setLocalWebSocketSessionId(storedWebSocketSessionId);
+    }
+  }, [isOpen, storedSessionId]);
+
+  const handleSessionIdSet = () => {
+    setStoredSessionId(localSessionId);
+    setStoredWebSocketSessionId(localWebSocketSessionId);
     setIsSettingsOpen(false);
   };
 
   return (
     <ModalBase
-      onClose={() =>
-        setSessionId(window.localStorage.getItem("poeSessionId") || "")
-      }
+      onClose={() => setIsSettingsOpen(false)}
       isOpen={isOpen}
       setIsOpen={setIsSettingsOpen}
       className="card max-w-md w-full"
@@ -33,8 +44,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       <div className="flex flex-col gap-2">
         <Input
           label="POESESSIONID:"
-          value={sessionId}
-          onChange={(value) => setSessionId(value.toString())}
+          value={localSessionId}
+          onChange={(value) => setLocalSessionId(value.toString())}
+        />
+        <Input
+          label="WEB-SOCKET POESESSIONID:"
+          value={localWebSocketSessionId}
+          onChange={(value) => setLocalWebSocketSessionId(value.toString())}
         />
 
         <div className="ml-auto flex gap-2">
@@ -42,15 +58,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             size="small"
             variant="outline"
             className="ml-auto"
-            onClick={() => handleSessionIdSet(sessionId)}
+            onClick={() => setIsSettingsOpen(false)}
           >
-            Close
+            Cancel
           </Button>
           <Button
             size="small"
             variant="success"
             className="ml-auto"
-            onClick={() => handleSessionIdSet(sessionId)}
+            onClick={() => handleSessionIdSet()}
           >
             Save
           </Button>

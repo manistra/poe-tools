@@ -7,7 +7,7 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   className?: string;
-  variant?: "default" | "danger" | "success" | "outline" | "text";
+  variant?: "primary" | "secondary" | "danger" | "success" | "outline" | "text";
   size?: "small" | "medium" | "large";
   fullWidth?: boolean;
 }
@@ -18,7 +18,7 @@ const Button: React.FC<ButtonProps> = ({
   type = "button",
   disabled = false,
   className = "",
-  variant = "default",
+  variant = "primary",
   size = "medium",
   fullWidth = false,
 }) => {
@@ -40,8 +40,8 @@ const Button: React.FC<ButtonProps> = ({
 
         // Color variants
         {
-          "bg-gradient-to-r from-orange-950 to-orange-800 border border-gray-700 hover:to-orange-600 transition-colors duration-200 text-white":
-            variant === "default",
+          "bg-gradient-to-r from-orange-950 to-orange-800 hover:to-orange-600 transition-colors duration-200 text-white":
+            variant === "primary",
           "border-red-900 border bg-red-950 hover:bg-red-800 text-white":
             variant === "danger",
           "border-green-900 border bg-green-950 hover:bg-green-700 text-white":
@@ -49,6 +49,8 @@ const Button: React.FC<ButtonProps> = ({
           "border border-gray-500 bg-transparent hover:text-gray-200 hover:border-gray-200 text-gray-500":
             variant === "outline",
           "bg-transparent": variant === "text",
+          "bg-gradient-to-r from-orange-950/40 to-orange-800/40 hover:to-orange-600/50 transition-colors duration-200 text-orange-200/80":
+            variant === "secondary",
         },
 
         // Width

@@ -1,8 +1,33 @@
-export interface SearchConfig {
+import { WebSocket as WsWebSocket } from "ws";
+
+export enum WebSocketState {
+  OPEN = 1,
+  CONNECTING = 0,
+  CLOSED = 3,
+  CLOSING = 2,
+}
+
+export interface LiveSearch {
   id: string;
-  label: string;
-  url: string;
-  isActive: boolean;
+  label: string; // This maps to 'name' in the original implementation
+  url: string; // This maps to 'searchUrl' in the original implementation
+
+  ws?: {
+    // Runtime state properties
+    error?: {
+      // Optional - only present when WebSocket errors occur
+      code: number;
+      reason: string;
+      // Computed connection state - derived from socket.readyState
+    };
+    readyState?: WebSocketState | null; // WebSocket.OPEN | CONNECTING | CLOSED | CLOSING
+  };
+}
+export type LiveSearchDetails = Omit<LiveSearch, "ws">;
+
+export interface LiveSearchWithSocket extends LiveSearch {
+  socket?: WsWebSocket | null;
+  pingTimeout?: NodeJS.Timeout | null;
 }
 
 export interface ItemData {
@@ -13,6 +38,7 @@ export interface ItemData {
     sockets: unknown;
     name: string;
     typeLine: string;
+    rarity: string;
     properties: {
       name: string;
       values: [string, number][];
@@ -41,6 +67,7 @@ export interface ItemData {
       currency: string;
     };
     whisper?: string;
+    whisper_token?: string;
     hideout_token?: string;
     stash?: {
       x: number;
@@ -54,8 +81,9 @@ export interface TransformedItemData {
   id: string;
   name: string;
   typeLine: string;
+  rarity: string;
   time: string;
-  listedAt: string;
+  listedAt?: string;
   explicitMods?: string[];
   runeMods?: string[];
   fracturedMods?: string[];
@@ -66,14 +94,27 @@ export interface TransformedItemData {
     amount: number;
     currency: string;
   };
+  isWhispered?: boolean;
   whisper?: string;
+  whisper_token?: string;
   hideoutToken?: string;
   searchQueryId?: string;
   searchLabel?: string;
 
   stash?: {
-    x: number;
-    y: number;
+    x?: number;
+    y?: number;
   };
   icon?: string;
+}
+
+export interface ApiResponse {
+  data?: any;
+  error?: {
+    message: string;
+    status: number;
+    headers: Record<string, string>;
+  };
+  status?: number;
+  headers?: Record<string, string>;
 }

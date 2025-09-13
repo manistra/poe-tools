@@ -1,4 +1,5 @@
+import { persistentStore } from "src/shared/store/sharedStore";
+
 export const getPoeSessionId = () => {
-  const sessionId = window.localStorage.getItem("poeSessionId");
-  return sessionId;
+  return persistentStore.getState().poeSessionid;
 };
