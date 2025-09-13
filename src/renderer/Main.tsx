@@ -3,6 +3,7 @@ import "./index.css"; // import css
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import { LiveSearchProvider } from "./live-search/context/LiveSearchContext";
 
 import Toast from "./components/Toast";
 
@@ -45,7 +46,9 @@ declare global {
 const root = createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
-    <App />
-    <Toast />
+    <LiveSearchProvider>
+      <App />
+      <Toast />
+    </LiveSearchProvider>
   </React.StrictMode>
 );

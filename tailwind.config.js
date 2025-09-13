@@ -7,8 +7,10 @@ module.exports = {
       colors: {
         poe: {
           mods: {
-            title: "#ffff77",
             fractured: "#a29162",
+            rare: "#ffff77",
+
+            unique: "#AF6025",
             enchanted: "#b4b4ff",
             regular: "#8888ff",
           },
