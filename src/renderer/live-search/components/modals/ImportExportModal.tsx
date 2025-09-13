@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import ModalBase from "src/renderer/components/Modal";
 import Button from "src/renderer/components/Button";
 import TextArea from "src/renderer/components/TextArea";
-import { copyToClipboard } from "../../../helpers/clipboard";
 import { useLiveSearchContext } from "../context/hooks/useLiveSearchContext";
+import { electronAPI } from "src/renderer/api/electronAPI";
 
 interface ImportExportModalProps {
   isOpen: boolean;
@@ -16,12 +16,8 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 }) => {
   const [importData, setImportData] = useState("");
   const [importError, setImportError] = useState("");
-  const {
-    liveSearches,
-    deleteAllLiveSearches,
-    importLiveSearches,
-    ws: { disconnectAll },
-  } = useLiveSearchContext();
+  const { liveSearches, deleteAllLiveSearches, importLiveSearches } =
+    useLiveSearchContext();
 
   const handleImport = () => {
     setImportError("");
@@ -63,7 +59,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
       }));
 
       const jsonString = JSON.stringify(exportData, null, 2);
-      await copyToClipboard(jsonString);
+      await electronAPI.poeTrade.copyToClipboard(jsonString);
       alert(`Exported ${liveSearches.length} live searches to clipboard!`);
     } catch (error) {
       console.error("Export failed:", error);
@@ -91,12 +87,6 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
   const handleClose = () => {
     setImportData("");
     setImportError("");
-    setIsImportExportOpen(false);
-  };
-
-  const handleForceStopAll = async () => {
-    await disconnectAll();
-
     setIsImportExportOpen(false);
   };
 
@@ -132,13 +122,6 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
               </Button>
               <Button size="small" variant="danger" onClick={handleDeleteAll}>
                 Delete All Live Searches
-              </Button>
-              <Button
-                size="small"
-                variant="danger"
-                onClick={handleForceStopAll}
-              >
-                Force Stop All Live Searches
               </Button>
             </div>
 

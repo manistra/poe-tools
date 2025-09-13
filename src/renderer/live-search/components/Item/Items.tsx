@@ -14,7 +14,7 @@ const Items: React.FC = () => {
     <ul className="space-y-4">
       {items.map((item) => (
         <li key={item.id}>
-          <Item key={item.id} item={item} />
+          <Item item={item} />
         </li>
       ))}
     </ul>

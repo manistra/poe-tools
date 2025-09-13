@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { AppState, Log } from "./storeUtils";
-import { LiveSearch, TransformedItemData } from "../types";
+import { ItemData, LiveSearch, TransformedItemData } from "../types";
 import { persistentStore } from "../store/sharedStore";
+import { transformItemData } from "src/renderer/helpers/transformItemData";
+import { mockData } from "../mocks/mockData";
 
 // Main hook to access the entire store
 export const useAppStore = () => {
@@ -28,6 +30,7 @@ export const useAppStore = () => {
     setResults: persistentStore.setResults.bind(persistentStore),
     addResult: persistentStore.addResult.bind(persistentStore),
     clearResults: persistentStore.clearResults.bind(persistentStore),
+    setAutoTeleport: persistentStore.setAutoTeleport.bind(persistentStore),
     setAutoWhisper: persistentStore.setAutoWhisper.bind(persistentStore),
     setIsTeleportingBlocked:
       persistentStore.setIsTeleportingBlocked.bind(persistentStore),
@@ -79,20 +82,25 @@ export const useWebSocketSessionId = () => {
 
 export const useLastTeleportedItem = () => {
   const [lastTeleportedItem, setLastTeleportedItem] = useState<
-    (TransformedItemData & { alreadyTeleported?: boolean }) | undefined
-  >(persistentStore.getState().lastTeleportedItem);
+    (TransformedItemData & { alreadyTeleported?: boolean }) | null
+  >(null); // Initialize with null instead of current store value
 
   useEffect(() => {
+    // if (process.env.NODE_ENV === "development") {
+    //   const item = transformItemData(mockData[0] as ItemData);
+    //   persistentStore.setLastTeleportedItem({
+    //     ...item,
+    //     alreadyTeleported: false,
+    //   });
+    // }
     const unsubscribe = persistentStore.subscribe((state) => {
-      setLastTeleportedItem(state.lastTeleportedItem);
+      setLastTeleportedItem(state.lastTeleportedItem ?? null);
     });
     return unsubscribe;
   }, []);
 
   const updateLastTeleportedItem = useCallback(
-    (
-      item: (TransformedItemData & { alreadyTeleported?: boolean }) | undefined
-    ) => {
+    (item: (TransformedItemData & { alreadyTeleported?: boolean }) | null) => {
       persistentStore.setLastTeleportedItem(item);
     },
     []
@@ -131,7 +139,6 @@ export const useLiveSearches = () => {
 
   useEffect(() => {
     const unsubscribe = persistentStore.subscribe((state) => {
-      console.log("useLiveSearches: State updated:", state.liveSearches);
       setLiveSearches(state.liveSearches);
     });
     return unsubscribe;
@@ -188,14 +195,33 @@ export const useResults = () => {
   };
 };
 
-export const useAutoWhisper = () => {
-  const [autoTeleport, setAutoWhisper] = useState<boolean>(
+export const useAutoTeleport = () => {
+  const [autoTeleport, setAutoTeleport] = useState<boolean>(
     persistentStore.getState().autoTeleport
   );
 
   useEffect(() => {
     const unsubscribe = persistentStore.subscribe((state) => {
-      setAutoWhisper(state.autoTeleport);
+      setAutoTeleport(state.autoTeleport);
+    });
+    return unsubscribe;
+  }, []);
+
+  const updateAutoTeleport = useCallback((enabled: boolean) => {
+    persistentStore.setAutoTeleport(enabled);
+  }, []);
+
+  return [autoTeleport, updateAutoTeleport] as const;
+};
+
+export const useAutoWhisper = () => {
+  const [autoWhisper, setAutoWhisper] = useState<boolean>(
+    persistentStore.getState().autoWhisper
+  );
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setAutoWhisper(state.autoWhisper);
     });
     return unsubscribe;
   }, []);
@@ -204,7 +230,7 @@ export const useAutoWhisper = () => {
     persistentStore.setAutoWhisper(enabled);
   }, []);
 
-  return [autoTeleport, updateAutoWhisper] as const;
+  return [autoWhisper, updateAutoWhisper] as const;
 };
 
 export const useIsTeleportingBlocked = () => {
@@ -315,6 +341,7 @@ export const useAppStoreSync = () => {
     setResults: persistentStore.setResults.bind(persistentStore),
     addResult: persistentStore.addResult.bind(persistentStore),
     clearResults: persistentStore.clearResults.bind(persistentStore),
+    setAutoTeleport: persistentStore.setAutoTeleport.bind(persistentStore),
     setAutoWhisper: persistentStore.setAutoWhisper.bind(persistentStore),
     setIsTeleportingBlocked:
       persistentStore.setIsTeleportingBlocked.bind(persistentStore),

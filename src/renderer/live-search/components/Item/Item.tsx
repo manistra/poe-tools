@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { copyToClipboard } from "../../../helpers/clipboard";
+import React, { useEffect, useState, useCallback } from "react";
+import { debounce } from "lodash";
 
 import Button from "src/renderer/components/Button";
 
@@ -7,7 +7,6 @@ import toast from "react-hot-toast";
 
 import clsx from "clsx";
 import ItemMods from "./ItemMods";
-import { autoTeleport } from "../../../../main/poe-trade/autoTeleport";
 import StashVisualization from "./StashVisualization";
 
 // Import currency images
@@ -15,6 +14,11 @@ import chaosImg from "src/renderer/assets/chaos.png";
 import divineImg from "src/renderer/assets/divine.png";
 import exaltedImg from "src/renderer/assets/exalted.png";
 import { TransformedItemData } from "../../../../shared/types";
+import { electronAPI } from "src/renderer/api/electronAPI";
+import {
+  ChatBubbleLeftEllipsisIcon,
+  ClipboardDocumentIcon,
+} from "@heroicons/react/24/outline";
 
 interface ItemProps {
   item: TransformedItemData;
@@ -71,7 +75,9 @@ const CurrencyDisplay: React.FC<{
 const Item: React.FC<ItemProps> = ({ item }) => {
   const [listedAgo, setListedAgo] = useState<string>("");
 
-  const [isWhispered, setIsWhispered] = useState<boolean>(false);
+  const [isWhispered, setIsWhispered] = useState<boolean>(
+    item.isWhispered ?? false
+  );
   const [isSendingWhisper, setIsSendingWhisper] = useState<boolean>(false);
 
   // Calculate and format the time difference
@@ -113,37 +119,68 @@ const Item: React.FC<ItemProps> = ({ item }) => {
   }, [item.listedAt]);
 
   const handleCopyWhisper = async () => {
-    await copyToClipboard(item.whisper ?? "");
+    await electronAPI.poeTrade.copyToClipboard(item.whisper ?? "asdwadsdw");
     toast.success("Whisper copied to clipboard");
   };
-
-  const handleSendWhisper = async () => {
-    if (!item.hideoutToken) {
-      toast.error("No hideout token available for this item");
-      return;
-    }
-
-    setIsSendingWhisper(true);
-    try {
-      const response = await autoTeleport({
-        itemId: item.id,
-        hideoutToken: item.hideoutToken,
-        searchQueryId: item.searchQueryId,
-      });
-
-      if (response.success) {
-        setIsWhispered(true);
-        toast.success("Whisper sent successfully");
-      } else {
-        toast.error(response.error || "Failed to send whisper");
+  const handleSendWhisper = useCallback(
+    debounce(async () => {
+      if (!item.whisper_token) {
+        toast.error("No whisper token available for this item");
+        return;
       }
-    } catch (error) {
-      console.error("Error sending whisper:", error);
-      toast.error("Failed to send whisper");
-    } finally {
-      setIsSendingWhisper(false);
-    }
-  };
+      setIsSendingWhisper(true);
+      try {
+        const response = await electronAPI.poeTrade.sendWhisper({
+          itemId: item.id,
+          token: item.whisper_token,
+          searchQueryId: item.searchQueryId,
+        });
+        if (response.success) {
+          toast.success("Whisper sent successfully");
+          setIsWhispered(true);
+        } else {
+          toast.error(response.error || "Failed to send whisper");
+        }
+      } catch (error) {
+        console.error("Error sending whisper:", error);
+        toast.error("Failed to send whisper");
+      } finally {
+        setIsSendingWhisper(false);
+      }
+    }, 300),
+    [item.whisper_token, item.id, item.searchQueryId]
+  );
+
+  const handleTeleportToHideout = useCallback(
+    debounce(async () => {
+      if (!item.hideoutToken) {
+        toast.error("No hideout token available for this item");
+        return;
+      }
+
+      setIsSendingWhisper(true);
+      try {
+        const response = await electronAPI.poeTrade.teleportToHideout({
+          itemId: item.id,
+          hideoutToken: item.hideoutToken,
+          searchQueryId: item.searchQueryId,
+        });
+
+        if (response.success) {
+          setIsWhispered(true);
+          toast.success("Teleported to hideout successfully");
+        } else {
+          toast.error(response.error || "Failed to teleport to hideout");
+        }
+      } catch (error) {
+        console.error("Error sending whisper:", error);
+        toast.error("Failed to teleport to hideout");
+      } finally {
+        setIsSendingWhisper(false);
+      }
+    }, 300),
+    [item.hideoutToken, item.id, item.searchQueryId]
+  );
 
   return (
     <div
@@ -160,7 +197,9 @@ const Item: React.FC<ItemProps> = ({ item }) => {
           <ItemMods item={item} />
 
           <div className="flex-col h-full flex gap-5">
-            <StashVisualization x={item.stash?.x} y={item.stash?.y} />
+            {!!item.hideoutToken && item.hideoutToken !== "" && (
+              <StashVisualization x={item.stash?.x} y={item.stash?.y} />
+            )}
 
             {item?.icon && (
               <div className="w-[170px] flex flex-col flex-1 max-w-[170px] items-center justify-center">
@@ -219,24 +258,58 @@ const Item: React.FC<ItemProps> = ({ item }) => {
         <div className="flex flex-row items-center gap-2">
           <div className="flex flex-row items-center gap-5">
             <div className="flex flex-row items-center">
-              <Button
-                size="small"
-                onClick={handleCopyWhisper}
-                className="h-8 text-xl text-center mr-2"
-              >
-                Copy Whisper
-              </Button>
+              <div className="flex flex-col items-center gap-2">
+                {/* <button
+                  onClick={handleCopyWhisper}
+                  className="text-sm hover:text-underline text-poe-mods-fractured self-start mr-4 opacity-50 hover:opacity-100 transition-opacity duration-200"
+                >
+                  Block This Seller
+                </button> */}
+                {item.whisper && (
+                  <button
+                    onClick={handleCopyWhisper}
+                    className="text-sm hover:text-underline text-poe-mods-fractured self-start mr-4 opacity-50 hover:opacity-100 transition-opacity duration-200 flex flex-row items-center gap-1"
+                  >
+                    <ClipboardDocumentIcon className="size-4" />
+                    Copy Whisper
+                  </button>
+                )}
+              </div>
               {item.hideoutToken && (
+                <Button
+                  onClick={handleTeleportToHideout}
+                  disabled={isSendingWhisper}
+                  className={clsx(
+                    "h-[70px] w-[186px] !text-[17px] !text-yellow-100 font-bold",
+                    isSendingWhisper && "opacity-50 cursor-not-allowed",
+                    isWhispered && "!bg-gray-600 hover:!bg-gray-700"
+                  )}
+                >
+                  {isSendingWhisper
+                    ? "Traveling..."
+                    : isWhispered
+                    ? "Teleported"
+                    : "⚡ Travel to Hideout"}
+                </Button>
+              )}
+
+              {item.whisper_token && (
                 <Button
                   onClick={handleSendWhisper}
                   disabled={isSendingWhisper}
+                  variant="secondary"
                   className={clsx(
-                    "h-[70px] w-[186px] !text-[17px] text-gray-500 font-bold",
+                    "h-[70px] w-[186px] !text-[17px] !text-yellow-100 font-bold flex flex-row items-center gap-1 justify-center ",
                     isSendingWhisper && "opacity-50 cursor-not-allowed",
-                    isWhispered && "bg-green-600 hover:bg-green-700"
+                    isWhispered && "!bg-gray-600 hover:!bg-gray-700"
                   )}
                 >
-                  {isSendingWhisper ? "Traveling..." : "Travel to Hideout"}
+                  <ChatBubbleLeftEllipsisIcon className="size-4 mt-1" />
+                  {isSendingWhisper
+                    ? "Sending Whisper..."
+                    : isWhispered
+                    ? "Whisper Sent"
+                    : "Send Whisper"}
                 </Button>
               )}
             </div>

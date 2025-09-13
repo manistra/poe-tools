@@ -67,8 +67,12 @@ const createWindow = (): void => {
   ]);
 
   // Set up right-click context menu
-  mainWindow.webContents.on("context-menu", () => {
-    contextMenu.popup();
+  mainWindow.webContents.on("context-menu", (event, params) => {
+    contextMenu.popup({
+      window: mainWindow,
+      x: params.x,
+      y: params.y,
+    });
   });
 
   Menu.setApplicationMenu(null);

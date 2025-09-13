@@ -11,7 +11,8 @@ import { TransformedItemData } from "src/shared/types";
 const LastTeleportedItemModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [lastTeleportedItem, setLastTeleportedItem] = useLastTeleportedItem();
-  const [_, setIsTeleportingBlocked] = useIsTeleportingBlocked();
+  const [, setIsTeleportingBlocked] = useIsTeleportingBlocked();
+  const [timeLeft, setTimeLeft] = useState(40);
 
   const handleClose = () => {
     setIsTeleportingBlocked(false);
@@ -23,8 +24,31 @@ const LastTeleportedItemModal: React.FC = () => {
   };
 
   useEffect(() => {
-    setIsOpen(!lastTeleportedItem?.alreadyTeleported);
+    setIsOpen(
+      lastTeleportedItem !== null &&
+        lastTeleportedItem &&
+        !lastTeleportedItem?.alreadyTeleported
+    );
+    console.log("lastTeleportedItem", lastTeleportedItem);
   }, [lastTeleportedItem]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    setTimeLeft(40);
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleClose();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isOpen]);
 
   return (
     <ModalBase
@@ -43,18 +67,21 @@ const LastTeleportedItemModal: React.FC = () => {
         </div>
       )}
       <div className="flex flex-col items-center gap-3 justify-center">
+        <div className="text-6xl font-bold text-yellow-400">{timeLeft}</div>
+
         <span className="text-white text-2xl text-center">
           Auto-Teleporting is <span className="text-red-500">BLOCKED</span>!{" "}
           <br />
           <span className="text-gray-400 text-xl">
-            Press the button below to continue.
+            Press the button below to continue or wait for for cooldown to
+            expire.
           </span>
         </span>
         <button
           onClick={handleClose}
           className="px-10 py-4 bg-gradient-to-br from-green-600 to-green-950 hover:from-green-700 hover:to-green-800 transition-colors text-white rounded text-4xl font-medium duration-300"
         >
-          Continue Auto-Teleporting
+          CONTINUE SNIPING
         </button>
       </div>
     </ModalBase>

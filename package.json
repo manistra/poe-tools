@@ -52,6 +52,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.1",
     "@heroicons/react": "^2.2.0",
+    "@types/lodash": "^4.17.20",
     "async-mutex": "^0.5.0",
     "axios": "^1.8.4",
     "clsx": "^2.1.1",
@@ -59,6 +60,7 @@
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^8.2.0",
     "heroicons": "^2.2.0",
+    "lodash": "^4.17.21",
     "postcss-loader": "^8.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

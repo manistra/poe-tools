@@ -47,13 +47,20 @@ export const rateLimiterAPI = {
   getCurrentTokens: () => ipcRenderer.invoke("get-rate-limiter-tokens"),
 };
 
-// Auto teleport API
-export const autoTeleportAPI = {
-  teleport: (request: {
+// Poe Trade API
+export const poeTradeAPI = {
+  copyToClipboard: async (text: string) =>
+    await ipcRenderer.invoke("copy-to-clipboard", text),
+  teleportToHideout: (request: {
     itemId: string;
     hideoutToken: string;
     searchQueryId?: string;
   }) => ipcRenderer.invoke("auto-teleport", request),
+  sendWhisper: (request: {
+    itemId: string;
+    token: string;
+    searchQueryId?: string;
+  }) => ipcRenderer.invoke("send-whisper", request),
 };
 
 // Combined API object for easy access
@@ -66,5 +73,5 @@ export const electronAPI = {
   updates: updatesAPI,
   shell: shellAPI,
   rateLimiter: rateLimiterAPI,
-  autoTeleport: autoTeleportAPI,
+  poeTrade: poeTradeAPI,
 };

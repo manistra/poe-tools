@@ -35,6 +35,27 @@ export interface ElectronAPI {
 
     getPoeSessionId: () => Promise<string | null>;
   };
+  poeTrade: {
+    copyToClipboard: (text: string) => Promise<void>;
+    teleportToHideout: (request: {
+      itemId: string;
+      hideoutToken: string;
+      searchQueryId?: string;
+    }) => Promise<{
+      success: boolean;
+      message?: string;
+      error?: string;
+    }>;
+    sendWhisper: (request: {
+      itemId: string;
+      token: string;
+      searchQueryId?: string;
+    }) => Promise<{
+      success: boolean;
+      message?: string;
+      error?: string;
+    }>;
+  };
   updates: {
     getAppVersion: () => Promise<string>;
     onUpdateStatus: (callback: (status: string) => void) => () => void;

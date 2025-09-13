@@ -97,7 +97,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
           : isWsStateAnyOf(
               liveSearch?.ws?.readyState,
               WebSocketState.CONNECTING
-            )
+            ) || isConnecting
           ? "border-yellow-900/20 bg-yellow-900/20"
           : "border-gray-900 bg-gray-900"
       )}
@@ -142,63 +142,35 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            title="Edit"
-            disabled={
-              isConnecting ||
-              connectDisabled ||
-              isWsStateAnyOf(
-                liveSearch?.ws?.readyState,
-                WebSocketState.OPEN,
-                WebSocketState.CLOSING,
-                WebSocketState.CONNECTING
-              )
-            }
-            onClick={handleDelete}
-            className={clsx(
-              isConnecting ||
-                connectDisabled ||
-                isWsStateAnyOf(
-                  liveSearch?.ws?.readyState,
-                  WebSocketState.OPEN,
-                  WebSocketState.CLOSING,
-                  WebSocketState.CONNECTING
-                )
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:opacity-80 hover:text-red-300 transition duration-200 cursor-pointer opacity-65"
-            )}
-          >
-            <TrashIcon className="size-5" />
-          </button>
+          {!(
+            isConnecting ||
+            connectDisabled ||
+            isWsStateAnyOf(
+              liveSearch?.ws?.readyState,
+              WebSocketState.OPEN,
+              WebSocketState.CLOSING,
+              WebSocketState.CONNECTING
+            )
+          ) && (
+            <>
+              <button
+                title="Edit"
+                onClick={handleDelete}
+                className="hover:opacity-80 hover:text-red-300 transition duration-200 cursor-pointer opacity-65"
+              >
+                <TrashIcon className="size-5" />
+              </button>
 
-          <button
-            title="Edit"
-            disabled={
-              isConnecting ||
-              connectDisabled ||
-              isWsStateAnyOf(
-                liveSearch?.ws?.readyState,
-                WebSocketState.OPEN,
-                WebSocketState.CLOSING,
-                WebSocketState.CONNECTING
-              )
-            }
-            onClick={() => setIsOpen(!isOpen)}
-            className={clsx(
-              isConnecting ||
-                connectDisabled ||
-                isWsStateAnyOf(
-                  liveSearch?.ws?.readyState,
-                  WebSocketState.OPEN,
-                  WebSocketState.CLOSING,
-                  WebSocketState.CONNECTING
-                )
-                ? "cursor-not-allowed opacity-50"
-                : "hover:scale-[104%] opacity-50 transition-transform duration-200 cursor-pointer hover:-rotate-12 hover:opacity-100"
-            )}
-          >
-            <PencilIcon className="size-5" />
-          </button>
+              <button
+                title="Edit"
+                onClick={() => setIsOpen(!isOpen)}
+                className="hover:scale-[104%] opacity-80 transition-transform duration-200 cursor-pointer hover:-rotate-12 hover:opacity-100"
+              >
+                <PencilIcon className="size-5" />
+              </button>
+            </>
+          )}
+
           {isWsStateAnyOf(
             liveSearch?.ws?.readyState,
             WebSocketState.OPEN,
@@ -217,8 +189,8 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
                   WebSocketState.CLOSED,
                   WebSocketState.CLOSING
                 )
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:scale-[104%] transition-transform duration-200 cursor-pointer opacity-50 hover:opacity-100"
+                  ? "opacity-30 cursor-not-allowed"
+                  : "hover:scale-[104%] transition-transform duration-200 cursor-pointer opacity-80 hover:opacity-100"
               )}
             >
               <SignalSlashIcon className="size-6 hover:scale-[104%] hover:text-red-500 transition-transform duration-200 cursor-pointer" />
@@ -250,11 +222,11 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
                     WebSocketState.OPEN,
                     WebSocketState.CONNECTING
                   )
-                  ? "opacity-50 cursor-not-allowed"
+                  ? "opacity-30 cursor-not-allowed"
                   : "transition-transform duration-200 cursor-pointer"
               )}
             >
-              <SignalIcon className="opacity-50 hover:opacity-100 size-6 hover:scale-[104%] hover:text-green-200 transition-transform duration-200 cursor-pointer" />
+              <SignalIcon className="opacity-80 hover:opacity-100 size-6 hover:scale-[104%] hover:text-green-200 transition-transform duration-200 cursor-pointer" />
             </button>
           )}
         </div>

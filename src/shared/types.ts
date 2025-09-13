@@ -38,6 +38,7 @@ export interface ItemData {
     sockets: unknown;
     name: string;
     typeLine: string;
+    rarity: string;
     properties: {
       name: string;
       values: [string, number][];
@@ -66,6 +67,7 @@ export interface ItemData {
       currency: string;
     };
     whisper?: string;
+    whisper_token?: string;
     hideout_token?: string;
     stash?: {
       x: number;
@@ -79,6 +81,7 @@ export interface TransformedItemData {
   id: string;
   name: string;
   typeLine: string;
+  rarity: string;
   time: string;
   listedAt?: string;
   explicitMods?: string[];
@@ -91,7 +94,9 @@ export interface TransformedItemData {
     amount: number;
     currency: string;
   };
+  isWhispered?: boolean;
   whisper?: string;
+  whisper_token?: string;
   hideoutToken?: string;
   searchQueryId?: string;
   searchLabel?: string;

@@ -39,9 +39,9 @@ const RateLimiterTokens: React.FC = () => {
         </div>
       </div>
 
-      <span className="text-gray-400 text-xs mx-auto">
-        {rateLimitData.requestLimit} requests per {rateLimitData.interval}
-        seconds
+      <span className="text-gray-500 text-xs mx-auto">
+        [{rateLimitData.requestLimit} requests per {rateLimitData.interval}{" "}
+        seconds]
       </span>
     </div>
   );

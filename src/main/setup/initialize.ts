@@ -5,7 +5,7 @@ import WsStore from "../web-sockets/ws-store";
 import { persistentStore } from "../../shared/store/sharedStore";
 import { mockData } from "src/shared/mocks/mockData";
 import { transformItemData } from "src/renderer/helpers/transformItemData";
-import { ItemData } from "src/shared/types";
+import { ItemData, TransformedItemData } from "src/shared/types";
 
 export const initializeHandlers = () => {
   if (process.env.NODE_ENV === "development") {

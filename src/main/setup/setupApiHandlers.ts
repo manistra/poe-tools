@@ -1,10 +1,11 @@
-import { ipcMain } from "electron";
+import { ipcMain, clipboard } from "electron";
 
 import { ApiResponse } from "../../shared/types";
 import HttpRequestLimiter from "../api/HttpRequestLimiter";
 import { persistentStore } from "../../shared/store/sharedStore";
 import { apiNoLimiter, rateLimitedApi } from "../api/apis";
 import { autoTeleport } from "../poe-trade/autoTeleport";
+import { sendWhisper } from "../poe-trade/sendWhisper";
 
 export function setupApiHandlers() {
   // Initialize with defaults
@@ -67,4 +68,33 @@ export function setupApiHandlers() {
       return autoTeleport(request);
     }
   );
+
+  // Add handler for sendWhisper
+  ipcMain.handle(
+    "send-whisper",
+    async (
+      _,
+      request: {
+        itemId: string;
+        token: string;
+        searchQueryId?: string;
+      }
+    ) => {
+      return sendWhisper(request);
+    }
+  );
+
+  // Clipboard handler
+  ipcMain.handle("copy-to-clipboard", async (_, text: string) => {
+    try {
+      clipboard.writeText(text);
+      return { success: true };
+    } catch (error) {
+      console.error("Clipboard copy failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  });
 }

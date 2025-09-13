@@ -13,8 +13,11 @@ export interface AppState {
   liveSearches: LiveSearch[];
   results: TransformedItemData[];
 
-  lastTeleportedItem?: TransformedItemData & { alreadyTeleported?: boolean };
+  lastTeleportedItem?:
+    | (TransformedItemData & { alreadyTeleported?: boolean })
+    | null;
   autoTeleport: boolean;
+  autoWhisper: boolean;
   isTeleportingBlocked: boolean;
 
   rateLimitData: {
@@ -34,6 +37,7 @@ export const initialState: AppState = {
 
   lastTeleportedItem: undefined,
   autoTeleport: false,
+  autoWhisper: false,
   isTeleportingBlocked: false,
 
   rateLimiterTokens: 6,
@@ -57,6 +61,7 @@ const store = new Store<AppState>({
 
     lastTeleportedItem: undefined,
     autoTeleport: false,
+    autoWhisper: false,
     isTeleportingBlocked: false,
 
     rateLimiterTokens: 6,
@@ -99,7 +104,7 @@ export const saveStateToStorage = (state: Partial<AppState>): void => {
       ...(state.liveSearches !== undefined && {
         liveSearches: sanitizeLiveSearchesForPersistence(state.liveSearches),
 
-        lastTeleportedItem: undefined,
+        lastTeleportedItem: null,
         isTeleportingBlocked: false,
       }),
     };
