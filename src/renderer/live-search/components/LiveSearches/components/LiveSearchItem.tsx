@@ -6,10 +6,9 @@ import { electronAPI } from "src/renderer/api/electronAPI";
 
 import { toast } from "react-hot-toast";
 import { LiveSearch, WebSocketState } from "src/shared/types";
-import { useLiveSearchContext } from "./context/hooks/useLiveSearchContext";
+import { useLiveSearchContext } from "../../../context/hooks/useLiveSearchContext";
 import { isWsStateAnyOf } from "src/renderer/helpers/isWsStateAnyOf";
 import {
-  ArrowTopRightOnSquareIcon,
   PencilIcon,
   SignalIcon,
   SignalSlashIcon,
@@ -102,7 +101,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
           : "border-gray-900 bg-gray-900"
       )}
     >
-      <div className="flex items-center justify-between rounded p-1 w-full px-3">
+      <div className="flex items-center justify-between rounded py-2 w-full px-3">
         <div className="flex items-center flex-row gap-2">
           <div
             className={clsx("w-3 h-3 rounded-full relative shadow-sm", {
@@ -129,11 +128,11 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
           </div>
 
           <button
+            title={liveSearch.label}
             onClick={() => handleUrlClick(liveSearch.url)}
-            className="text-gray-300 truncate hover:text-blue-900 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1"
+            className="text-gray-300 hover:text-blue-900 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1 max-w-[270px]"
           >
-            {liveSearch.label}
-            <ArrowTopRightOnSquareIcon className="size-4" />
+            <span className="truncate">{liveSearch.label}</span>
           </button>
         </div>
 
@@ -141,7 +140,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
           {liveSearch?.ws?.error?.code} {liveSearch?.ws?.error?.reason}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {!(
             isConnecting ||
             connectDisabled ||
@@ -154,7 +153,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
           ) && (
             <>
               <button
-                title="Edit"
+                title="Delete"
                 onClick={handleDelete}
                 className="hover:opacity-80 hover:text-red-300 transition duration-200 cursor-pointer opacity-65"
               >
@@ -177,6 +176,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
             WebSocketState.CONNECTING
           ) && (
             <button
+              title="Disconnect"
               disabled={isWsStateAnyOf(
                 liveSearch?.ws?.readyState,
                 WebSocketState.CLOSED,
@@ -202,6 +202,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
             WebSocketState.CLOSING
           ) && (
             <button
+              title="Connect"
               onClick={() => handleConnect()}
               disabled={
                 isOpen ||

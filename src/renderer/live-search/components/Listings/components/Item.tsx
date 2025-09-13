@@ -6,19 +6,19 @@ import Button from "src/renderer/components/Button";
 import toast from "react-hot-toast";
 
 import clsx from "clsx";
-import ItemMods from "./ItemMods";
-import StashVisualization from "./StashVisualization";
 
 // Import currency images
 import chaosImg from "src/renderer/assets/chaos.png";
 import divineImg from "src/renderer/assets/divine.png";
 import exaltedImg from "src/renderer/assets/exalted.png";
-import { TransformedItemData } from "../../../../shared/types";
+import { TransformedItemData } from "../../../../../shared/types";
 import { electronAPI } from "src/renderer/api/electronAPI";
 import {
   ChatBubbleLeftEllipsisIcon,
   ClipboardDocumentIcon,
 } from "@heroicons/react/24/outline";
+import ItemMods from "./ItemMods";
+import StashVisualization from "./StashVisualization";
 
 interface ItemProps {
   item: TransformedItemData;
@@ -47,28 +47,24 @@ const CurrencyDisplay: React.FC<{
 
   const currencyImage = getCurrencyImage(currency);
 
-  if (currencyImage) {
-    return (
-      <div
-        className={clsx(
-          "flex items-center gap-1 text-[#aa9e82] text-[18px] justify-center",
-          className
-        )}
-      >
-        <span>{amount} x</span>
+  return (
+    <div
+      className={clsx(
+        "flex items-center gap-1 text-[#aa9e82] text-[18px] justify-center",
+        className
+      )}
+    >
+      <span>{amount} x</span>
+      {currencyImage ? (
         <img
           src={currencyImage}
           alt={currency}
           className={clsx("w-6 h-6 object-contain", iconClassName)}
         />
-      </div>
-    );
-  }
-
-  return (
-    <span className="text-[#aa9e82]">
-      {amount} x {currency}
-    </span>
+      ) : (
+        <span>{currency}</span>
+      )}
+    </div>
   );
 };
 

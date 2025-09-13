@@ -2,12 +2,159 @@ import { ItemData } from "src/shared/types";
 
 export const mockData = [
   {
+    searchLabel: "Dev Mock Search",
+    id: "bf07bbd017e5156defdb04f61ad9633a7604d9ec7b80c417a663d0088363eebc",
+    listing: {
+      method: "psapi",
+      indexed: "2025-09-13T11:39:27Z",
+      stash: {
+        name: "4",
+        x: 10,
+        y: 1,
+      },
+      price: {
+        type: "~b/o",
+        amount: 2,
+        currency: "divine",
+      },
+      fee: 9988,
+      account: {
+        name: "15867481747#4436",
+        online: null,
+      },
+      hideout_token:
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1Y2JkY2M1ZmU0NmUzZWUzZTg2OGZlZjE2ZTMzYWRiOCIsImlzcyI6IlFMS0wyVmdPdXciLCJhdWQiOiJiOGVkOGM0MC04YTJkLTQ1ODgtODg4OC1jN2I5YjhiYmZkZjIiLCJ0b2siOiJoaWRlb3V0Iiwic3ViIjoiYmYwN2JiZDAxN2U1MTU2ZGVmZGIwNGY2MWFkOTYzM2E3NjA0ZDllYzdiODBjNDE3YTY2M2QwMDg4MzYzZWViYyIsImRhdCI6ImE5NDgzOWY3OTg5ZjllMTE5ZDc5NmQwZWU5NzVmZTBmIiwiaWF0IjoxNzU3NzY4MDA2LCJleHAiOjE3NTc3NjgzMDZ9.34L8NmR4fvt9TnheU-i9_0COizwGf3LRRD5x6Tqbbhw",
+    },
+    item: {
+      realm: "poe2",
+      verified: true,
+      w: 2,
+      h: 4,
+      icon: "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9Ud29IYW5kV2VhcG9ucy9Cb3dzL0Jhc2V0eXBlcy9Cb3cwNiIsInciOjIsImgiOjQsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/b0a606586d/Bow06.png",
+      league: "Rise of the Abyssal",
+      id: "bf07bbd017e5156defdb04f61ad9633a7604d9ec7b80c417a663d0088363eebc",
+      name: "",
+      typeLine: "Flaring Gemini Bow of Ruin",
+      baseType: "Gemini Bow",
+      rarity: "Magic",
+      ilvl: 80,
+      identified: true,
+      note: "~b/o 2 divine",
+      properties: [
+        {
+          name: "[Bow]",
+          values: [],
+          displayMode: 0,
+        },
+        {
+          name: "[Physical] Damage",
+          values: [["71-137", 1]],
+          displayMode: 0,
+          type: 9,
+        },
+        {
+          name: "[Critical|Critical Hit] Chance",
+          values: [["9.28%", 1]],
+          displayMode: 0,
+          type: 12,
+        },
+        {
+          name: "Attacks per Second",
+          values: [["1.10", 0]],
+          displayMode: 0,
+          type: 13,
+        },
+      ],
+      requirements: [
+        {
+          name: "Level",
+          values: [["78", 0]],
+          displayMode: 0,
+          type: 62,
+        },
+        {
+          name: "[Dexterity|Dex]",
+          values: [["163", 0]],
+          displayMode: 1,
+          type: 64,
+        },
+      ],
+      implicitMods: ["Bow [Attack|Attacks] fire an additional Arrow"],
+      explicitMods: [
+        "Adds 32 to 65 [Physical|Physical] Damage",
+        "+4.28% to [Critical|Critical Hit] Chance",
+      ],
+      frameType: 1,
+      extended: {
+        dps: 136.95,
+        pdps: 136.95,
+        edps: 0,
+        dps_aug: true,
+        pdps_aug: true,
+        mods: {
+          explicit: [
+            {
+              name: "Flaring",
+              tier: "P1",
+              level: 75,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_1940865751",
+                  min: "26",
+                  max: "39",
+                },
+                {
+                  hash: "explicit.stat_1940865751",
+                  min: "44",
+                  max: "66",
+                },
+              ],
+            },
+            {
+              name: "of Ruin",
+              tier: "S2",
+              level: 59,
+              magnitudes: [
+                {
+                  hash: "explicit.stat_518292764",
+                  min: "3.81",
+                  max: "4.4",
+                },
+              ],
+            },
+          ],
+          implicit: [
+            {
+              name: "",
+              tier: "",
+              level: 1,
+              magnitudes: [
+                {
+                  hash: "implicit.stat_3885405204",
+                  min: "1",
+                  max: "1",
+                },
+              ],
+            },
+          ],
+        },
+        hashes: {
+          explicit: [
+            ["explicit.stat_1940865751", [0]],
+            ["explicit.stat_518292764", [1]],
+          ],
+          implicit: [["implicit.stat_3885405204", [0]]],
+        },
+      },
+    },
+  },
+  {
     id: "af080ef6476337bba7c3813c2d65eb3381f74776735a05c0aec5ade7898ec8a6",
     listing: {
       method: "psapi",
       indexed: "2025-09-12T15:04:18Z",
       stash: {
-        name: "~price 500 exalted",
+        name: "~price 500 annul",
         x: 8,
         y: 0,
       },
@@ -178,7 +325,7 @@ export const mockData = [
       price: {
         type: "~price",
         amount: 1,
-        currency: "exalted",
+        currency: "annul",
       },
     },
     item: {
@@ -510,154 +657,6 @@ export const mockData = [
           ],
           implicit: [["implicit.stat_3885405204", [0]]],
           rune: [["rune.stat_3336890334", null]],
-        },
-      },
-    },
-  },
-
-  {
-    searchLabel: "Dev Mock Search",
-    id: "bf07bbd017e5156defdb04f61ad9633a7604d9ec7b80c417a663d0088363eebc",
-    listing: {
-      method: "psapi",
-      indexed: "2025-09-13T11:39:27Z",
-      stash: {
-        name: "4",
-        x: 10,
-        y: 1,
-      },
-      price: {
-        type: "~b/o",
-        amount: 2,
-        currency: "divine",
-      },
-      fee: 9988,
-      account: {
-        name: "15867481747#4436",
-        online: null,
-      },
-      hideout_token:
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1Y2JkY2M1ZmU0NmUzZWUzZTg2OGZlZjE2ZTMzYWRiOCIsImlzcyI6IlFMS0wyVmdPdXciLCJhdWQiOiJiOGVkOGM0MC04YTJkLTQ1ODgtODg4OC1jN2I5YjhiYmZkZjIiLCJ0b2siOiJoaWRlb3V0Iiwic3ViIjoiYmYwN2JiZDAxN2U1MTU2ZGVmZGIwNGY2MWFkOTYzM2E3NjA0ZDllYzdiODBjNDE3YTY2M2QwMDg4MzYzZWViYyIsImRhdCI6ImE5NDgzOWY3OTg5ZjllMTE5ZDc5NmQwZWU5NzVmZTBmIiwiaWF0IjoxNzU3NzY4MDA2LCJleHAiOjE3NTc3NjgzMDZ9.34L8NmR4fvt9TnheU-i9_0COizwGf3LRRD5x6Tqbbhw",
-    },
-    item: {
-      realm: "poe2",
-      verified: true,
-      w: 2,
-      h: 4,
-      icon: "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9Ud29IYW5kV2VhcG9ucy9Cb3dzL0Jhc2V0eXBlcy9Cb3cwNiIsInciOjIsImgiOjQsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/b0a606586d/Bow06.png",
-      league: "Rise of the Abyssal",
-      id: "bf07bbd017e5156defdb04f61ad9633a7604d9ec7b80c417a663d0088363eebc",
-      name: "",
-      typeLine: "Flaring Gemini Bow of Ruin",
-      baseType: "Gemini Bow",
-      rarity: "Magic",
-      ilvl: 80,
-      identified: true,
-      note: "~b/o 2 divine",
-      properties: [
-        {
-          name: "[Bow]",
-          values: [],
-          displayMode: 0,
-        },
-        {
-          name: "[Physical] Damage",
-          values: [["71-137", 1]],
-          displayMode: 0,
-          type: 9,
-        },
-        {
-          name: "[Critical|Critical Hit] Chance",
-          values: [["9.28%", 1]],
-          displayMode: 0,
-          type: 12,
-        },
-        {
-          name: "Attacks per Second",
-          values: [["1.10", 0]],
-          displayMode: 0,
-          type: 13,
-        },
-      ],
-      requirements: [
-        {
-          name: "Level",
-          values: [["78", 0]],
-          displayMode: 0,
-          type: 62,
-        },
-        {
-          name: "[Dexterity|Dex]",
-          values: [["163", 0]],
-          displayMode: 1,
-          type: 64,
-        },
-      ],
-      implicitMods: ["Bow [Attack|Attacks] fire an additional Arrow"],
-      explicitMods: [
-        "Adds 32 to 65 [Physical|Physical] Damage",
-        "+4.28% to [Critical|Critical Hit] Chance",
-      ],
-      frameType: 1,
-      extended: {
-        dps: 136.95,
-        pdps: 136.95,
-        edps: 0,
-        dps_aug: true,
-        pdps_aug: true,
-        mods: {
-          explicit: [
-            {
-              name: "Flaring",
-              tier: "P1",
-              level: 75,
-              magnitudes: [
-                {
-                  hash: "explicit.stat_1940865751",
-                  min: "26",
-                  max: "39",
-                },
-                {
-                  hash: "explicit.stat_1940865751",
-                  min: "44",
-                  max: "66",
-                },
-              ],
-            },
-            {
-              name: "of Ruin",
-              tier: "S2",
-              level: 59,
-              magnitudes: [
-                {
-                  hash: "explicit.stat_518292764",
-                  min: "3.81",
-                  max: "4.4",
-                },
-              ],
-            },
-          ],
-          implicit: [
-            {
-              name: "",
-              tier: "",
-              level: 1,
-              magnitudes: [
-                {
-                  hash: "implicit.stat_3885405204",
-                  min: "1",
-                  max: "1",
-                },
-              ],
-            },
-          ],
-        },
-        hashes: {
-          explicit: [
-            ["explicit.stat_1940865751", [0]],
-            ["explicit.stat_518292764", [1]],
-          ],
-          implicit: [["implicit.stat_3885405204", [0]]],
         },
       },
     },

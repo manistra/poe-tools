@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Button from "src/renderer/components/Button";
 import Input from "src/renderer/components/Input";
 import { electronAPI } from "../api/electronAPI";
-import RateLimiterTokens from "./RateLimiterTokens";
+import RateLimiterTokens from "../live-search/components/Navbar/components/RateLimiterTokens";
 
 // const URL = "https://jsonplaceholder.typicode.com/posts/1";
 const URL = "https://localhost:3000/api/ping";

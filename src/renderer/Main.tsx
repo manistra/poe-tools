@@ -3,7 +3,7 @@ import "./index.css"; // import css
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import { LiveSearchProvider } from "./live-search/components/context/LiveSearchContext";
+import { LiveSearchProvider } from "./live-search/context/LiveSearchContext";
 
 import Toast from "./components/Toast";
 

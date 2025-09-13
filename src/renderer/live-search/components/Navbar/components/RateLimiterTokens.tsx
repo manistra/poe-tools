@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  useRateLimitData,
-  useRateLimiterTokens,
-} from "../../shared/store/hooks";
+import { useRateLimiterTokens, useRateLimitData } from "src/shared/store/hooks";
 
 const RateLimiterTokens: React.FC = () => {
   const [tokens] = useRateLimiterTokens();
@@ -21,11 +18,11 @@ const RateLimiterTokens: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center gap-2 text-sm">
-        <span className="text-gray-400">Rate Limiter:</span>
+    <div className="flex flex-col min-w-[200px] max-w-[100px]">
+      <div className="flex items-center gap-2 text-sm justify-between">
+        <span className="text-xs text-gray-300">Rate Limiter:</span>
         <div className="flex items-center gap-1">
-          <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
+          <div className="w-20 h-2 bg-gray-700 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all duration-300 ${getProgressColor()}`}
               style={{
@@ -39,10 +36,14 @@ const RateLimiterTokens: React.FC = () => {
         </div>
       </div>
 
-      <span className="text-gray-500 text-xs mx-auto">
-        [{rateLimitData.requestLimit} requests per {rateLimitData.interval}{" "}
-        seconds]
-      </span>
+      <div className="flex justify-between text-gray-500 text-xs w-full">
+        <span>[</span>
+        <span>
+          {rateLimitData.requestLimit} requests per {rateLimitData.interval}{" "}
+          seconds
+        </span>
+        <span>]</span>
+      </div>
     </div>
   );
 };

@@ -5,7 +5,7 @@ import {
   useIsTeleportingBlocked,
   useLastTeleportedItem,
 } from "src/shared/store/hooks";
-import Item from "../Item/Item";
+import Item from "../Listings/components/Item";
 import { TransformedItemData } from "src/shared/types";
 
 const LastTeleportedItemModal: React.FC = () => {
@@ -62,7 +62,7 @@ const LastTeleportedItemModal: React.FC = () => {
       </h1>
 
       {lastTeleportedItem && (
-        <div className="scale-125 my-24">
+        <div className="my-3">
           <Item item={lastTeleportedItem} />
         </div>
       )}
@@ -79,9 +79,9 @@ const LastTeleportedItemModal: React.FC = () => {
         </span>
         <button
           onClick={handleClose}
-          className="px-10 py-4 bg-gradient-to-br from-green-600 to-green-950 hover:from-green-700 hover:to-green-800 transition-colors text-white rounded text-4xl font-medium duration-300"
+          className="px-10 py-4 bg-gradient-to-br from-green-600 to-green-950 hover:from-green-700 hover:to-green-800 transition-colors text-white rounded text-4xl font-medium duration-300 w-[300px]"
         >
-          CONTINUE SNIPING
+          Unblock
         </button>
       </div>
     </ModalBase>

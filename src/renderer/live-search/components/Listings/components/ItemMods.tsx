@@ -1,5 +1,5 @@
 import React from "react";
-import { TransformedItemData } from "../../../../shared/types";
+import { TransformedItemData } from "../../../../../shared/types";
 import clsx from "clsx";
 
 interface ItemModsProps {
@@ -19,7 +19,7 @@ const ItemMods: React.FC<ItemModsProps> = ({ item }) => {
         </div>
       )}
 
-      <div className="flex flex-col gap-2 text-center w-full h-full p-3 flex-1 justify-center bg-black">
+      <div className="flex flex-col gap-2 text-center min-h-[280px] w-full h-full p-3 flex-1 justify-center bg-black">
         <h1
           className={clsx(
             "text-lg text-poe-mods-rare font-bold",

@@ -1,7 +1,7 @@
 import React from "react";
 import { useAutoTeleport, useAutoWhisper } from "src/shared/store/hooks";
 
-const AutoTeleportToggle: React.FC = () => {
+const AutoBuyToggles: React.FC = () => {
   const [autoTeleport, updateAutoTeleport] = useAutoTeleport();
   const [autoWhisper, updateAutoWhisper] = useAutoWhisper();
 
@@ -29,4 +29,4 @@ const AutoTeleportToggle: React.FC = () => {
   );
 };
 
-export default AutoTeleportToggle;
+export default AutoBuyToggles;
