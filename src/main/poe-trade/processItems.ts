@@ -44,7 +44,7 @@ export const processItems = async (
         itemToAutoBuy?.whisper_token !== ""
       ) {
         persistentStore.addLog(`[API] Auto Whisper Initiated - ${searchLabel}`);
-
+        playWhisperSound();
         const whisperResponse = await sendWhisper({
           itemId: itemToAutoBuy?.id,
           token: itemToAutoBuy?.whisper_token,
@@ -53,7 +53,7 @@ export const processItems = async (
 
         if (whisperResponse.success) {
           // Trigger success sound for whisper
-          playWhisperSound();
+
           transformedItems.shift(); // Remove first element
           transformedItems.unshift({ ...itemToAutoBuy, isWhispered: true }); // Add itemToAutoBuy at beginning
         } else {

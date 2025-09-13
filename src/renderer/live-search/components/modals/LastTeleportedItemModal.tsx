@@ -24,6 +24,10 @@ const LastTeleportedItemModal: React.FC = () => {
     } as TransformedItemData & { alreadyTeleported?: boolean });
     setIsOpen(false);
   };
+  const handleCloseAndCancelAll = () => {
+    ws.cancelAllAndDisconnect();
+    handleClose();
+  };
 
   useEffect(() => {
     setIsOpen(
@@ -87,7 +91,7 @@ const LastTeleportedItemModal: React.FC = () => {
         </button>
 
         <button
-          onClick={ws.cancelAllAndDisconnect}
+          onClick={handleCloseAndCancelAll}
           className="text-gray-400 hover:text-gray-200 transition-colors duration-200 opacity-40 hover:opacity-100"
         >
           🚫

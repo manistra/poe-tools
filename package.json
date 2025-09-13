@@ -1,6 +1,6 @@
 {
   "name": "poe-tools",
-  "productName": "PoE Tools",
+  "productName": "PoE Sniper",
   "version": "2.1.0",
   "description": "My Electron application description",
   "main": ".webpack/main",
