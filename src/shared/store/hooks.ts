@@ -86,13 +86,13 @@ export const useLastTeleportedItem = () => {
   >(null); // Initialize with null instead of current store value
 
   useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      const item = transformItemData(mockData[0] as ItemData);
-      persistentStore.setLastTeleportedItem({
-        ...item,
-        alreadyTeleported: false,
-      });
-    }
+    // if (process.env.NODE_ENV === "development") {
+    //   const item = transformItemData(mockData[0] as ItemData);
+    //   persistentStore.setLastTeleportedItem({
+    //     ...item,
+    //     alreadyTeleported: false,
+    //   });
+    // }
     const unsubscribe = persistentStore.subscribe((state) => {
       setLastTeleportedItem(state.lastTeleportedItem ?? null);
     });
