@@ -98,6 +98,9 @@ export const saveStateToStorage = (state: Partial<AppState>): void => {
       ...state,
       ...(state.liveSearches !== undefined && {
         liveSearches: sanitizeLiveSearchesForPersistence(state.liveSearches),
+
+        lastTeleportedItem: undefined,
+        isTeleportingBlocked: false,
       }),
     };
 

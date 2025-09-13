@@ -9,7 +9,7 @@ export const processItems = async (
   searchLabel?: string
 ) => {
   try {
-    const autoWhisperEnabled =
+    const autoTeleportEnabled =
       persistentStore.getState().autoTeleport &&
       !persistentStore.getState().isTeleportingBlocked;
 
@@ -35,7 +35,7 @@ export const processItems = async (
         return transformItemData(rawItem);
       });
 
-      if (autoWhisperEnabled) {
+      if (autoTeleportEnabled) {
         const itemToTeleportTo = transformedItems[0];
 
         persistentStore.addLog(
@@ -49,6 +49,8 @@ export const processItems = async (
           hideoutToken: itemToTeleportTo?.hideoutToken,
           searchQueryId: itemToTeleportTo?.searchQueryId,
         });
+
+        persistentStore.setIsTeleportingBlocked(true);
       }
 
       transformedItems.forEach((item) => {

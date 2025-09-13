@@ -59,15 +59,16 @@ const PoELiveSearch = () => {
         <div className="flex flex-col gap-1">
           <AutoTeleportToggle />
 
+          <Button
+            variant="danger"
+            className="w-full !p-0"
+            onClick={handleConnectAllAndDisconnect}
+          >
+            Force Stop All
+          </Button>
+
           {!hasActiveConnections || isConnectingAll ? (
             <div className="flex gap-2 flex-col">
-              <Button
-                variant="danger"
-                className="w-full !p-0"
-                onClick={handleConnectAllAndDisconnect}
-              >
-                Force Stop All
-              </Button>
               <Button
                 variant="success"
                 onClick={handleConnectAll}
