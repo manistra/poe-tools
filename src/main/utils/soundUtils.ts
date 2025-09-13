@@ -2,7 +2,7 @@ import player from "play-sound";
 
 const audioPlayer = player({});
 
-export type SoundType = "whisper" | "teleport" | "notification";
+export type SoundType = "whisper" | "teleport" | "notification" | "ping";
 
 export const playSound = (soundType: SoundType = "notification") => {
   try {
@@ -30,6 +30,8 @@ const getSoundPath = (soundType: SoundType): string => {
       return `${basePath}/teleport.mp3`;
     case "notification":
       return `${basePath}/ding.mp3`;
+    case "ping":
+      return `${basePath}/ping.mp3`;
     default:
       return `${basePath}/ding.mp3`;
   }
@@ -37,4 +39,5 @@ const getSoundPath = (soundType: SoundType): string => {
 
 export const playWhisperSound = () => playSound("whisper");
 export const playTeleportSound = () => playSound("teleport");
+export const playPingSound = () => playSound("ping");
 export const playNotificationSound = () => playSound("notification");

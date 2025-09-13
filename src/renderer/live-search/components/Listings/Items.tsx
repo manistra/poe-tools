@@ -1,21 +1,48 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import Item from "./components/Item";
 
 import { useResults } from "src/shared/store/hooks";
 import clsx from "clsx";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { electronAPI } from "src/renderer/api/electronAPI";
 
 const Items: React.FC = () => {
   const { results: items, clearResults } = useResults();
+  const scrollContainerRef = useRef<HTMLUListElement>(null);
+  const previousItemsLengthRef = useRef<number>(0);
 
   const handleClearListings = () => {
     clearResults();
   };
 
+  // Auto-scroll to newest item when new items arrive
+  useEffect(() => {
+    const currentLength = items.length;
+    const previousLength = previousItemsLengthRef.current;
+
+    // Only scroll if items were added (not removed or cleared)
+    if (currentLength > previousLength && previousLength > 0) {
+      const scrollContainer = scrollContainerRef.current;
+      if (scrollContainer) {
+        // Scroll to top to show the newest item
+        scrollContainer.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+
+      // Play whisper sound when new items arrive
+      electronAPI.sound.playSound("ping");
+    }
+
+    // Update the previous length reference
+    previousItemsLengthRef.current = currentLength;
+  }, [items.length]);
+
   return (
     <div className="w-full flex flex-col gap-5 card">
       <div className="flex justify-between items-center border-b border-gray-900 mb-2">
-        <h1 className="text-xl text-gray-300 font-semibold mb-2">Listings:</h1>
+        <h1 className="text-xl text-gray-300 mb-2">Listings</h1>
 
         <button
           title="Delete All Listings"
@@ -33,7 +60,7 @@ const Items: React.FC = () => {
         <p className="text-gray-400 text-sm">No items to show...</p>
       )}
 
-      <ul className="space-y-6 h-full overflow-y-auto">
+      <ul ref={scrollContainerRef} className="space-y-6 h-full overflow-y-auto">
         {items.map((item, index) => (
           <li key={`${item.id}-${index}`}>
             <Item item={item} />

@@ -4,7 +4,11 @@ import { transformItemData } from "src/renderer/helpers/transformItemData";
 import { autoTeleport } from "./autoTeleport";
 import { sendWhisper } from "./sendWhisper";
 import { TransformedItemData } from "src/shared/types";
-import { playTeleportSound, playWhisperSound } from "../utils/soundUtils";
+import {
+  playPingSound,
+  playTeleportSound,
+  playWhisperSound,
+} from "../utils/soundUtils";
 
 export const processItems = async (
   itemIds: string[],
@@ -91,7 +95,6 @@ export const processItems = async (
           persistentStore.addLog(autoTeleportResponse.error || "Unknown error");
         }
       }
-
       transformedItems.forEach((item) => {
         persistentStore.addResult(item);
       });
