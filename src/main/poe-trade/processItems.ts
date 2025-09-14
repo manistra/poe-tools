@@ -114,7 +114,19 @@ export const processItems = async (
         }
       }
       transformedItems.forEach((item) => {
-        persistentStore.addResult(item);
+        // Check if item with this ID already exists in results
+        const existingResults = persistentStore.getState().results;
+        const itemExists = existingResults.some(
+          (existingItem) => existingItem.id === item.id
+        );
+
+        if (!itemExists) {
+          persistentStore.addResult(item);
+        } else {
+          persistentStore.addLog(
+            `[API] Item ${item.id} already exists in results, skipping - ${liveSearch?.label}`
+          );
+        }
       });
 
       if (

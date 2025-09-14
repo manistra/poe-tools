@@ -146,9 +146,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
           <ItemMods item={item} />
 
           <div className="flex-col h-full flex gap-5">
-            {!!item.hideoutToken && item.hideoutToken !== "" && (
-              <StashVisualization x={item.stash?.x} y={item.stash?.y} />
-            )}
+            <StashVisualization x={item.stash?.x} y={item.stash?.y} />
 
             {item?.icon && (
               <div className="w-[170px] flex flex-col flex-1 max-w-[170px] items-center justify-center">
