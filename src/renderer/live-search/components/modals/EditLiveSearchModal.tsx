@@ -169,34 +169,58 @@ const EditLiveSearchModal: React.FC<EditLiveSearchModalProps> = ({
 
         {/* Currency Conditions Section */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-md font-medium text-gray-300">
-              Price Conditions for auto teleport/whisper
-            </h4>
+          <div className="flex items-end justify-between border-gray-700 border-t pt-3 mt-3">
+            <div className="text-xs text-gray-300">
+              <h4 className="text-xl font-bold text-gray-300">
+                Price Conditions:
+              </h4>
+              <p className="mb-2">
+                Prevent auto-teleporting to hideouts with items priced in
+                unwanted currencies. Avoid miscalculations when different
+                currencies have varying exchange rates compared to your max
+                price settings.
+              </p>
+              <div className="space-y-1">
+                <p className="font-medium text-gray-200">Benefits:</p>
+                <ul className="list-disc list-inside space-y-0.5 ml-2">
+                  <li>Filter out items priced in currencies you don't want</li>
+                  <li>
+                    Ensure auto-actions only trigger for preferred currency
+                    pricing
+                  </li>
+                  <li>
+                    Prevent budget miscalculations from currency conversion
+                    differences
+                  </li>
+                </ul>
+              </div>
+            </div>
 
-            <span className="text-xs font-medium text-gray-600">
-              ({currencyConditions.length} conditions)
-            </span>
-            <Button
-              size="small"
-              variant="outline"
-              onClick={addCurrencyCondition}
-              className="text-xs"
-            >
-              + Add Condition
-            </Button>
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-xs font-medium text-gray-600 text-nowrap">
+                ({currencyConditions.length} conditions)
+              </span>
+              <Button
+                size="small"
+                variant="outline"
+                onClick={addCurrencyCondition}
+                className="text-xs"
+              >
+                + Add Condition
+              </Button>
+            </div>
           </div>
 
           {currencyConditions.length === 0 ? (
-            <div className="text-sm text-gray-400 italic text-center py-4 border-2 border-dashed border-gray-700 rounded-lg bg-gray-900/50">
+            <div className="text-sm text-gray-400 italic text-center py-4 border-2 border-dashed border-gray-700 rounded bg-gray-900/50">
               No currency conditions added. Click "Add Condition" to create one.
             </div>
           ) : (
-            <div className="space-y-3 overflow-y-auto max-h-[300px] border p-2 border-gray-700 rounded-lg">
+            <div className="space-y-3 overflow-y-auto max-h-[300px] border p-2 border-gray-700 rounded">
               {currencyConditions.map((condition, index) => (
                 <div
                   key={condition.id}
-                  className="flex items-center gap-3 p-3 bg-black border border-gray-700 rounded-lg backdrop-blur-sm"
+                  className="flex items-center gap-3 p-3 bg-black border border-gray-700 rounded backdrop-blur-sm"
                 >
                   <span className="text-sm font-medium text-gray-300 w-8">
                     #{index + 1}

@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { AppState, Log } from "./storeUtils";
-import { ItemData, LiveSearch, TransformedItemData } from "../types";
+import { LiveSearch, TransformedItemData } from "../types";
 import { persistentStore } from "../store/sharedStore";
-import { transformItemData } from "src/renderer/helpers/transformItemData";
-import { mockData } from "../mocks/mockData";
 
 // Main hook to access the entire store
 export const useAppStore = () => {

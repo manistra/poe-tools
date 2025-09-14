@@ -4,7 +4,7 @@ import { transformItemData } from "src/renderer/helpers/transformItemData";
 import { autoTeleport } from "./autoTeleport";
 import { sendWhisper } from "./sendWhisper";
 import { LiveSearchDetails, TransformedItemData } from "src/shared/types";
-import { passesCurrencyConditions } from "src/shared/utils/passesCurrencyConditions";
+
 import {
   playPingSound,
   playTeleportSound,
@@ -37,16 +37,14 @@ export const processItems = async (
             searchLabel: liveSearch?.label,
           };
 
-          return transformItemData(rawItem);
+          return transformItemData(rawItem, liveSearch);
         }),
       ];
 
       const itemToAutoBuy = { ...transformedItems[0] } as TransformedItemData;
 
-      const doesPassCurrencyConditions = passesCurrencyConditions(
-        itemToAutoBuy,
-        liveSearch?.currencyConditions || []
-      );
+      const doesPassCurrencyConditions =
+        !itemToAutoBuy?.failingCurrencyCondition;
 
       if (
         doesPassCurrencyConditions &&
@@ -144,7 +142,10 @@ export const processItems = async (
           itemToAutoBuy?.whisper_token !== ""
         )
       ) {
-        if (!persistentStore.getState().disableSounds) {
+        if (
+          !persistentStore.getState().disableSounds &&
+          doesPassCurrencyConditions
+        ) {
           playPingSound();
         }
       }

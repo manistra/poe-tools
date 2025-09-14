@@ -30,7 +30,7 @@ export interface LiveSearch {
     readyState?: WebSocketState | null; // WebSocket.OPEN | CONNECTING | CLOSED | CLOSING
   };
 }
-export type LiveSearchDetails = Omit<LiveSearch, "ws">;
+export type LiveSearchDetails = Omit<LiveSearch, "ws" | "socket">;
 
 export interface LiveSearchWithSocket extends LiveSearch {
   socket?: WsWebSocket | null;
@@ -99,7 +99,7 @@ export interface TransformedItemData {
   seller?: string;
   price?: {
     amount: number;
-    currency: string;
+    currency: Poe2Currency;
   };
   isWhispered?: boolean;
   whisper?: string;
@@ -113,6 +113,8 @@ export interface TransformedItemData {
     y?: number;
   };
   icon?: string;
+
+  failingCurrencyCondition: CurrencyCondition | null;
 }
 
 export interface ApiResponse {

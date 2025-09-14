@@ -13,8 +13,9 @@ import { Poe2Currency } from "src/shared/types";
 
 // Function to get currency image
 export const getCurrencyImage = (
-  currency: Poe2Currency
+  currency: Poe2Currency | undefined | null
 ): string | undefined => {
+  if (!currency) return undefined;
   switch (currency) {
     case "alch":
       return alchImg;

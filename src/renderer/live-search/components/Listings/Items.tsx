@@ -40,8 +40,8 @@ const Items: React.FC = () => {
   }, [items.length]);
 
   return (
-    <div className="w-full flex flex-col gap-5 card">
-      <div className="flex justify-between items-center border-b border-gray-900 mb-2">
+    <div className="w-full flex flex-col card">
+      <div className="flex justify-between items-center border-b border-gray-900">
         <h1 className="text-xl text-gray-300 mb-2">Listings</h1>
 
         <button
@@ -60,7 +60,10 @@ const Items: React.FC = () => {
         <p className="text-gray-400 text-sm">No items to show...</p>
       )}
 
-      <ul ref={scrollContainerRef} className="space-y-6 h-full overflow-y-auto">
+      <ul
+        ref={scrollContainerRef}
+        className="space-y-12 p-5 h-full overflow-y-auto"
+      >
         {items.map((item, index) => (
           <li key={`${item.id}-${index}`}>
             <Item item={item} />

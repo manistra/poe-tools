@@ -146,7 +146,9 @@ const Item: React.FC<ItemProps> = ({ item }) => {
           <ItemMods item={item} />
 
           <div className="flex-col h-full flex gap-5">
-            <StashVisualization x={item.stash?.x} y={item.stash?.y} />
+            {item.hideoutToken && (
+              <StashVisualization x={item.stash?.x} y={item.stash?.y} />
+            )}
 
             {item?.icon && (
               <div className="w-[170px] flex flex-col flex-1 max-w-[170px] items-center justify-center">
@@ -170,10 +172,11 @@ const Item: React.FC<ItemProps> = ({ item }) => {
 
             {item.price && (
               <CurrencyDisplay
-                className="text-xl px-2 py-1 border border-poe-mods-fractured border-opacity-25 rounded-md mx-auto w-full"
+                className="w-full"
                 iconClassName="w-8 h-8"
                 amount={item.price.amount}
                 currency={item.price.currency}
+                failingCurrencyCondition={item.failingCurrencyCondition}
               />
             )}
           </div>
@@ -236,7 +239,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
                     ? "Traveling..."
                     : isWhispered
                     ? "Teleported"
-                    : "⚡ Travel to Hideout"}
+                    : "⚡ Travel"}
                 </Button>
               )}
 

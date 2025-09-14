@@ -51,9 +51,13 @@ const NewLiveSearchForm: React.FC<{
         <Input
           label="URL:"
           value={newConfig.url}
-          onChange={(value) =>
-            setNewConfig((prev) => ({ ...prev, url: String(value) }))
-          }
+          onChange={(value) => {
+            const urlValue = String(value);
+            const processedUrl = urlValue.endsWith("/live")
+              ? urlValue
+              : urlValue + (urlValue.endsWith("/") ? "live" : "/live");
+            setNewConfig((prev) => ({ ...prev, url: processedUrl }));
+          }}
           placeholder="https://www.pathofexile.com/trade/search/..."
           className="text-xs"
         />

@@ -41,6 +41,7 @@ const LiveSearchesList: React.FC<{ isConnectingAll: boolean }> = ({
       const exportData = liveSearches.map((liveSearch) => ({
         label: liveSearch.label,
         url: liveSearch.url,
+        currencyConditions: liveSearch.currencyConditions || [],
       }));
 
       const jsonString = JSON.stringify(exportData, null, 2);
@@ -110,7 +111,7 @@ const LiveSearchesList: React.FC<{ isConnectingAll: boolean }> = ({
         <p className="text-gray-400 text-sm">No live searches to show...</p>
       )}
 
-      <div className="overflow-y-scroll h-full space-y-[5px]">
+      <div className="overflow-y-scroll h-full space-y-[6px]">
         {/* Existing Search Items */}
         {liveSearches.map((liveSearch, index) => {
           return (
@@ -118,7 +119,7 @@ const LiveSearchesList: React.FC<{ isConnectingAll: boolean }> = ({
               key={liveSearch.id}
               className="w-full flex flex-row gap-1 items-center"
             >
-              <span className="text-gray-600 text-[10px] font-bold pr-2 pl-1">
+              <span className="text-gray-600 text-[10px] font-bold w-4 h-4 flex items-center justify-center">
                 {index + 1}.
               </span>
               <LiveSearchItem

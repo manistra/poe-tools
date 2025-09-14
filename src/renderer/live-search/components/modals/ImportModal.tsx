@@ -32,6 +32,13 @@ const ImportModal: React.FC<ImportExportModalProps> = ({
         if (!item.label || !item.url) {
           throw new Error("Each item must have 'label' and 'url' properties");
         }
+        // Validate currencyConditions if present
+        if (
+          item.currencyConditions &&
+          !Array.isArray(item.currencyConditions)
+        ) {
+          throw new Error("currencyConditions must be an array");
+        }
       }
 
       importLiveSearches(parsedData);
@@ -73,8 +80,8 @@ const ImportModal: React.FC<ImportExportModalProps> = ({
             value={importData}
             onChange={(value) => setImportData(value.toString())}
             placeholder={`[
-  {"label": "search Label value", "url": "searchUrl Value"},
-  {"label": "search Label value", "url": "searchUrl Value"}
+  {"label": "search Label value", "url": "searchUrl Value", "currencyConditions": []},
+  {"label": "search Label value", "url": "searchUrl Value", "currencyConditions": [{"currency": "chaos", "minPrice": 1, "maxPrice": 10}]}
 ]`}
             className="min-h-[200px] font-mono text-sm"
             error={importError}

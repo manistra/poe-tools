@@ -90,15 +90,29 @@ export default class HttpRequestLimiter {
   }
 
   static updateSettings(requestLimit: number, interval: number): void {
+    const calculatedIncomingMinTime = (interval / requestLimit) * 7000;
+
+    const minTime = Math.max(
+      this.config.minRequestIntervalMs, // 1500ms
+      calculatedIncomingMinTime
+    );
+
+    console.log(
+      `[HttpRequestLimiter] Updating settings: requestLimit=${requestLimit}, interval=${interval}s, minTime=${minTime}ms`
+    );
+    console.log("[HttpRequestLimiter] Updating settings", {
+      requestLimit,
+      interval,
+      minTime,
+    });
+
     this.bottleneck.updateSettings({
       reservoir: requestLimit,
       reservoirRefreshAmount: requestLimit,
       reservoirRefreshInterval: interval * 1000,
       // GGG prohibits bursting requests (even though this is not specified by the rate-limiting headers).
-      minTime: Math.max(
-        this.config.minRequestIntervalMs,
-        interval / requestLimit
-      ),
+      // Always enforce minimum 1500ms between requests
+      minTime: minTime,
       maxConcurrent: 1,
     });
 
@@ -130,16 +144,20 @@ export default class HttpRequestLimiter {
 
   static async cancelAll(): Promise<void> {
     await this.bottleneck.stop({ dropWaitingJobs: true });
-    // Recreate the bottleneck to allow future operations
-    this.bottleneck = new Bottleneck();
-    // Reinitialize with current settings if they exist
-    if (this.isInitialized) {
-      const currentState = persistentStore.getState();
-      this.updateSettings(
-        currentState.rateLimitData.requestLimit,
-        currentState.rateLimitData.interval
-      );
-    }
+
+    this.bottleneck = new Bottleneck({
+      maxConcurrent: 1,
+      minTime: 1500,
+    });
+
+    const currentState = persistentStore.getState();
+    this.updateSettings(
+      currentState.rateLimitData.requestLimit ||
+        this.config.defaultReservoirValues.requestLimit,
+      currentState.rateLimitData.interval ||
+        this.config.defaultReservoirValues.interval
+    );
+
     persistentStore.addLog(
       "[HttpRequestLimiter] All queued requests cancelled and limiter recreated"
     );

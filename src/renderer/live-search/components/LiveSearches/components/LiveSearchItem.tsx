@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import EditLiveSearchModal from "../../modals/EditLiveSearchModal";
+import CurrencyConditionView from "./CurrencyConditionView";
 
 interface LiveSearchItemProps {
   liveSearch: LiveSearch;
@@ -202,6 +203,15 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
           )}
         </div>
       </div>
+
+      {liveSearch.currencyConditions &&
+        liveSearch.currencyConditions.length > 0 && (
+          <div className="flex flex-row gap-2 px-3 pb-2 w-full border-t border-gray-700/20 border-dashed pt-2">
+            <CurrencyConditionView
+              currencyConditions={liveSearch.currencyConditions || []}
+            />
+          </div>
+        )}
 
       <EditLiveSearchModal
         isOpen={isEditModalOpen}

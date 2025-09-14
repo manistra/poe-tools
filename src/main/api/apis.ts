@@ -17,7 +17,17 @@ export const rateLimitedApi = async ({
   data,
   params,
 }: FetchOptions) => {
+  const startTime = Date.now();
+  console.log(`[${startTime}] - [RateLimiter] Queuing API request to: ${url}`);
+
   return HttpRequestLimiter.schedule(async () => {
+    const scheduledTime = Date.now();
+    console.log(
+      `[${scheduledTime}] - [RateLimiter] Executing API request to: ${url} (queued for ${
+        scheduledTime - startTime
+      }ms)`
+    );
+
     try {
       const config: AxiosRequestConfig = {
         url,

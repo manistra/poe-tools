@@ -1,6 +1,15 @@
-import { ItemData, TransformedItemData } from "../../shared/types";
+import { getFailingCurrencyCondition } from "src/shared/utils/getFailingCurrencyCondition";
+import {
+  ItemData,
+  LiveSearchDetails,
+  Poe2Currency,
+  TransformedItemData,
+} from "../../shared/types";
 
-export function transformItemData(rawItem: ItemData): TransformedItemData {
+export function transformItemData(
+  rawItem: ItemData,
+  liveSearcDetails?: LiveSearchDetails
+): TransformedItemData {
   const transformedItem: TransformedItemData = {
     pingedAt: rawItem?.pingedAt || new Date().toISOString(),
 
@@ -20,7 +29,9 @@ export function transformItemData(rawItem: ItemData): TransformedItemData {
     price: rawItem?.listing?.price
       ? {
           amount: rawItem?.listing?.price?.amount || 0,
-          currency: rawItem?.listing?.price?.currency || "",
+          currency:
+            (rawItem?.listing?.price?.currency as Poe2Currency) ||
+            ("" as Poe2Currency),
         }
       : undefined,
     isWhispered: false,
@@ -34,6 +45,11 @@ export function transformItemData(rawItem: ItemData): TransformedItemData {
       x: rawItem?.listing?.stash?.x,
       y: rawItem?.listing?.stash?.y,
     },
+
+    failingCurrencyCondition: getFailingCurrencyCondition(
+      rawItem,
+      liveSearcDetails?.currencyConditions || []
+    ),
   };
 
   return transformedItem;
