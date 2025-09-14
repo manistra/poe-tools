@@ -7,10 +7,6 @@ import toast from "react-hot-toast";
 
 import clsx from "clsx";
 
-// Import currency images
-import chaosImg from "src/renderer/assets/chaos.png";
-import divineImg from "src/renderer/assets/divine.png";
-import exaltedImg from "src/renderer/assets/exalted.png";
 import { TransformedItemData } from "../../../../../shared/types";
 import { electronAPI } from "src/renderer/api/electronAPI";
 import {
@@ -19,54 +15,11 @@ import {
 } from "@heroicons/react/24/outline";
 import ItemMods from "./ItemMods";
 import StashVisualization from "./StashVisualization";
+import { CurrencyDisplay } from "./CurrencyDisplay";
 
 interface ItemProps {
   item: TransformedItemData;
 }
-
-// Currency display component
-const CurrencyDisplay: React.FC<{
-  amount: number;
-  currency: string;
-  className?: string;
-  iconClassName?: string;
-}> = ({ amount, currency, className, iconClassName }) => {
-  const getCurrencyImage = (currency: string) => {
-    switch (currency.toLowerCase()) {
-      case "chaos":
-        return chaosImg;
-      case "divine":
-        return divineImg;
-      case "exalted":
-      case "exalt":
-        return exaltedImg;
-      default:
-        return null;
-    }
-  };
-
-  const currencyImage = getCurrencyImage(currency);
-
-  return (
-    <div
-      className={clsx(
-        "flex items-center gap-1 text-[#aa9e82] text-[18px] justify-center",
-        className
-      )}
-    >
-      <span>{amount} x</span>
-      {currencyImage ? (
-        <img
-          src={currencyImage}
-          alt={currency}
-          className={clsx("w-6 h-6 object-contain", iconClassName)}
-        />
-      ) : (
-        <span>{currency}</span>
-      )}
-    </div>
-  );
-};
 
 const Item: React.FC<ItemProps> = ({ item }) => {
   const [listedAgo, setListedAgo] = useState<string>("");
