@@ -8,8 +8,8 @@ import {
   SoundType,
   TransformedItemData,
 } from "src/shared/types";
-
 import { playSound } from "../utils/soundUtils";
+import { createOverlayWindow, hideOverlayWindow } from "../overlay/gridOverlay";
 
 export const processItems = async (
   itemIds: string[],
@@ -95,6 +95,26 @@ export const processItems = async (
           `[API] Auto Teleport Initiated - ${liveSearch?.label}`
         );
 
+        // Show grid overlay with stash coordinates
+        const gridConfig = persistentStore.getState().gridConfig;
+        if (itemToAutoBuy?.stash?.x !== undefined && itemToAutoBuy?.stash?.y !== undefined) {
+          persistentStore.addLog(
+            `[GRID] Showing grid overlay at stash position (${itemToAutoBuy.stash.x}, ${itemToAutoBuy.stash.y})`
+          );
+        
+          
+          // Show the grid overlay with highlight coordinates
+          createOverlayWindow({
+            width: gridConfig.width,
+            height: gridConfig.height,
+            x: gridConfig.x,
+            y: gridConfig.y,
+            screenIndex: gridConfig.screenIndex,
+            highlightX: itemToAutoBuy.stash.x,
+            highlightY: itemToAutoBuy.stash.y,
+          });
+        }
+
         persistentStore.setLastTeleportedItem(itemToAutoBuy ?? null);
         persistentStore.setIsTeleportingBlocked(true);
 
@@ -116,6 +136,8 @@ export const processItems = async (
           transformedItems.shift(); // Remove first element
           transformedItems.unshift({ ...itemToAutoBuy, isWhispered: true }); // Add itemToAutoBuy at beginning
         } else {
+          // Hide grid overlay
+          hideOverlayWindow();
           persistentStore.addLog(
             `[API] Auto Teleport Failed - ${liveSearch?.label}`
           );
