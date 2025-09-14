@@ -80,6 +80,14 @@ const EditLiveSearchModal: React.FC<EditLiveSearchModalProps> = ({
         url: editUrl.trim(),
         currencyConditions: currencyConditions
           .filter((condition) => condition.currency) // Only include conditions with currency selected
+          .filter((condition) => {
+            // Don't persist if min is 0 and max is undefined or 0
+            const minIsZero =
+              condition.minPrice === 0 || condition.minPrice === undefined;
+            const maxIsZeroOrUndefined =
+              condition.maxPrice === 0 || condition.maxPrice === undefined;
+            return !(minIsZero && maxIsZeroOrUndefined);
+          })
           .map((condition) => ({
             currency: condition.currency as Poe2Currency,
             minPrice: condition.minPrice,

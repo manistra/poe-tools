@@ -20,6 +20,7 @@ export const processItems = async (
     if (!itemIds) {
       return;
     }
+
     persistentStore.addLog(
       `[API] Fetching ${itemIds.length} item details - ${liveSearch?.label}`
     );
@@ -46,12 +47,22 @@ export const processItems = async (
       const doesPassCurrencyConditions =
         !itemToAutoBuy?.failingCurrencyCondition;
 
-      if (
+      const soundsEnabled = !persistentStore.getState().disableSounds;
+
+      const teleportCondition =
+        doesPassCurrencyConditions &&
+        persistentStore.getState().autoTeleport &&
+        !persistentStore.getState().isTeleportingBlocked &&
+        itemToAutoBuy?.hideoutToken &&
+        itemToAutoBuy?.hideoutToken !== "";
+
+      const whisperCondition =
         doesPassCurrencyConditions &&
         persistentStore.getState().autoWhisper &&
         itemToAutoBuy?.whisper_token &&
-        itemToAutoBuy?.whisper_token !== ""
-      ) {
+        itemToAutoBuy?.whisper_token !== "";
+
+      if (whisperCondition) {
         persistentStore.addLog(
           `[API] Auto Whisper Initiated - ${liveSearch?.label}`
         );
@@ -63,7 +74,7 @@ export const processItems = async (
         });
 
         if (whisperResponse.success) {
-          if (!persistentStore.getState().disableSounds) {
+          if (soundsEnabled) {
             playWhisperSound();
           }
 
@@ -77,13 +88,7 @@ export const processItems = async (
         }
       }
 
-      if (
-        doesPassCurrencyConditions &&
-        persistentStore.getState().autoTeleport &&
-        !persistentStore.getState().isTeleportingBlocked &&
-        itemToAutoBuy?.hideoutToken &&
-        itemToAutoBuy?.hideoutToken !== ""
-      ) {
+      if (teleportCondition) {
         persistentStore.addLog(
           `[API] Auto Teleport Initiated - ${liveSearch?.label}`
         );
@@ -99,7 +104,7 @@ export const processItems = async (
 
         if (autoTeleportResponse.success) {
           // Trigger success sound for teleport
-          if (!persistentStore.getState().disableSounds) {
+          if (soundsEnabled) {
             playTeleportSound();
           }
           transformedItems.shift(); // Remove first element
@@ -111,6 +116,7 @@ export const processItems = async (
           persistentStore.addLog(autoTeleportResponse.error || "Unknown error");
         }
       }
+
       transformedItems.forEach((item) => {
         // Check if item with this ID already exists in results
         const existingResults = persistentStore.getState().results;
@@ -128,26 +134,12 @@ export const processItems = async (
       });
 
       if (
-        !(
-          doesPassCurrencyConditions &&
-          persistentStore.getState().autoTeleport &&
-          !persistentStore.getState().isTeleportingBlocked &&
-          itemToAutoBuy?.hideoutToken &&
-          itemToAutoBuy?.hideoutToken !== ""
-        ) &&
-        !(
-          doesPassCurrencyConditions &&
-          persistentStore.getState().autoWhisper &&
-          itemToAutoBuy?.whisper_token &&
-          itemToAutoBuy?.whisper_token !== ""
-        )
+        !teleportCondition &&
+        !whisperCondition &&
+        soundsEnabled &&
+        doesPassCurrencyConditions
       ) {
-        if (
-          !persistentStore.getState().disableSounds &&
-          doesPassCurrencyConditions
-        ) {
-          playPingSound();
-        }
+        playPingSound();
       }
     } else {
       console.warn("API response data is not an array:", itemDetails?.data);

@@ -13,12 +13,14 @@ import {
 import clsx from "clsx";
 import ImportModal from "../modals/ImportModal";
 import { electronAPI } from "src/renderer/api/electronAPI";
+import { useResults } from "src/shared/store/hooks";
 
 const LiveSearchesList: React.FC<{ isConnectingAll: boolean }> = ({
   isConnectingAll,
 }) => {
   const [newFormOpen, setNewFormOpen] = useState(false);
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
+  const { results } = useResults();
   const { liveSearches, deleteAllLiveSearches } = useLiveSearchContext();
 
   const handleDeleteAll = async () => {
@@ -114,6 +116,10 @@ const LiveSearchesList: React.FC<{ isConnectingAll: boolean }> = ({
       <div className="overflow-y-scroll h-full space-y-[6px]">
         {/* Existing Search Items */}
         {liveSearches.map((liveSearch, index) => {
+          const resultsCount = results.filter(
+            (result) => result.searchLabel === liveSearch.label
+          ).length;
+
           return (
             <div
               key={liveSearch.id}
@@ -125,6 +131,7 @@ const LiveSearchesList: React.FC<{ isConnectingAll: boolean }> = ({
               <LiveSearchItem
                 liveSearch={liveSearch}
                 isConnectingAll={isConnectingAll}
+                resultsCount={resultsCount}
               />
             </div>
           );

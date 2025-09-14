@@ -30,9 +30,6 @@ const Items: React.FC = () => {
           behavior: "smooth",
         });
       }
-
-      // Play whisper sound when new items arrive
-      electronAPI.sound.playSound("ping");
     }
 
     // Update the previous length reference

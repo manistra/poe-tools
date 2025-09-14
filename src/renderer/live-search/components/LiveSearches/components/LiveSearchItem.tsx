@@ -18,11 +18,13 @@ import CurrencyConditionView from "./CurrencyConditionView";
 interface LiveSearchItemProps {
   liveSearch: LiveSearch;
   isConnectingAll: boolean;
+  resultsCount: number;
 }
 
 const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
   liveSearch,
   isConnectingAll,
+  resultsCount,
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { deleteLiveSearch, ws } = useLiveSearchContext();
@@ -204,14 +206,36 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
         </div>
       </div>
 
-      {liveSearch.currencyConditions &&
-        liveSearch.currencyConditions.length > 0 && (
-          <div className="flex flex-row gap-2 px-3 pb-2 w-full border-t border-gray-700/20 border-dashed pt-2">
-            <CurrencyConditionView
-              currencyConditions={liveSearch.currencyConditions || []}
-            />
-          </div>
+      <div className="flex flex-row gap-2 justify-between px-3 pb-2 w-full border-t border-gray-700/20 border-dashed pt-2">
+        <div>
+          {liveSearch.currencyConditions &&
+            liveSearch.currencyConditions.length > 0 && (
+              <CurrencyConditionView
+                currencyConditions={liveSearch.currencyConditions || []}
+              />
+            )}
+        </div>
+        {resultsCount > 0 && (
+          <p className="self-end text-xs text-gray-500 text-nowrap">
+            Results:{" "}
+            <span
+              className={clsx("text-gray-300", {
+                "text-orange-100": resultsCount > 4,
+                "text-orange-200": resultsCount > 8,
+                "text-orange-300": resultsCount > 12,
+                "text-orange-400": resultsCount > 16,
+                "text-orange-500": resultsCount > 20,
+                "text-orange-600": resultsCount > 24,
+                "text-red-800": resultsCount > 28,
+                "text-red-700": resultsCount > 28,
+                "text-red-600": resultsCount > 32,
+              })}
+            >
+              {resultsCount}
+            </span>
+          </p>
         )}
+      </div>
 
       <EditLiveSearchModal
         isOpen={isEditModalOpen}
