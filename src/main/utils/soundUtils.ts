@@ -28,10 +28,11 @@ const getSoundPath = (soundType: SoundType): string => {
     case "ping":
       return path.join(basePath, "ping.mp3");
     case "evo_item":
+      return path.join(basePath, "evo_item.mp3");
     case "teleport_2":
-      return path.join(basePath, "teleport_2.mp3");
+      return path.join(basePath, "teleport_2.wav");
     case "teleport_3":
-      return path.join(basePath, "teleport_3.mp3");
+      return path.join(basePath, "teleport_3.wav");
     default:
       return path.join(basePath, "ding.wav");
   }
