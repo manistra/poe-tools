@@ -70,6 +70,8 @@ const Dropdown: React.FC<DropdownProps> = ({
         window.removeEventListener("resize", handleResize);
       };
     }
+    // Add explicit return for when isOpen is false
+    return undefined;
   }, [isOpen]);
 
   return (
