@@ -14,14 +14,14 @@ export const poe2CurrencyValues: Poe2Currency[] = [
 ];
 
 export const POE2_CURRENCY_LABELS: Record<Poe2Currency, string> = {
-  alch: "Alchemy",
-  annul: "Annul",
-  aug: "Augment",
-  chaos: "Chaos",
-  divine: "Divine",
-  exalted: "Exalted",
+  alch: "Alchemy Orb",
+  annul: "Annulment Orb",
+  aug: "Augment Orb",
+  chaos: "Chaos Orb",
+  divine: "Divine Orb",
+  exalted: "Exalted Orb",
   mirror: "Mirror",
-  regal: "Regal",
-  transmute: "Transmute",
-  vaal: "Vaal",
+  regal: "Regal Orb",
+  transmute: "Transmute Orb",
+  vaal: "Vaal Orb",
 };

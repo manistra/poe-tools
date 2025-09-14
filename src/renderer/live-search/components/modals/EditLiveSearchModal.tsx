@@ -2,14 +2,37 @@ import React, { useState, useEffect } from "react";
 import ModalBase from "src/renderer/components/Modal";
 import Input from "src/renderer/components/Input";
 import Button from "src/renderer/components/Button";
-import { LiveSearch } from "src/shared/types";
+import Dropdown, { DropdownOption } from "src/renderer/components/Dropdown";
+import { LiveSearch, Poe2Currency } from "src/shared/types";
 import { useLiveSearchContext } from "../../context/hooks/useLiveSearchContext";
+import {
+  poe2CurrencyValues,
+  POE2_CURRENCY_LABELS,
+} from "src/renderer/constants/poe2currency";
 import { toast } from "react-hot-toast";
+import { getCurrencyImage } from "src/renderer/helpers/getCurrencyImage";
 
 interface EditLiveSearchModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   liveSearch: LiveSearch | null;
+}
+
+// Create currency options for dropdown
+const currencyOptions: DropdownOption[] = poe2CurrencyValues.map(
+  (currency) => ({
+    id: currency,
+    label: POE2_CURRENCY_LABELS[currency],
+    value: currency,
+    img: getCurrencyImage(currency),
+  })
+);
+
+interface CurrencyCondition {
+  id: string;
+  currency?: Poe2Currency;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 const EditLiveSearchModal: React.FC<EditLiveSearchModalProps> = ({
@@ -19,6 +42,9 @@ const EditLiveSearchModal: React.FC<EditLiveSearchModalProps> = ({
 }) => {
   const [editLabel, setEditLabel] = useState("");
   const [editUrl, setEditUrl] = useState("");
+  const [currencyConditions, setCurrencyConditions] = useState<
+    CurrencyCondition[]
+  >([]);
   const { updateLiveSearch } = useLiveSearchContext();
 
   // Load the live search data into local state when modal opens
@@ -26,6 +52,14 @@ const EditLiveSearchModal: React.FC<EditLiveSearchModalProps> = ({
     if (isOpen && liveSearch) {
       setEditLabel(liveSearch.label);
       setEditUrl(liveSearch.url);
+      setCurrencyConditions(
+        liveSearch.currencyConditions?.map((condition, index) => ({
+          id: `condition-${index}`,
+          currency: condition.currency,
+          minPrice: condition.minPrice,
+          maxPrice: condition.maxPrice,
+        })) || []
+      );
     }
   }, [isOpen, liveSearch]);
 
@@ -44,6 +78,13 @@ const EditLiveSearchModal: React.FC<EditLiveSearchModalProps> = ({
       updateLiveSearch(liveSearch.id, {
         label: editLabel.trim(),
         url: editUrl.trim(),
+        currencyConditions: currencyConditions
+          .filter((condition) => condition.currency) // Only include conditions with currency selected
+          .map((condition) => ({
+            currency: condition.currency as Poe2Currency,
+            minPrice: condition.minPrice,
+            maxPrice: condition.maxPrice,
+          })),
       });
 
       setIsOpen(false);
@@ -57,6 +98,14 @@ const EditLiveSearchModal: React.FC<EditLiveSearchModalProps> = ({
     if (liveSearch) {
       setEditLabel(liveSearch.label);
       setEditUrl(liveSearch.url);
+      setCurrencyConditions(
+        liveSearch.currencyConditions?.map((condition, index) => ({
+          id: `condition-${index}`,
+          currency: condition.currency,
+          minPrice: condition.minPrice,
+          maxPrice: condition.maxPrice,
+        })) || []
+      );
     }
     setIsOpen(false);
   };
@@ -65,12 +114,40 @@ const EditLiveSearchModal: React.FC<EditLiveSearchModalProps> = ({
     handleCancel();
   };
 
+  // Currency condition management functions
+  const addCurrencyCondition = () => {
+    const newCondition: CurrencyCondition = {
+      id: `condition-${Date.now()}`,
+      currency: undefined,
+      minPrice: undefined,
+      maxPrice: undefined,
+    };
+    setCurrencyConditions([...currencyConditions, newCondition]);
+  };
+
+  const removeCurrencyCondition = (id: string) => {
+    setCurrencyConditions(
+      currencyConditions.filter((condition) => condition.id !== id)
+    );
+  };
+
+  const updateCurrencyCondition = (
+    id: string,
+    updates: Partial<CurrencyCondition>
+  ) => {
+    setCurrencyConditions(
+      currencyConditions.map((condition) =>
+        condition.id === id ? { ...condition, ...updates } : condition
+      )
+    );
+  };
+
   return (
     <ModalBase
       onClose={handleClose}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-      className="card max-w-md w-full"
+      className="card max-w-2xl w-full"
     >
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-semibold mb-2">Edit Live Search</h3>
@@ -88,6 +165,109 @@ const EditLiveSearchModal: React.FC<EditLiveSearchModalProps> = ({
             onChange={(value) => setEditUrl(String(value))}
             placeholder="Enter search URL"
           />
+        </div>
+
+        {/* Currency Conditions Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-md font-medium text-gray-300">
+              Price Conditions for auto teleport/whisper
+            </h4>
+
+            <span className="text-xs font-medium text-gray-600">
+              ({currencyConditions.length} conditions)
+            </span>
+            <Button
+              size="small"
+              variant="outline"
+              onClick={addCurrencyCondition}
+              className="text-xs"
+            >
+              + Add Condition
+            </Button>
+          </div>
+
+          {currencyConditions.length === 0 ? (
+            <div className="text-sm text-gray-400 italic text-center py-4 border-2 border-dashed border-gray-700 rounded-lg bg-gray-900/50">
+              No currency conditions added. Click "Add Condition" to create one.
+            </div>
+          ) : (
+            <div className="space-y-3 overflow-y-auto max-h-[300px] border p-2 border-gray-700 rounded-lg">
+              {currencyConditions.map((condition, index) => (
+                <div
+                  key={condition.id}
+                  className="flex items-center gap-3 p-3 bg-black border border-gray-700 rounded-lg backdrop-blur-sm"
+                >
+                  <span className="text-sm font-medium text-gray-300 w-8">
+                    #{index + 1}
+                  </span>
+
+                  {/* Currency Dropdown */}
+                  <div className="flex-1 min-w-0">
+                    <Dropdown
+                      options={currencyOptions}
+                      value={
+                        condition.currency
+                          ? currencyOptions.find(
+                              (opt) => opt.value === condition.currency
+                            )
+                          : null
+                      }
+                      onChange={(option) =>
+                        updateCurrencyCondition(condition.id, {
+                          currency: option.value as Poe2Currency,
+                        })
+                      }
+                      placeholder="Select currency"
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* Min Price Input */}
+                  <div className="w-24">
+                    <Input
+                      value={condition.minPrice?.toString() || "0"}
+                      onChange={(value) =>
+                        updateCurrencyCondition(condition.id, {
+                          minPrice: value ? Number(value) : undefined,
+                        })
+                      }
+                      placeholder="Min"
+                      type="number"
+                      className="text-sm"
+                      min={0}
+                    />
+                  </div>
+
+                  {/* Max Price Input */}
+                  <div className="w-24">
+                    <Input
+                      value={condition.maxPrice?.toString() || ""}
+                      onChange={(value) =>
+                        updateCurrencyCondition(condition.id, {
+                          maxPrice: value ? Number(value) : undefined,
+                        })
+                      }
+                      placeholder="Max"
+                      type="number"
+                      className="text-sm"
+                      min={0}
+                    />
+                  </div>
+
+                  {/* Remove Button */}
+                  <Button
+                    size="small"
+                    variant="danger"
+                    onClick={() => removeCurrencyCondition(condition.id)}
+                    className="px-2 py-1 text-xs"
+                  >
+                    ×
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2 justify-end mt-4">

@@ -3,7 +3,8 @@ import { persistentStore } from "src/shared/store/sharedStore";
 import { transformItemData } from "src/renderer/helpers/transformItemData";
 import { autoTeleport } from "./autoTeleport";
 import { sendWhisper } from "./sendWhisper";
-import { TransformedItemData } from "src/shared/types";
+import { LiveSearchDetails, TransformedItemData } from "src/shared/types";
+import { passesCurrencyConditions } from "src/shared/utils/passesCurrencyConditions";
 import {
   playPingSound,
   playTeleportSound,
@@ -13,19 +14,19 @@ import {
 export const processItems = async (
   itemIds: string[],
   game: "poe" | "poe2",
-  searchLabel?: string
+  liveSearch?: LiveSearchDetails
 ) => {
   try {
     if (!itemIds) {
       return;
     }
     persistentStore.addLog(
-      `[API] Fetching ${itemIds.length} item details - ${searchLabel}`
+      `[API] Fetching ${itemIds.length} item details - ${liveSearch?.label}`
     );
     const itemDetails = await fetchItemDetails(itemIds, game);
 
     persistentStore.addLog(
-      `[API] Received ${itemIds.length} item details - ${searchLabel}`
+      `[API] Received ${itemIds.length} item details - ${liveSearch?.label}`
     );
 
     if (itemDetails?.data && Array.isArray(itemDetails.data.result)) {
@@ -33,7 +34,7 @@ export const processItems = async (
         ...itemDetails.data.result.map((item) => {
           const rawItem = {
             ...item,
-            searchLabel: searchLabel,
+            searchLabel: liveSearch?.label,
           };
 
           return transformItemData(rawItem);
@@ -42,12 +43,20 @@ export const processItems = async (
 
       const itemToAutoBuy = { ...transformedItems[0] } as TransformedItemData;
 
+      const doesPassCurrencyConditions = passesCurrencyConditions(
+        itemToAutoBuy,
+        liveSearch?.currencyConditions || []
+      );
+
       if (
+        doesPassCurrencyConditions &&
         persistentStore.getState().autoWhisper &&
         itemToAutoBuy?.whisper_token &&
         itemToAutoBuy?.whisper_token !== ""
       ) {
-        persistentStore.addLog(`[API] Auto Whisper Initiated - ${searchLabel}`);
+        persistentStore.addLog(
+          `[API] Auto Whisper Initiated - ${liveSearch?.label}`
+        );
         if (!persistentStore.getState().disableSounds) {
           playWhisperSound();
         }
@@ -63,19 +72,22 @@ export const processItems = async (
           transformedItems.shift(); // Remove first element
           transformedItems.unshift({ ...itemToAutoBuy, isWhispered: true }); // Add itemToAutoBuy at beginning
         } else {
-          persistentStore.addLog(`[API] Auto Whisper Failed - ${searchLabel}`);
+          persistentStore.addLog(
+            `[API] Auto Whisper Failed - ${liveSearch?.label}`
+          );
           persistentStore.addLog(whisperResponse.error || "Unknown error");
         }
       }
 
       if (
+        doesPassCurrencyConditions &&
         persistentStore.getState().autoTeleport &&
         !persistentStore.getState().isTeleportingBlocked &&
         itemToAutoBuy?.hideoutToken &&
         itemToAutoBuy?.hideoutToken !== ""
       ) {
         persistentStore.addLog(
-          `[API] Auto Teleport Initiated - ${searchLabel}`
+          `[API] Auto Teleport Initiated - ${liveSearch?.label}`
         );
 
         persistentStore.setLastTeleportedItem(itemToAutoBuy ?? null);
@@ -95,7 +107,9 @@ export const processItems = async (
           transformedItems.shift(); // Remove first element
           transformedItems.unshift({ ...itemToAutoBuy, isWhispered: true }); // Add itemToAutoBuy at beginning
         } else {
-          persistentStore.addLog(`[API] Auto Teleport Failed - ${searchLabel}`);
+          persistentStore.addLog(
+            `[API] Auto Teleport Failed - ${liveSearch?.label}`
+          );
           persistentStore.addLog(autoTeleportResponse.error || "Unknown error");
         }
       }
@@ -105,12 +119,14 @@ export const processItems = async (
 
       if (
         !(
+          doesPassCurrencyConditions &&
           persistentStore.getState().autoTeleport &&
           !persistentStore.getState().isTeleportingBlocked &&
           itemToAutoBuy?.hideoutToken &&
           itemToAutoBuy?.hideoutToken !== ""
         ) &&
         !(
+          doesPassCurrencyConditions &&
           persistentStore.getState().autoWhisper &&
           itemToAutoBuy?.whisper_token &&
           itemToAutoBuy?.whisper_token !== ""
@@ -124,6 +140,8 @@ export const processItems = async (
       console.warn("API response data is not an array:", itemDetails?.data);
     }
   } catch (error) {
-    persistentStore.addLog(`[API] Error processing items - ${searchLabel}`);
+    persistentStore.addLog(
+      `[API] Error processing items - ${liveSearch?.label}`
+    );
   }
 };

@@ -168,7 +168,7 @@ export const connect = async (id: string, signal?: AbortSignal) =>
               `[WebSocket] Socket message received: Found ${itemIds?.length} items - ${liveSearchDetails.label}`
             );
           if (itemIds) {
-            processItems(itemIds, game, liveSearchDetails.label);
+            processItems(itemIds, game, liveSearchDetails);
           }
         });
 

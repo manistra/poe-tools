@@ -7,10 +7,17 @@ export enum WebSocketState {
   CLOSING = 2,
 }
 
+export interface CurrencyCondition {
+  currency: Poe2Currency;
+  minPrice?: number;
+  maxPrice?: number;
+}
+
 export interface LiveSearch {
   id: string;
   label: string; // This maps to 'name' in the original implementation
   url: string; // This maps to 'searchUrl' in the original implementation
+  currencyConditions?: CurrencyCondition[];
 
   ws?: {
     // Runtime state properties
@@ -109,7 +116,7 @@ export interface TransformedItemData {
 }
 
 export interface ApiResponse {
-  data?: any;
+  data?: unknown;
   error?: {
     message: string;
     status: number;
