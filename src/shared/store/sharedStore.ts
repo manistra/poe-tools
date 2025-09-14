@@ -4,6 +4,7 @@ import {
   getInitialState,
   saveStateToStorage,
   Log,
+  GridConfig,
 } from "./storeUtils";
 import { LiveSearch, TransformedItemData, SoundType } from "../types";
 
@@ -30,6 +31,14 @@ const getInitialStoreState = (): AppState => {
         interval: 4,
       },
       logs: [],
+      gridConfig: {
+        width: "400",
+        height: "400",
+        x: "100",
+        y: "100",
+        screenIndex: 0,
+        isVisible: false,
+      },
     };
   }
 };
@@ -219,6 +228,12 @@ export class PersistentSharedStore {
   setRateLimiterTokens(tokens: number): void {
     this.setState((state) => {
       state.rateLimiterTokens = tokens;
+    });
+  }
+
+  setGridConfig(config: GridConfig): void {
+    this.setState((state) => {
+      state.gridConfig = config;
     });
   }
 

@@ -6,6 +6,15 @@ export interface Log {
   timestamp: string;
 }
 
+export interface GridConfig {
+  width: string;
+  height: string;
+  x: string;
+  y: string;
+  screenIndex: number;
+  isVisible: boolean;
+}
+
 export interface AppState {
   poeSessionid: string;
   webSocketSessionId: string;
@@ -33,6 +42,8 @@ export interface AppState {
     teleport?: SoundType | "none";
     ping?: SoundType | "none";
   };
+
+  gridConfig: GridConfig;
 }
 
 export const initialState: AppState = {
@@ -60,6 +71,15 @@ export const initialState: AppState = {
     whisper: "evo_item",
     teleport: "evo_item",
     ping: "evo_item",
+  },
+
+  gridConfig: {
+    width: "400",
+    height: "400",
+    x: "100",
+    y: "100",
+    screenIndex: 0,
+    isVisible: false,
   },
 };
 
@@ -91,6 +111,15 @@ const store = new Store<AppState>({
       whisper: "whisper",
       teleport: "teleport",
       ping: "ping",
+    },
+
+    gridConfig: {
+      width: "400",
+      height: "400",
+      x: "100",
+      y: "100",
+      screenIndex: 0,
+      isVisible: false,
     },
   },
 });

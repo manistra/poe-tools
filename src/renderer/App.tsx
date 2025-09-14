@@ -2,6 +2,7 @@ import React from "react";
 
 import PoeLiveSearch from "./live-search/PoeLiveSearch";
 import ApiTester from "./components/ApiTester";
+import GridOverlayManager from "./components/GridOverlayManager";
 
 import { useIsTeleportingBlocked } from "src/shared/store/hooks";
 import LastTeleportedItemModal from "./live-search/components/modals/LastTeleportedItemModal";
@@ -38,6 +39,8 @@ export default function App() {
       <PoeLiveSearch />
 
       <LastTeleportedItemModal />
+
+      <GridOverlayManager />
     </div>
   );
 }

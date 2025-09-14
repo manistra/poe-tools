@@ -106,11 +106,27 @@ export const processItems = async (
 
         if (autoTeleportResponse.success) {
           // Trigger success sound for teleport
-
           const teleportSound =
             persistentStore.getState().selectedSounds?.teleport;
           if (soundsEnabled && teleportSound !== "none") {
             playSound(teleportSound);
+          }
+
+          // Highlight grid cell if stash coordinates are available
+          if (
+            itemToAutoBuy?.stash?.x !== undefined &&
+            itemToAutoBuy?.stash?.y !== undefined
+          ) {
+            // Import the overlay window reference from main process
+            const { getOverlayWindow } = require("../index");
+            const overlayWindow = getOverlayWindow();
+
+            if (overlayWindow) {
+              overlayWindow.webContents.send("update-highlight", {
+                x: itemToAutoBuy.stash.x,
+                y: itemToAutoBuy.stash.y,
+              });
+            }
           }
 
           transformedItems.shift(); // Remove first element

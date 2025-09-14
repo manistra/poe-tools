@@ -5,6 +5,7 @@ import {
   ipcMain,
   shell,
   globalShortcut,
+  screen,
 } from "electron";
 import path from "path";
 
@@ -20,6 +21,7 @@ if (require("electron-squirrel-startup")) {
 }
 
 let mainWindow: BrowserWindow;
+let overlayWindow: BrowserWindow | null = null;
 
 const createWindow = (): void => {
   // Create the browser window.
@@ -113,6 +115,73 @@ const createWindow = (): void => {
   // mainWindow.webContents.openDevTools();
 };
 
+const createOverlayWindow = (config: {
+  width: string;
+  height: string;
+  x: string;
+  y: string;
+  screenIndex: number;
+}): void => {
+  // Close existing overlay if it exists
+  if (overlayWindow) {
+    overlayWindow.close();
+    overlayWindow = null;
+  }
+
+  const displays = screen.getAllDisplays();
+  const targetDisplay = displays[config.screenIndex] || displays[0];
+
+  overlayWindow = new BrowserWindow({
+    width: parseInt(config.width),
+    height: parseInt(config.height),
+    x: parseInt(config.x) + (targetDisplay?.bounds.x || 0),
+    y: parseInt(config.y) + (targetDisplay?.bounds.y || 0),
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    hasShadow: false,
+    skipTaskbar: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      webSecurity: false,
+    },
+  });
+
+  // Load the grid overlay HTML
+  overlayWindow.loadFile(path.join(__dirname, "../renderer/grid-overlay.html"));
+
+  // Set a title for easier identification
+  overlayWindow.setTitle("Grid Overlay");
+
+  // Make the overlay ignore mouse events (click-through)
+  overlayWindow.setIgnoreMouseEvents(true);
+
+  // Handle overlay window closed
+  overlayWindow.on("closed", () => {
+    overlayWindow = null;
+  });
+};
+
+const hideOverlayWindow = (): void => {
+  if (overlayWindow) {
+    overlayWindow.close();
+    overlayWindow = null;
+  }
+};
+
+const updateOverlayHighlight = (x: number, y: number): void => {
+  if (overlayWindow) {
+    overlayWindow.webContents.send("update-highlight", { x, y });
+  }
+};
+
+// Export function to get overlay window reference
+export const getOverlayWindow = (): BrowserWindow | null => {
+  return overlayWindow;
+};
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -158,4 +227,30 @@ ipcMain.handle("shell-open-external", async (_, url) => {
     return true;
   }
   return false;
+});
+
+// Screen API handlers
+ipcMain.handle("get-displays", async () => {
+  const displays = screen.getAllDisplays();
+  return displays.map((display, index) => ({
+    id: index,
+    label: display.label || `Display ${index + 1}`,
+    bounds: display.bounds,
+  }));
+});
+
+// Grid overlay handlers
+ipcMain.handle("show-grid-overlay", async (_, config) => {
+  createOverlayWindow(config);
+  return true;
+});
+
+ipcMain.handle("hide-grid-overlay", async () => {
+  hideOverlayWindow();
+  return true;
+});
+
+ipcMain.handle("update-grid-highlight", async (_, { x, y }) => {
+  updateOverlayHighlight(x, y);
+  return true;
 });
