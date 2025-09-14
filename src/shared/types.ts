@@ -118,3 +118,15 @@ export interface ApiResponse {
   status?: number;
   headers?: Record<string, string>;
 }
+
+export type Poe2Currency =
+  | "alch"
+  | "annul"
+  | "aug"
+  | "chaos"
+  | "divine"
+  | "exalted"
+  | "mirror"
+  | "regal"
+  | "transmute"
+  | "vaal";

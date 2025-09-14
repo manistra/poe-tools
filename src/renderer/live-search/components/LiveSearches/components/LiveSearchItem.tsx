@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import clsx from "clsx";
-import Button from "src/renderer/components/Button";
-import Input from "src/renderer/components/Input";
 import { electronAPI } from "src/renderer/api/electronAPI";
 
 import { toast } from "react-hot-toast";
@@ -14,6 +12,7 @@ import {
   SignalSlashIcon,
 } from "@heroicons/react/24/solid";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import EditLiveSearchModal from "../../modals/EditLiveSearchModal";
 
 interface LiveSearchItemProps {
   liveSearch: LiveSearch;
@@ -24,10 +23,8 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
   liveSearch,
   isConnectingAll,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [editLabel, setEditLabel] = useState(liveSearch.label);
-  const [editUrl, setEditUrl] = useState(liveSearch.url);
-  const { updateLiveSearch, deleteLiveSearch, ws } = useLiveSearchContext();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { deleteLiveSearch, ws } = useLiveSearchContext();
   const [isConnecting, setIsConnecting] = useState(false);
 
   const handleConnect = async () => {
@@ -44,31 +41,6 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
     } catch (error) {
       console.error("Failed to open external URL:", error);
     }
-  };
-
-  const handleSave = () => {
-    if (!editLabel.trim() || !editUrl.trim()) {
-      toast.error("Please provide both label and URL");
-      return;
-    }
-
-    try {
-      updateLiveSearch(liveSearch.id, {
-        label: editLabel.trim(),
-        url: editUrl.trim(),
-      });
-
-      setIsOpen(false);
-      toast.success("Search configuration updated");
-    } catch (error) {
-      toast.error("Failed to update search configuration");
-    }
-  };
-
-  const handleCancel = () => {
-    setEditLabel(liveSearch.label);
-    setEditUrl(liveSearch.url);
-    setIsOpen(false);
   };
 
   const handleDelete = () => {
@@ -162,7 +134,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
 
               <button
                 title="Edit"
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => setIsEditModalOpen(true)}
                 className="hover:scale-[104%] opacity-80 transition-transform duration-200 cursor-pointer hover:-rotate-12 hover:opacity-100"
               >
                 <PencilIcon className="size-5" />
@@ -205,7 +177,6 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
               title="Connect"
               onClick={() => handleConnect()}
               disabled={
-                isOpen ||
                 isConnecting ||
                 isConnectingAll ||
                 isWsStateAnyOf(
@@ -215,8 +186,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
                 )
               }
               className={clsx(
-                isOpen ||
-                  isConnecting ||
+                isConnecting ||
                   isConnectingAll ||
                   isWsStateAnyOf(
                     liveSearch?.ws?.readyState,
@@ -233,45 +203,11 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
         </div>
       </div>
 
-      {isOpen && (
-        <div className="flex items-center gap-2 w-full p-5">
-          <div className="flex-1 flex flex-row items-end gap-3 min-w-0 ">
-            <div className="flex flex-col gap-2 w-full">
-              <Input
-                label="Live Search Label:"
-                className="text-xs"
-                value={editLabel}
-                onChange={(value) => setEditLabel(String(value))}
-              />
-              <Input
-                label="URL:"
-                className="text-xs"
-                value={editUrl}
-                onChange={(value) => setEditUrl(String(value))}
-              />
-            </div>
-
-            <div className="flex flex-col justify-between gap-2">
-              <Button
-                size="small"
-                variant="outline"
-                onClick={handleCancel}
-                className="text-xs px-2 py-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                size="small"
-                variant="success"
-                onClick={handleSave}
-                className="text-xs px-2 py-1"
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditLiveSearchModal
+        isOpen={isEditModalOpen}
+        setIsOpen={setIsEditModalOpen}
+        liveSearch={liveSearch}
+      />
     </div>
   );
 };
