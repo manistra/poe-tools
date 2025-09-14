@@ -1,6 +1,6 @@
 import { ipcRenderer } from "electron";
 import { websocketAPI } from "./websocketsApi";
-import { SoundType } from "src/main/utils/soundUtils";
+import { SoundType } from "src/shared/types";
 
 // API request handler
 export const apiRequest = (options: {

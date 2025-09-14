@@ -3,13 +3,13 @@ import { persistentStore } from "src/shared/store/sharedStore";
 import { transformItemData } from "src/renderer/helpers/transformItemData";
 import { autoTeleport } from "./autoTeleport";
 import { sendWhisper } from "./sendWhisper";
-import { LiveSearchDetails, TransformedItemData } from "src/shared/types";
-
 import {
-  playPingSound,
-  playTeleportSound,
-  playWhisperSound,
-} from "../utils/soundUtils";
+  LiveSearchDetails,
+  SoundType,
+  TransformedItemData,
+} from "src/shared/types";
+
+import { playSound } from "../utils/soundUtils";
 
 export const processItems = async (
   itemIds: string[],
@@ -74,8 +74,10 @@ export const processItems = async (
         });
 
         if (whisperResponse.success) {
-          if (soundsEnabled) {
-            playWhisperSound();
+          const whisperSound =
+            persistentStore.getState().selectedSounds?.whisper;
+          if (soundsEnabled && whisperSound !== "none") {
+            playSound(whisperSound);
           }
 
           transformedItems.shift(); // Remove first element
@@ -104,9 +106,13 @@ export const processItems = async (
 
         if (autoTeleportResponse.success) {
           // Trigger success sound for teleport
-          if (soundsEnabled) {
-            playTeleportSound();
+
+          const teleportSound =
+            persistentStore.getState().selectedSounds?.teleport;
+          if (soundsEnabled && teleportSound !== "none") {
+            playSound(teleportSound);
           }
+
           transformedItems.shift(); // Remove first element
           transformedItems.unshift({ ...itemToAutoBuy, isWhispered: true }); // Add itemToAutoBuy at beginning
         } else {
@@ -136,10 +142,12 @@ export const processItems = async (
       if (
         !teleportCondition &&
         !whisperCondition &&
-        soundsEnabled &&
         doesPassCurrencyConditions
       ) {
-        playPingSound();
+        const pingSound = persistentStore.getState().selectedSounds?.ping;
+        if (soundsEnabled && pingSound !== "none") {
+          playSound(pingSound);
+        }
       }
     } else {
       console.warn("API response data is not an array:", itemDetails?.data);

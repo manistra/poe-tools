@@ -1,4 +1,4 @@
-import { LiveSearch, TransformedItemData } from "../types";
+import { LiveSearch, SoundType, TransformedItemData } from "../types";
 import Store from "electron-store";
 
 export interface Log {
@@ -27,6 +27,12 @@ export interface AppState {
   };
   rateLimiterTokens: number;
   logs: Log[];
+
+  selectedSounds?: {
+    whisper?: SoundType | "none";
+    teleport?: SoundType | "none";
+    ping?: SoundType | "none";
+  };
 }
 
 export const initialState: AppState = {
@@ -49,6 +55,12 @@ export const initialState: AppState = {
   },
 
   logs: [],
+
+  selectedSounds: {
+    whisper: "evo_item",
+    teleport: "evo_item",
+    ping: "evo_item",
+  },
 };
 
 // Create electron-store instance
@@ -74,6 +86,12 @@ const store = new Store<AppState>({
     },
 
     logs: [],
+
+    selectedSounds: {
+      whisper: "whisper",
+      teleport: "teleport",
+      ping: "ping",
+    },
   },
 });
 

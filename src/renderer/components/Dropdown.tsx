@@ -177,7 +177,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                                 </span>
                               </div>
                               {selected && showCheckIcon && (
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-orange-400">
+                                <span className="absolute inset-y-0 right-3 flex items-center pl-3 text-orange-400">
                                   <CheckIcon
                                     className="h-5 w-5"
                                     aria-hidden="true"

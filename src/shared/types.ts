@@ -139,3 +139,12 @@ export type Poe2Currency =
   | "regal"
   | "transmute"
   | "vaal";
+
+export type SoundType =
+  | "whisper"
+  | "notification"
+  | "ping"
+  | "evo_item"
+  | "teleport"
+  | "teleport_2"
+  | "teleport_3";

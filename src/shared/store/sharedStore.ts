@@ -5,7 +5,7 @@ import {
   saveStateToStorage,
   Log,
 } from "./storeUtils";
-import { LiveSearch, TransformedItemData } from "../types";
+import { LiveSearch, TransformedItemData, SoundType } from "../types";
 
 // Create the shared store with data loaded from electron-store
 const getInitialStoreState = (): AppState => {
@@ -194,6 +194,19 @@ export class PersistentSharedStore {
   setDisableSounds(disabled: boolean): void {
     this.setState((state) => {
       state.disableSounds = disabled;
+    });
+  }
+
+  setSelectedSounds(selectedSounds: {
+    whisper?: SoundType | "none";
+    teleport?: SoundType | "none";
+    ping?: SoundType | "none";
+  }): void {
+    this.setState((state) => {
+      state.selectedSounds = {
+        ...state.selectedSounds,
+        ...selectedSounds,
+      };
     });
   }
 

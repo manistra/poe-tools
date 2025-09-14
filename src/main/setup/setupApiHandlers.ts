@@ -1,12 +1,12 @@
 import { ipcMain, clipboard } from "electron";
 
-import { ApiResponse } from "../../shared/types";
+import { ApiResponse, SoundType } from "../../shared/types";
 import HttpRequestLimiter from "../api/HttpRequestLimiter";
 import { persistentStore } from "../../shared/store/sharedStore";
 import { apiNoLimiter, rateLimitedApi } from "../api/apis";
 import { autoTeleport } from "../poe-trade/autoTeleport";
 import { sendWhisper } from "../poe-trade/sendWhisper";
-import { playSound, SoundType } from "../utils/soundUtils";
+import { playSound } from "../utils/soundUtils";
 
 export function setupApiHandlers() {
   // Initialize with defaults

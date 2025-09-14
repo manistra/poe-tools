@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { AppState, Log } from "./storeUtils";
-import { LiveSearch, TransformedItemData } from "../types";
+import { LiveSearch, TransformedItemData, SoundType } from "../types";
 import { persistentStore } from "../store/sharedStore";
 
 // Main hook to access the entire store
@@ -31,6 +31,7 @@ export const useAppStore = () => {
     setAutoTeleport: persistentStore.setAutoTeleport.bind(persistentStore),
     setAutoWhisper: persistentStore.setAutoWhisper.bind(persistentStore),
     setDisableSounds: persistentStore.setDisableSounds.bind(persistentStore),
+    setSelectedSounds: persistentStore.setSelectedSounds.bind(persistentStore),
     setIsTeleportingBlocked:
       persistentStore.setIsTeleportingBlocked.bind(persistentStore),
     addLog: persistentStore.addLog.bind(persistentStore),
@@ -251,6 +252,34 @@ export const useDisableSounds = () => {
   return [disableSounds, updateDisableSounds] as const;
 };
 
+export const useSelectedSounds = () => {
+  const [selectedSounds, setSelectedSounds] = useState<{
+    whisper?: SoundType | "none";
+    teleport?: SoundType | "none";
+    ping?: SoundType | "none";
+  }>(persistentStore.getState().selectedSounds || {});
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setSelectedSounds(state.selectedSounds || {});
+    });
+    return unsubscribe;
+  }, []);
+
+  const updateSelectedSounds = useCallback(
+    (sounds: {
+      whisper?: SoundType | "none";
+      teleport?: SoundType | "none";
+      ping?: SoundType | "none";
+    }) => {
+      persistentStore.setSelectedSounds(sounds);
+    },
+    []
+  );
+
+  return [selectedSounds, updateSelectedSounds] as const;
+};
+
 export const useIsTeleportingBlocked = () => {
   const [isTeleportingBlocked, setIsTeleportingBlocked] = useState<boolean>(
     persistentStore.getState().isTeleportingBlocked
@@ -362,6 +391,7 @@ export const useAppStoreSync = () => {
     setAutoTeleport: persistentStore.setAutoTeleport.bind(persistentStore),
     setAutoWhisper: persistentStore.setAutoWhisper.bind(persistentStore),
     setDisableSounds: persistentStore.setDisableSounds.bind(persistentStore),
+    setSelectedSounds: persistentStore.setSelectedSounds.bind(persistentStore),
     setIsTeleportingBlocked:
       persistentStore.setIsTeleportingBlocked.bind(persistentStore),
     addLog: persistentStore.addLog.bind(persistentStore),

@@ -1,8 +1,7 @@
 import sound from "sound-play";
 import { app } from "electron";
 import path from "path";
-
-export type SoundType = "whisper" | "teleport" | "notification" | "ping";
+import { SoundType } from "src/shared/types";
 
 export const playSound = async (soundType: SoundType = "notification") => {
   try {
@@ -28,13 +27,12 @@ const getSoundPath = (soundType: SoundType): string => {
       return path.join(basePath, "ding.wav");
     case "ping":
       return path.join(basePath, "ping.mp3");
+    case "evo_item":
+    case "teleport_2":
+      return path.join(basePath, "teleport_2.mp3");
+    case "teleport_3":
+      return path.join(basePath, "teleport_3.mp3");
     default:
       return path.join(basePath, "ding.wav");
   }
 };
-
-export const playWhisperSound = async () => await playSound("whisper");
-export const playTeleportSound = async () => await playSound("teleport");
-export const playPingSound = async () => await playSound("ping");
-export const playNotificationSound = async () =>
-  await playSound("notification");

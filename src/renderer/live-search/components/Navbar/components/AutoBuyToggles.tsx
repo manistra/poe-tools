@@ -12,14 +12,18 @@ const AutoBuyToggles: React.FC = () => {
     updateAutoTeleport(checked);
     if (checked) {
       electronAPI.sound.playSound("teleport");
-      toast.success("You're gonna hear this sound on Auto-Teleport");
+      toast.success(
+        "You're gonna hear this sound on Auto-Teleport. (Change sound in settings)"
+      );
     }
   };
   const handleAutoWhisperChange = (checked: boolean) => {
     updateAutoWhisper(checked);
     if (checked) {
       electronAPI.sound.playSound("whisper");
-      toast.success("You're gonna hear this sound on Auto-Whisper");
+      toast.success(
+        "You're gonna hear this sound on Auto-Whisper. (Change sound in settings)"
+      );
     }
   };
 
