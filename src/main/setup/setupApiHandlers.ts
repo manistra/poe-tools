@@ -102,7 +102,7 @@ export function setupApiHandlers() {
   // Sound handlers
   ipcMain.handle("play-sound", async (_, soundType: SoundType) => {
     try {
-      playSound(soundType);
+      await playSound(soundType);
       return { success: true };
     } catch (error) {
       console.error("Sound playback failed:", error);

@@ -33,7 +33,6 @@ const createWindow = (): void => {
     },
     frame: true,
     autoHideMenuBar: true,
-    fullscreen: true,
     show: true,
     icon: path.join(__dirname, "../renderer/assets/icon.ico"),
   });
