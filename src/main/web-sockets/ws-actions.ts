@@ -74,18 +74,23 @@ const heartbeat = (liveSearch: LiveSearchWithSocket) => {
 
 export const connect = async (id: string, signal?: AbortSignal) =>
   ConcurrentConnectionMutex.acquire().then(async (release) => {
-    const ws = WsStore.find(id);
+    const liveSearchDetails = WsStore.find(id);
 
-    persistentStore.addLog(`[WebSocket] Starting connection to ${ws?.label}`);
+    persistentStore.addLog(
+      `[WebSocket] Starting connection to ${liveSearchDetails?.label}`
+    );
 
-    if (!ws) {
+    if (!liveSearchDetails) {
       persistentStore.addLog(`[WebSocket] No connection found: id=${id}`);
       return release();
     }
 
-    if (ws.socket && ws.socket.readyState !== WebSocket.CLOSED) {
+    if (
+      liveSearchDetails.socket &&
+      liveSearchDetails.socket.readyState !== WebSocket.CLOSED
+    ) {
       persistentStore.addLog(
-        `[WebSocket] Connection already open: ${ws.label}`
+        `[WebSocket] Connection already open: ${liveSearchDetails.label}`
       );
       return release();
     }
@@ -93,7 +98,7 @@ export const connect = async (id: string, signal?: AbortSignal) =>
     // Check abort signal before starting
     if (signal?.aborted) {
       persistentStore.addLog(
-        `[WebSocket] Connection cancelled before start: ${ws.label}`
+        `[WebSocket] Connection cancelled before start: ${liveSearchDetails.label}`
       );
       return release();
     }
@@ -103,20 +108,25 @@ export const connect = async (id: string, signal?: AbortSignal) =>
         // Check abort signal before limiter execution
         if (signal?.aborted) {
           persistentStore.addLog(
-            `[WebSocket] Connection cancelled in limiter: ${ws.label}`
+            `[WebSocket] Connection cancelled in limiter: ${liveSearchDetails.label}`
           );
           return;
         }
 
-        const webSocketUri = getWebSocketUri(ws.url);
+        const webSocketUri = getWebSocketUri(liveSearchDetails.url);
         const game = webSocketUri.includes("poe2") ? "poe2" : "poe";
 
-        persistentStore.addLog(`[WebSocket] Connecting to ${ws.label}`);
+        persistentStore.addLog(
+          `[WebSocket] Connecting to ${liveSearchDetails.label}`
+        );
 
         // Update state immediately to CONNECTING
-        updateWsConnectionState(ws.id, WebSocketState.CONNECTING);
+        updateWsConnectionState(
+          liveSearchDetails.id,
+          WebSocketState.CONNECTING
+        );
 
-        ws.socket = new WebSocket(webSocketUri, {
+        liveSearchDetails.socket = new WebSocket(webSocketUri, {
           headers: Object.assign(apiHeaders(true), {
             Origin: "https://www.pathofexile.com",
           }),
@@ -125,55 +135,62 @@ export const connect = async (id: string, signal?: AbortSignal) =>
         // Check abort signal after creating socket
         if (signal?.aborted) {
           persistentStore.addLog(
-            `[WebSocket] Connection cancelled after socket creation: ${ws.label}`
+            `[WebSocket] Connection cancelled after socket creation: ${liveSearchDetails.label}`
           );
-          ws.socket.close();
+          liveSearchDetails.socket.close();
           return;
         }
 
         // Update the store with the socket reference
-        WsStore.update(ws.id, {
-          socket: ws.socket,
+        WsStore.update(liveSearchDetails.id, {
+          socket: liveSearchDetails.socket,
         });
 
-        ws.socket.on("open", () => {
-          persistentStore.addLog(`[WebSocket] Socket open - ${ws.label}`);
+        liveSearchDetails.socket.on("open", () => {
+          persistentStore.addLog(
+            `[WebSocket] Socket open - ${liveSearchDetails.label}`
+          );
 
-          heartbeat(ws);
+          heartbeat(liveSearchDetails);
 
-          updateWsConnectionState(ws.id, ws?.socket?.readyState);
+          updateWsConnectionState(
+            liveSearchDetails.id,
+            liveSearchDetails?.socket?.readyState
+          );
         });
 
-        ws.socket.on("message", (response) => {
+        liveSearchDetails.socket.on("message", (response) => {
           const parsedResponse = JSON.parse(response.toString());
 
           const itemIds = parsedResponse.new;
           if (itemIds?.length || itemIds?.length > 0)
             persistentStore.addLog(
-              `[WebSocket] Socket message received: Found ${itemIds?.length} items - ${ws.label}`
+              `[WebSocket] Socket message received: Found ${itemIds?.length} items - ${liveSearchDetails.label}`
             );
           if (itemIds) {
-            processItems(itemIds, game, ws.label);
+            processItems(itemIds, game, liveSearchDetails.label);
           }
         });
 
-        ws.socket.on("ping", () => {
-          console.log(`[WS] SOCKET PING - ${ws.url} / ${ws.id}`);
+        liveSearchDetails.socket.on("ping", () => {
+          console.log(
+            `[WS] SOCKET PING - ${liveSearchDetails.url} / ${liveSearchDetails.id}`
+          );
 
-          heartbeat(ws);
+          heartbeat(liveSearchDetails);
         });
 
-        ws.socket.on("error", (error) => {
+        liveSearchDetails.socket.on("error", (error) => {
           const errorMessage = error?.message || "Unknown error";
           persistentStore.addLog(
-            `[WebSocket] Socket error - ${ws.label} - ${errorMessage}`
+            `[WebSocket] Socket error - ${liveSearchDetails.label} - ${errorMessage}`
           );
 
           const [reason, code] = errorMessage.split(": ");
           if (code && reason)
-            persistentStore.updateLiveSearch(ws.id, {
+            persistentStore.updateLiveSearch(liveSearchDetails.id, {
               ws: {
-                ...ws.ws,
+                ...liveSearchDetails.ws,
                 error: {
                   code: parseInt(code, 10),
                   reason,
@@ -181,40 +198,47 @@ export const connect = async (id: string, signal?: AbortSignal) =>
               },
             });
 
-          updateWsConnectionState(ws.id, ws?.socket?.readyState);
+          updateWsConnectionState(
+            liveSearchDetails.id,
+            liveSearchDetails?.socket?.readyState
+          );
 
-          ws.socket?.close();
+          liveSearchDetails.socket?.close();
         });
 
-        ws.socket.on("close", () => {
+        liveSearchDetails.socket.on("close", () => {
           const errorInfo =
-            ws.ws?.error?.code || ws.ws?.error?.reason
-              ? ` [Code: ${ws.ws?.error?.code} | Reason: ${ws.ws?.error?.reason}]`
+            liveSearchDetails.ws?.error?.code ||
+            liveSearchDetails.ws?.error?.reason
+              ? ` [Code: ${liveSearchDetails.ws?.error?.code} | Reason: ${liveSearchDetails.ws?.error?.reason}]`
               : "";
 
           persistentStore.addLog(
-            `[WebSocket] Socket close - ${ws.label}${errorInfo}`
+            `[WebSocket] Socket close - ${liveSearchDetails.label}${errorInfo}`
           );
 
-          updateWsConnectionState(ws.id, ws?.socket?.readyState);
+          updateWsConnectionState(
+            liveSearchDetails.id,
+            liveSearchDetails?.socket?.readyState
+          );
 
-          if (ws.ws?.error?.code === 429) {
+          if (liveSearchDetails.ws?.error?.code === 429) {
             persistentStore.addLog(
-              `[WebSocket] Rate limit exceded! Closing connection - ${ws.label}.`
+              `[WebSocket] Rate limit exceded! Closing connection - ${liveSearchDetails.label}.`
             );
             return;
           }
 
-          if (ws.ws?.error?.code === 404) {
+          if (liveSearchDetails.ws?.error?.code === 404) {
             persistentStore.addLog(
-              `[WebSocket] Search not found. Closing connection - ${ws.label}.`
+              `[WebSocket] Search not found. Closing connection - ${liveSearchDetails.label}.`
             );
             return;
           }
 
-          if (ws.ws?.error?.code === 401) {
+          if (liveSearchDetails.ws?.error?.code === 401) {
             persistentStore.addLog(
-              `[WebSocket] Unauthorized. Closing connection - ${ws.label}. Check Session ID.`
+              `[WebSocket] Unauthorized. Closing connection - ${liveSearchDetails.label}. Check Session ID.`
             );
             return;
           }
@@ -237,7 +261,7 @@ export const connect = async (id: string, signal?: AbortSignal) =>
         error.message?.includes("This limiter has been stopped")
       ) {
         persistentStore.addLog(
-          `[WebSocket] Connection cancelled due to limiter stop: ${ws.label}`
+          `[WebSocket] Connection cancelled due to limiter stop: ${liveSearchDetails.label}`
         );
         return release();
       }
@@ -246,9 +270,9 @@ export const connect = async (id: string, signal?: AbortSignal) =>
   });
 
 export const disconnect = async (id: string) => {
-  const ws = WsStore.find(id);
+  const liveSearchDetails = WsStore.find(id);
 
-  if (!ws) {
+  if (!liveSearchDetails) {
     persistentStore.addLog(
       `[WebSocket] No disconnect initiated (no such object in store) - ${id}`
     );
@@ -256,25 +280,29 @@ export const disconnect = async (id: string) => {
   }
 
   if (
-    ws.socket &&
-    (ws.socket.readyState === WebSocket.OPEN ||
-      ws.socket.readyState === WebSocket.CONNECTING)
+    liveSearchDetails.socket &&
+    (liveSearchDetails.socket.readyState === WebSocket.OPEN ||
+      liveSearchDetails.socket.readyState === WebSocket.CONNECTING)
   ) {
-    persistentStore.addLog(`[WebSocket] Disconnect initiated - ${ws.label}`);
+    persistentStore.addLog(
+      `[WebSocket] Disconnect initiated - ${liveSearchDetails.label}`
+    );
 
     // Update state to CLOSING before closing
-    updateWsConnectionState(ws.id, WebSocketState.CLOSING);
+    updateWsConnectionState(liveSearchDetails.id, WebSocketState.CLOSING);
 
-    ws.socket.close();
-    persistentStore.addLog(`[WebSocket] Disconnect closed - ${ws.label}`);
-  } else if (!ws.socket) {
+    liveSearchDetails.socket.close();
     persistentStore.addLog(
-      `[WebSocket] No disconnect initiated (no socket) - ${ws.label}`
+      `[WebSocket] Disconnect closed - ${liveSearchDetails.label}`
+    );
+  } else if (!liveSearchDetails.socket) {
+    persistentStore.addLog(
+      `[WebSocket] No disconnect initiated (no socket) - ${liveSearchDetails.label}`
     );
     return false;
   } else {
     persistentStore.addLog(
-      `[WebSocket] No disconnect initiated (socket in wrong state) - ${ws.label} - ${ws.socket.readyState}`
+      `[WebSocket] No disconnect initiated (socket in wrong state) - ${liveSearchDetails.label} - ${liveSearchDetails.socket.readyState}`
     );
 
     return false;

@@ -21,6 +21,7 @@ const getInitialStoreState = (): AppState => {
       liveSearches: [],
       results: [],
       autoTeleport: false,
+      disableSounds: false,
       autoWhisper: false,
       isTeleportingBlocked: false,
       rateLimiterTokens: 6,
@@ -187,6 +188,12 @@ export class PersistentSharedStore {
   setAutoWhisper(enabled: boolean): void {
     this.setState((state) => {
       state.autoWhisper = enabled;
+    });
+  }
+
+  setDisableSounds(disabled: boolean): void {
+    this.setState((state) => {
+      state.disableSounds = disabled;
     });
   }
 

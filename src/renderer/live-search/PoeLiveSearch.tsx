@@ -24,7 +24,7 @@ const PoELiveSearch = () => {
       />
 
       <div className="w-full flex flex-row gap-5 mx-auto h-[calc(100vh-200px)]">
-        <LiveSearchesList connectDisabled={isConnectingAll} />
+        <LiveSearchesList isConnectingAll={isConnectingAll} />
 
         <Items />
       </div>

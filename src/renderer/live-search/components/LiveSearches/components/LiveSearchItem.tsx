@@ -17,12 +17,12 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 
 interface LiveSearchItemProps {
   liveSearch: LiveSearch;
-  connectDisabled: boolean;
+  isConnectingAll: boolean;
 }
 
 const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
   liveSearch,
-  connectDisabled,
+  isConnectingAll,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editLabel, setEditLabel] = useState(liveSearch.label);
@@ -90,7 +90,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
   return (
     <div
       className={clsx(
-        "flex-col items-center justify-between rounded border bg-gradient-to-r from-[#000000] to-green-900/20",
+        "flex-col items-center justify-between rounded border bg-gradient-to-r from-[#000000] to-green-900/20 w-full",
         isWsStateAnyOf(liveSearch?.ws?.readyState, WebSocketState.OPEN)
           ? "border-[#0d311e]/70"
           : isWsStateAnyOf(
@@ -116,7 +116,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
                 isWsStateAnyOf(
                   liveSearch?.ws?.readyState,
                   WebSocketState.CONNECTING
-                ),
+                ) || isConnectingAll,
               "bg-gradient-to-br from-red-300 to-red-500 border border-red-700 shadow-red-400/30 animate-pulse":
                 isWsStateAnyOf(
                   liveSearch?.ws?.readyState,
@@ -143,7 +143,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
         <div className="flex items-center gap-2">
           {!(
             isConnecting ||
-            connectDisabled ||
+            isConnectingAll ||
             isWsStateAnyOf(
               liveSearch?.ws?.readyState,
               WebSocketState.OPEN,
@@ -207,7 +207,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
               disabled={
                 isOpen ||
                 isConnecting ||
-                connectDisabled ||
+                isConnectingAll ||
                 isWsStateAnyOf(
                   liveSearch?.ws?.readyState,
                   WebSocketState.OPEN,
@@ -217,7 +217,7 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
               className={clsx(
                 isOpen ||
                   isConnecting ||
-                  connectDisabled ||
+                  isConnectingAll ||
                   isWsStateAnyOf(
                     liveSearch?.ws?.readyState,
                     WebSocketState.OPEN,

@@ -32,6 +32,7 @@ export const useAppStore = () => {
     clearResults: persistentStore.clearResults.bind(persistentStore),
     setAutoTeleport: persistentStore.setAutoTeleport.bind(persistentStore),
     setAutoWhisper: persistentStore.setAutoWhisper.bind(persistentStore),
+    setDisableSounds: persistentStore.setDisableSounds.bind(persistentStore),
     setIsTeleportingBlocked:
       persistentStore.setIsTeleportingBlocked.bind(persistentStore),
     addLog: persistentStore.addLog.bind(persistentStore),
@@ -233,6 +234,25 @@ export const useAutoWhisper = () => {
   return [autoWhisper, updateAutoWhisper] as const;
 };
 
+export const useDisableSounds = () => {
+  const [disableSounds, setDisableSounds] = useState<boolean>(
+    persistentStore.getState().disableSounds
+  );
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setDisableSounds(state.disableSounds);
+    });
+    return unsubscribe;
+  }, []);
+
+  const updateDisableSounds = useCallback((disabled: boolean) => {
+    persistentStore.setDisableSounds(disabled);
+  }, []);
+
+  return [disableSounds, updateDisableSounds] as const;
+};
+
 export const useIsTeleportingBlocked = () => {
   const [isTeleportingBlocked, setIsTeleportingBlocked] = useState<boolean>(
     persistentStore.getState().isTeleportingBlocked
@@ -343,6 +363,7 @@ export const useAppStoreSync = () => {
     clearResults: persistentStore.clearResults.bind(persistentStore),
     setAutoTeleport: persistentStore.setAutoTeleport.bind(persistentStore),
     setAutoWhisper: persistentStore.setAutoWhisper.bind(persistentStore),
+    setDisableSounds: persistentStore.setDisableSounds.bind(persistentStore),
     setIsTeleportingBlocked:
       persistentStore.setIsTeleportingBlocked.bind(persistentStore),
     addLog: persistentStore.addLog.bind(persistentStore),

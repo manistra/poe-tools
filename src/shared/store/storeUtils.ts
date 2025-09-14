@@ -20,6 +20,7 @@ export interface AppState {
   autoWhisper: boolean;
   isTeleportingBlocked: boolean;
 
+  disableSounds: boolean;
   rateLimitData: {
     requestLimit: number;
     interval: number;
@@ -40,6 +41,7 @@ export const initialState: AppState = {
   autoWhisper: false,
   isTeleportingBlocked: false,
 
+  disableSounds: false,
   rateLimiterTokens: 6,
   rateLimitData: {
     requestLimit: 6,
@@ -64,6 +66,7 @@ const store = new Store<AppState>({
     autoWhisper: false,
     isTeleportingBlocked: false,
 
+    disableSounds: false,
     rateLimiterTokens: 6,
     rateLimitData: {
       requestLimit: 6,

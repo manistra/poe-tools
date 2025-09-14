@@ -48,7 +48,9 @@ export const processItems = async (
         itemToAutoBuy?.whisper_token !== ""
       ) {
         persistentStore.addLog(`[API] Auto Whisper Initiated - ${searchLabel}`);
-        playWhisperSound();
+        if (!persistentStore.getState().disableSounds) {
+          playWhisperSound();
+        }
         const whisperResponse = await sendWhisper({
           itemId: itemToAutoBuy?.id,
           token: itemToAutoBuy?.whisper_token,
@@ -87,7 +89,9 @@ export const processItems = async (
 
         if (autoTeleportResponse.success) {
           // Trigger success sound for teleport
-          playTeleportSound();
+          if (!persistentStore.getState().disableSounds) {
+            playTeleportSound();
+          }
           transformedItems.shift(); // Remove first element
           transformedItems.unshift({ ...itemToAutoBuy, isWhispered: true }); // Add itemToAutoBuy at beginning
         } else {
@@ -111,8 +115,11 @@ export const processItems = async (
           itemToAutoBuy?.whisper_token &&
           itemToAutoBuy?.whisper_token !== ""
         )
-      )
-        playPingSound();
+      ) {
+        if (!persistentStore.getState().disableSounds) {
+          playPingSound();
+        }
+      }
     } else {
       console.warn("API response data is not an array:", itemDetails?.data);
     }

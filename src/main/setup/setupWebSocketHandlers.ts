@@ -145,7 +145,7 @@ export const setupWebSocketHandlers = () => {
         ...liveSearchDetails,
       });
 
-      persistentStore.setLiveSearches(WsStore.sanitized());
+      persistentStore.updateLiveSearch(id, liveSearchDetails);
 
       persistentStore.addLog(
         `[WebSocket] Updated connection: ${liveSearchDetails.label}`

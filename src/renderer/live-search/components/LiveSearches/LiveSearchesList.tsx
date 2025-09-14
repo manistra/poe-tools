@@ -14,8 +14,8 @@ import clsx from "clsx";
 import ImportModal from "../modals/ImportModal";
 import { electronAPI } from "src/renderer/api/electronAPI";
 
-const LiveSearchesList: React.FC<{ connectDisabled: boolean }> = ({
-  connectDisabled,
+const LiveSearchesList: React.FC<{ isConnectingAll: boolean }> = ({
+  isConnectingAll,
 }) => {
   const [newFormOpen, setNewFormOpen] = useState(false);
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
@@ -55,8 +55,8 @@ const LiveSearchesList: React.FC<{ connectDisabled: boolean }> = ({
   };
 
   return (
-    <div className="w-[500px] max-w-[500px] min-w-[500px] flex flex-col gap-5 card">
-      <div className="flex flex-row justify-between items-center border-b border-gray-900 mb-2">
+    <div className="w-[500px] max-w-[500px] min-w-[500px] flex flex-col gap-5 card !pl-3">
+      <div className="flex flex-row justify-between items-center border-b border-gray-900 mb-2 !ml-5">
         <h1 className="text-xl text-gray-300 mb-2">Live Searches</h1>
 
         <div className="flex flex-row">
@@ -110,15 +110,22 @@ const LiveSearchesList: React.FC<{ connectDisabled: boolean }> = ({
         <p className="text-gray-400 text-sm">No live searches to show...</p>
       )}
 
-      <div className="overflow-y-scroll h-full space-y-[6px]">
+      <div className="overflow-y-scroll h-full space-y-[5px]">
         {/* Existing Search Items */}
-        {liveSearches.map((liveSearch) => {
+        {liveSearches.map((liveSearch, index) => {
           return (
-            <LiveSearchItem
+            <div
               key={liveSearch.id}
-              liveSearch={liveSearch}
-              connectDisabled={connectDisabled}
-            />
+              className="w-full flex flex-row gap-1 items-center"
+            >
+              <span className="text-gray-600 text-[10px] font-bold pr-2 pl-1">
+                {index + 1}.
+              </span>
+              <LiveSearchItem
+                liveSearch={liveSearch}
+                isConnectingAll={isConnectingAll}
+              />
+            </div>
           );
         })}
       </div>

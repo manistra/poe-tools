@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import ModalBase from "src/renderer/components/Modal";
 import Input from "src/renderer/components/Input";
 import Button from "src/renderer/components/Button";
-import { usePoeSessionId, useWebSocketSessionId } from "src/shared/store/hooks";
+import Checkbox from "src/renderer/components/Checkbox";
+import {
+  usePoeSessionId,
+  useWebSocketSessionId,
+  useDisableSounds,
+} from "src/shared/store/hooks";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -19,6 +24,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const [storedWebSocketSessionId, setStoredWebSocketSessionId] =
     useWebSocketSessionId();
   const [localWebSocketSessionId, setLocalWebSocketSessionId] = useState("");
+
+  const [disableSounds, setDisableSounds] = useDisableSounds();
 
   // Load the stored session ID into local state when modal opens
   useEffect(() => {
@@ -51,6 +58,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           label="WEB-SOCKET POESESSIONID:"
           value={localWebSocketSessionId}
           onChange={(value) => setLocalWebSocketSessionId(value.toString())}
+        />
+
+        <Checkbox
+          label="Disable Sounds"
+          checked={disableSounds}
+          onChange={setDisableSounds}
         />
 
         <div className="ml-auto flex gap-2">
