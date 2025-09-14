@@ -8,6 +8,7 @@ import {
 import Item from "../Listings/components/Item";
 import { TransformedItemData } from "src/shared/types";
 import { useLiveSearchContext } from "../../context/hooks/useLiveSearchContext";
+import { electronAPI } from "src/renderer/api/electronAPI";
 
 const LastTeleportedItemModal: React.FC = () => {
   const { ws } = useLiveSearchContext();
@@ -23,6 +24,7 @@ const LastTeleportedItemModal: React.FC = () => {
       alreadyTeleported: true,
     } as TransformedItemData & { alreadyTeleported?: boolean });
     setIsOpen(false);
+    electronAPI.screen.hideGridOverlay();
   };
   const handleCloseAndCancelAll = () => {
     ws.cancelAllAndDisconnect();

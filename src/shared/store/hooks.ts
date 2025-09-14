@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { AppState, Log } from "./storeUtils";
+import { AppState, Log, GridConfig } from "./storeUtils";
 import { LiveSearch, TransformedItemData, SoundType } from "../types";
 import { persistentStore } from "../store/sharedStore";
 
@@ -369,6 +369,28 @@ export const useLogs = () => {
     setLogs,
     clearLogs,
   };
+};
+
+export const useGridConfig = () => {
+  const [gridConfig, setGridConfig] = useState<GridConfig>(
+    persistentStore.getState().gridConfig
+  );
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setGridConfig(state.gridConfig);
+    });
+    return unsubscribe;
+  }, []);
+
+  const updateGridConfig = useCallback(
+    (config: Partial<GridConfig>) => {
+      persistentStore.setGridConfig({ ...gridConfig, ...config });
+    },
+    [gridConfig]
+  );
+
+  return [gridConfig, updateGridConfig] as const;
 };
 
 // Hook for synchronous access to current state (useful for event handlers)

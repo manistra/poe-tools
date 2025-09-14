@@ -70,6 +70,28 @@ const soundAPI = {
     ipcRenderer.invoke("play-sound", soundType),
 };
 
+// Screen API
+const screenAPI = {
+  getDisplays: () => ipcRenderer.invoke("get-displays"),
+  showGridOverlay: (config: {
+    width: string;
+    height: string;
+    x: string;
+    y: string;
+    screenIndex: number;
+    highlightX: number;
+    highlightY: number;
+  }) => ipcRenderer.invoke("show-grid-overlay", config),
+  hideGridOverlay: () => ipcRenderer.invoke("hide-grid-overlay"),
+  updateGridPosition: (config: {
+    width: string;
+    height: string;
+    x: string;
+    y: string;
+    screenIndex: number;
+  }) => ipcRenderer.invoke("update-grid-position", config),
+};
+
 // Combined API object for easy access
 export const electronAPI = {
   websocket: websocketAPI,
@@ -82,4 +104,5 @@ export const electronAPI = {
   rateLimiter: rateLimiterAPI,
   poeTrade: poeTradeAPI,
   sound: soundAPI,
+  screen: screenAPI,
 };
