@@ -20,13 +20,16 @@ const LastTeleportedItemModal: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(40);
 
   const handleClose = async () => {
-    setIsTeleportingBlocked(false);
     setLastTeleportedItem({
       ...lastTeleportedItem,
       alreadyTeleported: true,
     } as TransformedItemData & { alreadyTeleported?: boolean });
-    setIsOpen(false);
     await electronAPI.screen.hideGridOverlay();
+    setIsOpen(false);
+
+    setTimeout(() => {
+      setIsTeleportingBlocked(false);
+    }, 1000);
   };
   const handleCloseAndCancelAll = () => {
     ws.cancelAllAndDisconnect();
@@ -34,29 +37,32 @@ const LastTeleportedItemModal: React.FC = () => {
   };
 
   useEffect(() => {
-
-    const open = lastTeleportedItem !== null &&
+    const open =
+      lastTeleportedItem !== null &&
       lastTeleportedItem &&
-      !lastTeleportedItem?.alreadyTeleported
+      !lastTeleportedItem?.alreadyTeleported;
     if (open) {
-      setIsOpen(
-        open
-      );
-
+      setIsOpen(open);
 
       // Show grid overlay if enabled, use coordinates if available, otherwise use center
-      if (gridEnabled && lastTeleportedItem?.stash?.x !== undefined && lastTeleportedItem?.stash?.y !== undefined) {
+      if (
+        gridEnabled &&
+        lastTeleportedItem?.stash?.x !== undefined &&
+        lastTeleportedItem?.stash?.y !== undefined
+      ) {
         const x = lastTeleportedItem.stash.x;
         const y = lastTeleportedItem.stash.y;
-        
-        if(x >= 0 && y >= 0) 
-        electronAPI.screen.showGridOverlay(x, y);
+
+        if (x >= 0 && y >= 0) electronAPI.screen.showGridOverlay(x, y);
       } else {
         console.log("Grid overlay skipped for item:", {
           itemId: lastTeleportedItem?.id,
           itemName: lastTeleportedItem?.name,
           gridEnabled,
-          hasCoords: !!(lastTeleportedItem?.stash?.x !== undefined && lastTeleportedItem?.stash?.y !== undefined)
+          hasCoords: !!(
+            lastTeleportedItem?.stash?.x !== undefined &&
+            lastTeleportedItem?.stash?.y !== undefined
+          ),
         });
       }
     }

@@ -2,16 +2,22 @@ import React from "react";
 import toast from "react-hot-toast";
 import { electronAPI } from "src/renderer/api/electronAPI";
 
-import { useAutoTeleport, useAutoWhisper } from "src/shared/store/hooks";
+import {
+  useAutoTeleport,
+  useAutoWhisper,
+  useSelectedSounds,
+} from "src/shared/store/hooks";
+import { SoundType } from "src/shared/types";
 
 const AutoBuyToggles: React.FC = () => {
   const [autoTeleport, updateAutoTeleport] = useAutoTeleport();
   const [autoWhisper, updateAutoWhisper] = useAutoWhisper();
+  const [selectedSounds] = useSelectedSounds();
 
   const handleAutoTeleportChange = (checked: boolean) => {
     updateAutoTeleport(checked);
-    if (checked) {
-      electronAPI.sound.playSound("teleport");
+    if (checked && selectedSounds.teleport !== "none") {
+      electronAPI.sound.playSound(selectedSounds.teleport as SoundType);
       toast.success(
         "You're gonna hear this sound on Auto-Teleport. (Change sound in settings)"
       );
@@ -19,8 +25,8 @@ const AutoBuyToggles: React.FC = () => {
   };
   const handleAutoWhisperChange = (checked: boolean) => {
     updateAutoWhisper(checked);
-    if (checked) {
-      electronAPI.sound.playSound("whisper");
+    if (checked && selectedSounds.whisper !== "none") {
+      electronAPI.sound.playSound(selectedSounds.whisper as SoundType);
       toast.success(
         "You're gonna hear this sound on Auto-Whisper. (Change sound in settings)"
       );
