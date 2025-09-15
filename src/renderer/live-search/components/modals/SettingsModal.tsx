@@ -13,6 +13,7 @@ import {
 } from "src/shared/store/hooks";
 import { SoundType } from "src/shared/types";
 import { electronAPI } from "src/renderer/api/electronAPI";
+import { useGridOverlay } from "src/renderer/hooks/useGridOverlay";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -36,16 +37,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const [selectedSounds, setSelectedSounds] = useSelectedSounds();
   const [gridEnabled, setGridEnabled] = useGridEnabled();
 
+  const { hideGridOverlay } = useGridOverlay();
   // Sound options for dropdowns
   const soundOptions: DropdownOption[] = [
     { id: "none", label: "None", value: "none" },
+    { id: "ping", label: "Ping", value: "ping" },
     { id: "whisper", label: "Whisper", value: "whisper" },
+    { id: "evo_item", label: "Evo Item Bog Te Jebo", value: "evo_item" },
     { id: "teleport", label: "Teleport", value: "teleport" },
     { id: "teleport_2", label: "Teleport 2", value: "teleport_2" },
     { id: "teleport_3", label: "Teleport 3", value: "teleport_3" },
-    { id: "ping", label: "Ping", value: "ping" },
     { id: "notification", label: "Notification", value: "notification" },
-    { id: "evo_item", label: "Evo Item Bog Te Jebo", value: "evo_item" },
   ];
 
   // Function to play sound when dropdown selection changes
@@ -78,6 +80,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     setStoredSessionId(localSessionId);
     setStoredWebSocketSessionId(localWebSocketSessionId);
     setIsSettingsOpen(false);
+  };
+
+  const handleGridEnabledChange = (enabled: boolean) => {
+    setGridEnabled(enabled);
+    if (!enabled) hideGridOverlay();
   };
 
   return (
@@ -199,7 +206,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <Checkbox
               label="Enable Grid Overlay"
               checked={gridEnabled}
-              onChange={setGridEnabled}
+              onChange={handleGridEnabledChange}
             />
 
             <button

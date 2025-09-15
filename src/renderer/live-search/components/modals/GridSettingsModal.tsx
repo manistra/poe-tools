@@ -110,12 +110,15 @@ const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
     updateGridInRealTime(newConfig);
   };
 
+  const handleClose = () => {
+    setIsOpen(false);
+    setIsSettingsOpen(true);
+    hideGridOverlay();
+  };
+
   return (
     <ModalBase
-      onClose={() => {
-        setIsOpen(false);
-        setIsSettingsOpen(true);
-      }}
+      onClose={handleClose}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       className="card max-w-2xl w-full"
@@ -250,11 +253,7 @@ const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
           </div>
         </div>
         <div className="flex justify-end gap-2 pt-4">
-          <Button
-            size="small"
-            variant="outline"
-            onClick={() => setIsOpen(false)}
-          >
+          <Button size="small" variant="outline" onClick={handleClose}>
             Close
           </Button>
         </div>
