@@ -3,6 +3,16 @@ import { BrowserWindow, screen } from "electron";
 let overlayWindow: BrowserWindow | null = null;
 let isInitialized = false;
 
+// Function to ensure overlay properties are correctly set
+const ensureOverlayProperties = (): void => {
+  if (!overlayWindow || overlayWindow.isDestroyed()) {
+    return;
+  }
+    overlayWindow.setAlwaysOnTop(true, 'screen-saver');
+    overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    overlayWindow.setIgnoreMouseEvents(true);
+};
+
 // Grid overlay HTML content (static, no dynamic highlighting)
 const gridHTML = `
 <!DOCTYPE html>
@@ -113,6 +123,7 @@ export const initializeOverlayWindow = (config: {
       hasShadow: false,
       skipTaskbar: true,
       show: false, // Don't show immediately
+      focusable: false, // Prevent the overlay from taking focus
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -124,7 +135,11 @@ export const initializeOverlayWindow = (config: {
     overlayWindow.loadURL(
       `data:text/html;charset=utf-8,${encodeURIComponent(gridHTML)}`
     );
-
+    
+    // Set overlay properties for fullscreen compatibility
+    overlayWindow.setAlwaysOnTop(true, 'screen-saver');
+    overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    
     // Set a title for easier identification
     overlayWindow.setTitle("Grid Overlay");
 
@@ -136,6 +151,27 @@ export const initializeOverlayWindow = (config: {
       console.log("Overlay window closed event fired");
       overlayWindow = null;
       isInitialized = false;
+    });
+
+    // Handle window focus events to maintain overlay properties
+    overlayWindow.on("focus", () => {
+      console.log("Overlay window focused");
+      ensureOverlayProperties();
+    });
+
+    overlayWindow.on("blur", () => {
+      console.log("Overlay window blurred");
+        ensureOverlayProperties();
+    });
+
+    // Handle window show/hide events
+    overlayWindow.on("show", () => {
+      console.log("Overlay window shown");
+      ensureOverlayProperties();
+    });
+
+    overlayWindow.on("hide", () => {
+      console.log("Overlay window hidden");
     });
 
     // Add error handling for load failures
@@ -173,7 +209,16 @@ export const showOverlayWindow = (highlightX = 0, highlightY = 0): void => {
   console.log("Showing overlay window with highlight:", {
     highlightX,
     highlightY,
+    currentState: {
+      isInitialized,
+      windowExists: !!overlayWindow,
+      windowDestroyed: overlayWindow?.isDestroyed()
+    }
   });
+
+
+  // Ensure overlay properties are set for fullscreen compatibility
+  ensureOverlayProperties();
 
   // Show the window
   overlayWindow.show();
@@ -184,6 +229,12 @@ export const showOverlayWindow = (highlightX = 0, highlightY = 0): void => {
       window.highlightCell(${highlightX}, ${highlightY});
     `);
   }
+
+  // Log final state
+  console.log("Overlay window show completed:", {
+    windowVisible: overlayWindow.isVisible(),
+    windowFocused: overlayWindow.isFocused()
+  });
 };
 
 // Hide the overlay window
@@ -194,14 +245,6 @@ export const hideOverlayWindow = (): void => {
   }
 
   console.log("Hiding overlay window");
-
-  // Clear highlights
-  if (overlayWindow.webContents) {
-    overlayWindow.webContents.executeJavaScript(`
-      window.clearHighlights();
-    `);
-  }
-
   // Hide the window
   overlayWindow.hide();
 };

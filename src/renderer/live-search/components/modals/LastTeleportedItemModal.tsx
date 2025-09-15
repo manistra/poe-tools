@@ -4,6 +4,7 @@ import ModalBase from "src/renderer/components/Modal";
 import {
   useIsTeleportingBlocked,
   useLastTeleportedItem,
+  useGridEnabled,
 } from "src/shared/store/hooks";
 import Item from "../Listings/components/Item";
 import { TransformedItemData } from "src/shared/types";
@@ -15,16 +16,17 @@ const LastTeleportedItemModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [lastTeleportedItem, setLastTeleportedItem] = useLastTeleportedItem();
   const [, setIsTeleportingBlocked] = useIsTeleportingBlocked();
+  const [gridEnabled] = useGridEnabled();
   const [timeLeft, setTimeLeft] = useState(40);
 
-  const handleClose =async () => {
+  const handleClose = async () => {
     setIsTeleportingBlocked(false);
     setLastTeleportedItem({
       ...lastTeleportedItem,
       alreadyTeleported: true,
     } as TransformedItemData & { alreadyTeleported?: boolean });
     setIsOpen(false);
-   await  electronAPI.screen.hideGridOverlay();
+    await electronAPI.screen.hideGridOverlay();
   };
   const handleCloseAndCancelAll = () => {
     ws.cancelAllAndDisconnect();
@@ -32,11 +34,33 @@ const LastTeleportedItemModal: React.FC = () => {
   };
 
   useEffect(() => {
-    setIsOpen(
-      lastTeleportedItem !== null &&
-        lastTeleportedItem &&
-        !lastTeleportedItem?.alreadyTeleported
-    );
+
+    const open = lastTeleportedItem !== null &&
+      lastTeleportedItem &&
+      !lastTeleportedItem?.alreadyTeleported
+    if (open) {
+      setIsOpen(
+        open
+      );
+
+
+      // Show grid overlay if enabled, use coordinates if available, otherwise use center
+      if (gridEnabled && lastTeleportedItem?.stash?.x !== undefined && lastTeleportedItem?.stash?.y !== undefined) {
+        const x = lastTeleportedItem.stash.x;
+        const y = lastTeleportedItem.stash.y;
+        
+        if(x >= 0 && y >= 0) 
+        electronAPI.screen.showGridOverlay(x, y);
+      } else {
+        console.log("Grid overlay skipped for item:", {
+          itemId: lastTeleportedItem?.id,
+          itemName: lastTeleportedItem?.name,
+          gridEnabled,
+          hasCoords: !!(lastTeleportedItem?.stash?.x !== undefined && lastTeleportedItem?.stash?.y !== undefined)
+        });
+      }
+    }
+
     console.log("lastTeleportedItem", lastTeleportedItem);
   }, [lastTeleportedItem]);
 
@@ -86,7 +110,7 @@ const LastTeleportedItemModal: React.FC = () => {
           </span>
         </span>
         <button
-          onClick={handleClose}
+          onClick={async () => await handleClose()}
           className="px-10 py-4 bg-gradient-to-br from-green-600 to-green-950 hover:from-green-700 hover:to-green-800 transition-colors text-white rounded text-4xl font-medium duration-300 w-[300px]"
         >
           Unblock

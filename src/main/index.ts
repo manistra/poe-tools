@@ -143,8 +143,6 @@ app.on("ready", () => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  console.log("All windows closed, cleaning up grid overlay...");
-  hideOverlayWindow();
 
   if (process.platform !== "darwin") {
     app.quit();
@@ -207,7 +205,7 @@ ipcMain.handle(
 
 ipcMain.handle("hide-grid-overlay", async () => {
   console.log("hide-grid-overlay IPC handler called");
-  destroyOverlayWindow();
+  hideOverlayWindow();
   return true;
 });
 
