@@ -90,7 +90,7 @@ export default class HttpRequestLimiter {
   }
 
   static updateSettings(requestLimit: number, interval: number): void {
-    const calculatedIncomingMinTime = (interval / requestLimit) * 7000;
+    const calculatedIncomingMinTime = (interval / requestLimit) * 1000;
 
     const minTime = Math.max(
       this.config.minRequestIntervalMs, // 1500ms

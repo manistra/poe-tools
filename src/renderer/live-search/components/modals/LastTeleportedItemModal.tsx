@@ -17,14 +17,14 @@ const LastTeleportedItemModal: React.FC = () => {
   const [, setIsTeleportingBlocked] = useIsTeleportingBlocked();
   const [timeLeft, setTimeLeft] = useState(40);
 
-  const handleClose = () => {
+  const handleClose =async () => {
     setIsTeleportingBlocked(false);
     setLastTeleportedItem({
       ...lastTeleportedItem,
       alreadyTeleported: true,
     } as TransformedItemData & { alreadyTeleported?: boolean });
     setIsOpen(false);
-    electronAPI.screen.hideGridOverlay();
+   await  electronAPI.screen.hideGridOverlay();
   };
   const handleCloseAndCancelAll = () => {
     ws.cancelAllAndDisconnect();

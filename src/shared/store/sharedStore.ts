@@ -30,6 +30,13 @@ const getInitialStoreState = (): AppState => {
         requestLimit: 6,
         interval: 4,
       },
+
+      selectedSounds: {
+        whisper: "evo_item",
+        teleport: "evo_item",
+        ping: "evo_item",
+      },
+
       logs: [],
       gridConfig: {
         width: "674",
