@@ -95,14 +95,17 @@ export const processItems = async (
           `[API] Auto Teleport Initiated - ${liveSearch?.label}`
         );
 
-        // Show grid overlay with stash coordinates
+        // Show grid overlay with stash coordinates (if enabled)
         const gridConfig = persistentStore.getState().gridConfig;
-        if (itemToAutoBuy?.stash?.x !== undefined && itemToAutoBuy?.stash?.y !== undefined) {
+        if (
+          itemToAutoBuy?.stash?.x !== undefined &&
+          itemToAutoBuy?.stash?.y !== undefined &&
+          gridConfig.enabled
+        ) {
           persistentStore.addLog(
             `[GRID] Showing grid overlay at stash position (${itemToAutoBuy.stash.x}, ${itemToAutoBuy.stash.y})`
           );
-        
-          
+
           // Show the grid overlay with highlight coordinates
           createOverlayWindow({
             width: gridConfig.width,
@@ -113,6 +116,14 @@ export const processItems = async (
             highlightX: itemToAutoBuy.stash.x,
             highlightY: itemToAutoBuy.stash.y,
           });
+        } else if (
+          itemToAutoBuy?.stash?.x !== undefined &&
+          itemToAutoBuy?.stash?.y !== undefined &&
+          !gridConfig.enabled
+        ) {
+          persistentStore.addLog(
+            `[GRID] Grid overlay is disabled, skipping display for stash position (${itemToAutoBuy.stash.x}, ${itemToAutoBuy.stash.y})`
+          );
         }
 
         persistentStore.setLastTeleportedItem(itemToAutoBuy ?? null);

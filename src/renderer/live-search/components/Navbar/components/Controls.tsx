@@ -5,12 +5,7 @@ import { WebSocketState } from "src/shared/types";
 import { useLiveSearchContext } from "../../../context/hooks/useLiveSearchContext";
 import { usePoeSessionId } from "src/shared/store/hooks";
 import AutoBuyToggles from "./AutoBuyToggles";
-import {
-  Cog6ToothIcon,
-  PlayIcon,
-  StopIcon,
-  Squares2X2Icon,
-} from "@heroicons/react/24/solid";
+import { Cog6ToothIcon, PlayIcon, StopIcon } from "@heroicons/react/24/solid";
 import SettingsModal from "../../modals/SettingsModal";
 import GridSettingsModal from "../../modals/GridSettingsModal";
 import clsx from "clsx";
@@ -88,14 +83,6 @@ const Controls: React.FC<ControlsProps> = ({
         </button>
 
         <button
-          title="Grid Overlay Settings"
-          className="text-xs transition opacity-60 hover:opacity-100 hover:scale-[104%] duration-200"
-          onClick={() => setIsGridSettingsOpen(true)}
-        >
-          <Squares2X2Icon className="size-11" />
-        </button>
-
-        <button
           className={clsx(
             "text-xs transition opacity-60 hover:opacity-100 hover:scale-[104%] hover:rotate-90 duration-400",
             !sessionId && "animate-bounce hover:animate-none"
@@ -111,10 +98,12 @@ const Controls: React.FC<ControlsProps> = ({
       <SettingsModal
         isOpen={isSettingsOpen}
         setIsSettingsOpen={setIsSettingsOpen}
+        setIsGridSettingsOpen={setIsGridSettingsOpen}
       />
 
       <GridSettingsModal
         isOpen={isGridSettingsOpen}
+        setIsSettingsOpen={setIsSettingsOpen}
         setIsOpen={setIsGridSettingsOpen}
       />
     </div>

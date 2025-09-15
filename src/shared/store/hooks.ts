@@ -393,6 +393,28 @@ export const useGridConfig = () => {
   return [gridConfig, updateGridConfig] as const;
 };
 
+export const useGridEnabled = () => {
+  const [gridEnabled, setGridEnabled] = useState<boolean>(
+    persistentStore.getState().gridConfig.enabled ?? true
+  );
+
+  useEffect(() => {
+    const unsubscribe = persistentStore.subscribe((state) => {
+      setGridEnabled(state.gridConfig.enabled ?? true);
+    });
+    return unsubscribe;
+  }, []);
+
+  const updateGridEnabled = useCallback((enabled: boolean) => {
+    persistentStore.setGridConfig({
+      ...persistentStore.getState().gridConfig,
+      enabled,
+    });
+  }, []);
+
+  return [gridEnabled, updateGridEnabled] as const;
+};
+
 // Hook for synchronous access to current state (useful for event handlers)
 export const useAppStoreSync = () => {
   return {

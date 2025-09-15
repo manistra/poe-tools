@@ -4,25 +4,26 @@ import Input from "src/renderer/components/Input";
 import Button from "src/renderer/components/Button";
 import { useGridConfig } from "src/shared/store/hooks";
 import { useGridOverlay } from "src/renderer/hooks/useGridOverlay";
-import {
-  EyeIcon,
-  EyeSlashIcon,
-} from "@heroicons/react/24/solid";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 interface GridSettingsModalProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  setIsSettingsOpen: (open: boolean) => void;
 }
 
 const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
   isOpen,
   setIsOpen,
+  setIsSettingsOpen,
 }) => {
   const [gridConfig, updateGridConfig] = useGridConfig();
   const [screens, setScreens] = useState<{ id: number; label: string }[]>([]);
-  const { showGridOverlay, hideGridOverlay, updateGridPosition } = useGridOverlay();
-  
-  const [isGridActuallyVisible, setIsGridActuallyVisible] = useState<boolean>(false);
+  const { showGridOverlay, hideGridOverlay, updateGridPosition } =
+    useGridOverlay();
+
+  const [isGridActuallyVisible, setIsGridActuallyVisible] =
+    useState<boolean>(false);
 
   // Check actual grid visibility when modal opens
   useEffect(() => {
@@ -35,7 +36,10 @@ const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
     // Since we removed isGridVisible, we'll use a simple approach
     // The grid visibility state is managed by the modal's local state
     // This will be updated when Preview/Hide buttons are clicked
-    console.log("Grid visibility check - using local state:", isGridActuallyVisible);
+    console.log(
+      "Grid visibility check - using local state:",
+      isGridActuallyVisible
+    );
   };
 
   const updateGridInRealTime = async (newConfig: typeof gridConfig) => {
@@ -101,14 +105,17 @@ const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
       [field]: value,
     };
     updateGridConfig(newConfig);
-    
+
     // Update grid in real-time if it's visible
     updateGridInRealTime(newConfig);
   };
 
   return (
     <ModalBase
-      onClose={() => setIsOpen(false)}
+      onClose={() => {
+        setIsOpen(false);
+        setIsSettingsOpen(true);
+      }}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       className="card max-w-2xl w-full"
@@ -232,8 +239,8 @@ const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
               <li>• Set the position and size to match your stash area</li>
               <li>• Use "Preview" to see the grid overlay on your screen</li>
               <li>
-                • The grid will highlight the correct cell when you teleport to an
-                item
+                • The grid will highlight the correct cell when you teleport to
+                an item
               </li>
               <li>
                 • Grid coordinates correspond to stash.x and stash.y from
@@ -241,6 +248,15 @@ const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
               </li>
             </ul>
           </div>
+        </div>
+        <div className="flex justify-end gap-2 pt-4">
+          <Button
+            size="small"
+            variant="outline"
+            onClick={() => setIsOpen(false)}
+          >
+            Close
+          </Button>
         </div>
       </div>
     </ModalBase>

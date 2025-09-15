@@ -9,6 +9,7 @@ import {
   useWebSocketSessionId,
   useDisableSounds,
   useSelectedSounds,
+  useGridEnabled,
 } from "src/shared/store/hooks";
 import { SoundType } from "src/shared/types";
 import { electronAPI } from "src/renderer/api/electronAPI";
@@ -16,11 +17,13 @@ import { electronAPI } from "src/renderer/api/electronAPI";
 interface SettingsModalProps {
   isOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
+  setIsGridSettingsOpen: (isOpen: boolean) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   setIsSettingsOpen,
+  setIsGridSettingsOpen,
 }) => {
   const [storedSessionId, setStoredSessionId] = usePoeSessionId();
   const [localSessionId, setLocalSessionId] = useState("");
@@ -31,6 +34,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const [disableSounds, setDisableSounds] = useDisableSounds();
   const [selectedSounds, setSelectedSounds] = useSelectedSounds();
+  const [gridEnabled, setGridEnabled] = useGridEnabled();
 
   // Sound options for dropdowns
   const soundOptions: DropdownOption[] = [
@@ -186,6 +190,24 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 />
               </div>
             </div>
+          </div>
+
+          <div className="space-y-4 border-t border-gray-700 pt-4">
+            <h3 className="text-lg font-semibold text-gray-200 mb-2">
+              Grid Configuration
+            </h3>
+            <Checkbox
+              label="Enable Grid Overlay"
+              checked={gridEnabled}
+              onChange={setGridEnabled}
+            />
+
+            <button
+              className="text-sm text-white underline"
+              onClick={() => setIsGridSettingsOpen(true)}
+            >
+              Click here to configure grid overlay
+            </button>
           </div>
         </div>
 

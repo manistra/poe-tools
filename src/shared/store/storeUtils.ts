@@ -12,6 +12,7 @@ export interface GridConfig {
   x: string;
   y: string;
   screenIndex: number;
+  enabled?: boolean;
 }
 
 export interface ShowGridOverlayParams {
@@ -88,6 +89,7 @@ export const initialState: AppState = {
     x: "331",
     y: "237",
     screenIndex: 1,
+    enabled: false,
   },
 };
 
@@ -122,11 +124,12 @@ const store = new Store<AppState>({
     },
 
     gridConfig: {
-      width: "400",
-      height: "400",
-      x: "100",
-      y: "100",
+      width: "674",
+      height: "674",
+      x: "331",
+      y: "237",
       screenIndex: 0,
+      enabled: false,
     },
   },
 });

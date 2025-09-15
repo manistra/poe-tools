@@ -32,11 +32,12 @@ const getInitialStoreState = (): AppState => {
       },
       logs: [],
       gridConfig: {
-        width: "400",
-        height: "400",
-        x: "100",
-        y: "100",
+        width: "674",
+        height: "674",
+        x: "331",
+        y: "237",
         screenIndex: 0,
+        enabled: false,
       },
     };
   }

@@ -1,50 +1,65 @@
 import { useCallback, useRef } from "react";
-import { useGridConfig } from "src/shared/store/hooks";
+import { useGridConfig, useGridEnabled } from "src/shared/store/hooks";
 import { electronAPI } from "../api/electronAPI";
 
 export const useGridOverlay = () => {
-  const [gridConfig, updateGridConfig] = useGridConfig();
+  const [gridConfig] = useGridConfig();
+  const [gridEnabled] = useGridEnabled();
   const gridConfigRef = useRef(gridConfig);
+  const gridEnabledRef = useRef(gridEnabled);
 
-  // Keep ref updated with latest config
+  // Keep refs updated with latest values
   gridConfigRef.current = gridConfig;
+  gridEnabledRef.current = gridEnabled;
 
-  const showGridOverlay = useCallback(async (highlightX: number = 0, highlightY: number = 0) => {
-    try {
+  const showGridOverlay = useCallback(
+    async (highlightX = 0, highlightY = 0) => {
+      try {
+        // Check if grid is enabled before showing
+        if (!gridEnabledRef.current) {
+          console.log(
+            "useGridOverlay: Grid overlay is disabled, skipping show"
+          );
+          return;
+        }
 
-      await hideGridOverlay()
-      console.log("useGridOverlay: Showing grid overlay with config:", gridConfigRef.current, "highlight:", { highlightX, highlightY });
+        await hideGridOverlay();
+        console.log(
+          "useGridOverlay: Showing grid overlay with config:",
+          gridConfigRef.current,
+          "highlight:",
+          { highlightX, highlightY }
+        );
 
-      // Force close any existing grid first
+        // Force close any existing grid first
 
-      await electronAPI.screen.hideGridOverlay();
+        await electronAPI.screen.hideGridOverlay();
 
-      // Show new grid
-      await electronAPI.screen.showGridOverlay({
-        width: gridConfigRef.current.width,
-        height: gridConfigRef.current.height,
-        x: gridConfigRef.current.x,
-        y: gridConfigRef.current.y,
-        screenIndex: gridConfigRef.current.screenIndex,
-        highlightX,
-        highlightY,
-      });
+        // Show new grid
+        await electronAPI.screen.showGridOverlay({
+          width: gridConfigRef.current.width,
+          height: gridConfigRef.current.height,
+          x: gridConfigRef.current.x,
+          y: gridConfigRef.current.y,
+          screenIndex: gridConfigRef.current.screenIndex,
+          highlightX,
+          highlightY,
+        });
 
-
-
-      console.log("useGridOverlay: Grid overlay shown successfully");
-    } catch (error) {
-      console.error("useGridOverlay: Failed to show grid overlay:", error);
-      throw error;
-    }
-  }, []); // No dependencies - uses ref
+        console.log("useGridOverlay: Grid overlay shown successfully");
+      } catch (error) {
+        console.error("useGridOverlay: Failed to show grid overlay:", error);
+        throw error;
+      }
+    },
+    []
+  ); // No dependencies - uses ref
 
   const hideGridOverlay = useCallback(async () => {
     try {
       console.log("useGridOverlay: Hiding grid overlay");
 
       await electronAPI.screen.hideGridOverlay();
-
 
       console.log("useGridOverlay: Grid overlay hidden successfully");
     } catch (error) {
@@ -53,24 +68,26 @@ export const useGridOverlay = () => {
     }
   }, []);
 
-
-  const updateGridPosition = useCallback(async (config: {
-    width: string;
-    height: string;
-    x: string;
-    y: string;
-    screenIndex: number;
-  }) => {
-    try {
-      console.log("useGridOverlay: Updating grid position:", config);
-      const { electronAPI } = await import("../api/electronAPI");
-      await electronAPI.screen.updateGridPosition(config);
-      console.log("useGridOverlay: Grid position updated successfully");
-    } catch (error) {
-      console.error("useGridOverlay: Failed to update grid position:", error);
-      throw error;
-    }
-  }, []);
+  const updateGridPosition = useCallback(
+    async (config: {
+      width: string;
+      height: string;
+      x: string;
+      y: string;
+      screenIndex: number;
+    }) => {
+      try {
+        console.log("useGridOverlay: Updating grid position:", config);
+        const { electronAPI } = await import("../api/electronAPI");
+        await electronAPI.screen.updateGridPosition(config);
+        console.log("useGridOverlay: Grid position updated successfully");
+      } catch (error) {
+        console.error("useGridOverlay: Failed to update grid position:", error);
+        throw error;
+      }
+    },
+    []
+  );
 
   return {
     showGridOverlay,
