@@ -23,28 +23,13 @@ export const useGridOverlay = () => {
           return;
         }
 
-        await hideGridOverlay();
-        console.log(
-          "useGridOverlay: Showing grid overlay with config:",
-          gridConfigRef.current,
-          "highlight:",
-          { highlightX, highlightY }
-        );
-
-        // Force close any existing grid first
-
-        await electronAPI.screen.hideGridOverlay();
-
-        // Show new grid
-        await electronAPI.screen.showGridOverlay({
-          width: gridConfigRef.current.width,
-          height: gridConfigRef.current.height,
-          x: gridConfigRef.current.x,
-          y: gridConfigRef.current.y,
-          screenIndex: gridConfigRef.current.screenIndex,
+        console.log("useGridOverlay: Showing grid overlay with highlight:", {
           highlightX,
           highlightY,
         });
+
+        // Show the persistent grid overlay
+        await electronAPI.screen.showGridOverlay(highlightX, highlightY);
 
         console.log("useGridOverlay: Grid overlay shown successfully");
       } catch (error) {

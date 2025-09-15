@@ -73,15 +73,8 @@ const soundAPI = {
 // Screen API
 const screenAPI = {
   getDisplays: () => ipcRenderer.invoke("get-displays"),
-  showGridOverlay: (config: {
-    width: string;
-    height: string;
-    x: string;
-    y: string;
-    screenIndex: number;
-    highlightX: number;
-    highlightY: number;
-  }) => ipcRenderer.invoke("show-grid-overlay", config),
+  showGridOverlay: (highlightX = 0, highlightY = 0) =>
+    ipcRenderer.invoke("show-grid-overlay", highlightX, highlightY),
   hideGridOverlay: () => ipcRenderer.invoke("hide-grid-overlay"),
   updateGridPosition: (config: {
     width: string;

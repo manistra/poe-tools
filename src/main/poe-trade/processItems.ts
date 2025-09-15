@@ -9,7 +9,7 @@ import {
   TransformedItemData,
 } from "src/shared/types";
 import { playSound } from "../utils/soundUtils";
-import { createOverlayWindow, hideOverlayWindow } from "../overlay/gridOverlay";
+import { showOverlayWindow, hideOverlayWindow } from "../overlay/gridOverlay";
 
 export const processItems = async (
   itemIds: string[],
@@ -107,15 +107,7 @@ export const processItems = async (
           );
 
           // Show the grid overlay with highlight coordinates
-          createOverlayWindow({
-            width: gridConfig.width,
-            height: gridConfig.height,
-            x: gridConfig.x,
-            y: gridConfig.y,
-            screenIndex: gridConfig.screenIndex,
-            highlightX: itemToAutoBuy.stash.x,
-            highlightY: itemToAutoBuy.stash.y,
-          });
+          showOverlayWindow(itemToAutoBuy.stash.x, itemToAutoBuy.stash.y);
         } else if (
           itemToAutoBuy?.stash?.x !== undefined &&
           itemToAutoBuy?.stash?.y !== undefined &&

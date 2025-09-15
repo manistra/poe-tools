@@ -11,6 +11,7 @@ import {
 } from "src/renderer/constants/poe2currency";
 import { toast } from "react-hot-toast";
 import { getCurrencyImage } from "src/renderer/helpers/getCurrencyImage";
+import { electronAPI } from "src/renderer/api/electronAPI";
 
 interface EditLiveSearchModalProps {
   isOpen: boolean;
@@ -114,6 +115,8 @@ const EditLiveSearchModal: React.FC<EditLiveSearchModalProps> = ({
           maxPrice: condition.maxPrice,
         })) || []
       );
+
+      electronAPI.screen.hideGridOverlay();
     }
     setIsOpen(false);
   };
