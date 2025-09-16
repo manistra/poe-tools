@@ -38,10 +38,16 @@ export const setupWebSocketHandlers = () => {
         id: generateId(),
       }));
 
-      WsStore.set(newLiveSearches);
-      persistentStore.setLiveSearches(newLiveSearches);
+      // Filter out new live searches that have URLs matching existing ones
+      const existingUrls = new Set(wsStoreLiveSearches.map((ws) => ws.url));
+      const filteredNewLiveSearches = newLiveSearches.filter(
+        (newSearch) => !existingUrls.has(newSearch.url)
+      );
 
-      return newLiveSearches;
+      WsStore.set([...filteredNewLiveSearches, ...wsStoreLiveSearches]);
+      persistentStore.setLiveSearches(filteredNewLiveSearches);
+
+      return filteredNewLiveSearches;
     }
   );
   ipcMain.handle(WS_EVENTS.WS_DELETE_ALL, async () => {

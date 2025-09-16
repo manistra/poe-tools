@@ -3,6 +3,9 @@ import ModalBase from "src/renderer/components/Modal";
 import Button from "src/renderer/components/Button";
 import TextArea from "src/renderer/components/TextArea";
 import { useLiveSearchContext } from "../../context/hooks/useLiveSearchContext";
+import { isWsStateAnyOf } from "src/renderer/helpers/isWsStateAnyOf";
+import { WebSocketState } from "src/shared/types";
+import { toast } from "react-hot-toast";
 
 interface ImportExportModalProps {
   isOpen: boolean;
@@ -15,10 +18,22 @@ const ImportModal: React.FC<ImportExportModalProps> = ({
 }) => {
   const [importData, setImportData] = useState("");
   const [importError, setImportError] = useState("");
-  const { importLiveSearches } = useLiveSearchContext();
+  const { importLiveSearches, liveSearches } = useLiveSearchContext();
 
   const handleImport = () => {
     setImportError("");
+
+    // Check for ongoing searches
+    const hasActiveConnections = liveSearches.some(
+      (search) => !isWsStateAnyOf(search.ws?.readyState, WebSocketState.CLOSED)
+    );
+
+    if (hasActiveConnections) {
+      toast.error(
+        "Cannot import while live searches are running. Please stop all searches first."
+      );
+      return;
+    }
 
     try {
       const parsedData = JSON.parse(importData);
