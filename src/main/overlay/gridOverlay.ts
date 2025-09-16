@@ -8,9 +8,9 @@ const ensureOverlayProperties = (): void => {
   if (!overlayWindow || overlayWindow.isDestroyed()) {
     return;
   }
-    overlayWindow.setAlwaysOnTop(true, 'screen-saver');
-    overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-    overlayWindow.setIgnoreMouseEvents(true);
+  overlayWindow.setAlwaysOnTop(true, "screen-saver");
+  overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  overlayWindow.setIgnoreMouseEvents(true);
 };
 
 // Grid overlay HTML content (static, no dynamic highlighting)
@@ -32,10 +32,18 @@ const gridHTML = `
     .grid-cell { 
       background: transparent; border: 1px solid rgba(162, 145, 98, 0.3); 
       transition: all 0.2s ease; position: relative; min-height: 20px; min-width: 20px; 
+      display: flex; align-items: center; justify-content: center;
     }
     .grid-cell.highlighted { 
       background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 1); 
       animation: pulse 1s infinite; z-index: 10; 
+    }
+    .coordinate-label {
+      color: rgba(162, 145, 98, 0.5);
+      font-size: 2vw;
+      text-align: center;
+      pointer-events: none;
+      user-select: none;
     }
     @keyframes pulse { 0%, 100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
   </style>
@@ -52,6 +60,17 @@ const gridHTML = `
       const cell = document.createElement("div");
       cell.className = "grid-cell";
       cell.dataset.index = i.toString();
+      
+      // Calculate x, y coordinates
+      const x = i % 12;
+      const y = Math.floor(i / 12);
+      
+      // Create coordinate label
+      const coordinateLabel = document.createElement("div");
+      coordinateLabel.className = "coordinate-label";
+      coordinateLabel.textContent = \`\${x}\${y}\`;
+      
+      cell.appendChild(coordinateLabel);
       gridContainer.appendChild(cell);
       cells.push(cell);
     }
@@ -135,11 +154,13 @@ export const initializeOverlayWindow = (config: {
     overlayWindow.loadURL(
       `data:text/html;charset=utf-8,${encodeURIComponent(gridHTML)}`
     );
-    
+
     // Set overlay properties for fullscreen compatibility
-    overlayWindow.setAlwaysOnTop(true, 'screen-saver');
-    overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-    
+    overlayWindow.setAlwaysOnTop(true, "screen-saver");
+    overlayWindow.setVisibleOnAllWorkspaces(true, {
+      visibleOnFullScreen: true,
+    });
+
     // Set a title for easier identification
     overlayWindow.setTitle("Grid Overlay");
 
@@ -161,7 +182,7 @@ export const initializeOverlayWindow = (config: {
 
     overlayWindow.on("blur", () => {
       console.log("Overlay window blurred");
-        ensureOverlayProperties();
+      ensureOverlayProperties();
     });
 
     // Handle window show/hide events
@@ -212,10 +233,9 @@ export const showOverlayWindow = (highlightX = 0, highlightY = 0): void => {
     currentState: {
       isInitialized,
       windowExists: !!overlayWindow,
-      windowDestroyed: overlayWindow?.isDestroyed()
-    }
+      windowDestroyed: overlayWindow?.isDestroyed(),
+    },
   });
-
 
   // Ensure overlay properties are set for fullscreen compatibility
   ensureOverlayProperties();
@@ -233,7 +253,7 @@ export const showOverlayWindow = (highlightX = 0, highlightY = 0): void => {
   // Log final state
   console.log("Overlay window show completed:", {
     windowVisible: overlayWindow.isVisible(),
-    windowFocused: overlayWindow.isFocused()
+    windowFocused: overlayWindow.isFocused(),
   });
 };
 

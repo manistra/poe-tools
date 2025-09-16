@@ -80,7 +80,7 @@ const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
 
   const handlePreview = async () => {
     try {
-      await showGridOverlay(0, 0); // Default highlight coordinates
+      await showGridOverlay(-1, -1); // Default highlight coordinates
       setIsGridActuallyVisible(true);
     } catch (error) {
       console.error("Failed to show grid overlay:", error);

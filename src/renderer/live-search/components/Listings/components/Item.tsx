@@ -151,7 +151,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
             )}
 
             {item?.icon && (
-              <div className="w-[170px] flex flex-col flex-1 max-w-[170px] items-center justify-center">
+              <div className="w-[170px] flex flex-col flex-1 max-w-[170px] items-center justify-center mx-auto">
                 <img
                   src={item.icon}
                   alt={item.name || "Item"}
@@ -230,7 +230,7 @@ const Item: React.FC<ItemProps> = ({ item }) => {
                   onClick={handleTeleportToHideout}
                   disabled={isSendingWhisper}
                   className={clsx(
-                    "h-[70px] w-[186px] !text-[17px] !text-yellow-100 font-bold",
+                    "h-[70px] w-[255px] !text-[17px] !text-yellow-100 font-bold",
                     isSendingWhisper && "opacity-50 cursor-not-allowed",
                     isWhispered && "!bg-gray-600 hover:!bg-gray-700"
                   )}

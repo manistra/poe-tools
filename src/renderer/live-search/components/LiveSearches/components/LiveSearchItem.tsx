@@ -19,12 +19,14 @@ interface LiveSearchItemProps {
   liveSearch: LiveSearch;
   isConnectingAll: boolean;
   resultsCount: number;
+  isCollapsed?: boolean;
 }
 
 const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
   liveSearch,
   isConnectingAll,
   resultsCount,
+  isCollapsed,
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { deleteLiveSearch, ws } = useLiveSearchContext();
@@ -76,7 +78,12 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
           : "border-gray-900 bg-gray-900"
       )}
     >
-      <div className="flex items-center justify-between rounded py-2 w-full px-3">
+      <div
+        className={clsx(
+          "flex items-center justify-between rounded w-full",
+          isCollapsed ? "px-2 py-[2px]" : "py-2 px-3"
+        )}
+      >
         <div className="flex items-center flex-row gap-2">
           <div
             className={clsx("w-3 h-3 rounded-full relative shadow-sm", {
@@ -105,7 +112,10 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
           <button
             title={liveSearch.label}
             onClick={() => handleUrlClick(liveSearch.url)}
-            className="text-gray-300 hover:text-blue-900 hover:underline cursor-pointer text-left text-sm flex flex-row items-center gap-1 max-w-[270px]"
+            className={clsx(
+              "text-gray-300 hover:text-blue-900 hover:underline cursor-pointer text-left flex flex-row items-center gap-1 max-w-[270px]",
+              !isCollapsed ? "text-[13px]" : "text-sm"
+            )}
           >
             <span className="truncate">{liveSearch.label}</span>
           </button>
@@ -205,38 +215,38 @@ const LiveSearchItem: React.FC<LiveSearchItemProps> = ({
           )}
         </div>
       </div>
-
-      <div className="flex flex-row gap-2 justify-between px-3 pb-2 w-full border-t border-gray-700/20 border-dashed pt-2">
-        <div>
-          {liveSearch.currencyConditions &&
-            liveSearch.currencyConditions.length > 0 && (
-              <CurrencyConditionView
-                currencyConditions={liveSearch.currencyConditions || []}
-              />
-            )}
+      {!isCollapsed && (
+        <div className="flex flex-row gap-2 justify-between px-3 pb-2 w-full border-t border-gray-700/20 border-dashed pt-2">
+          <div>
+            {liveSearch.currencyConditions &&
+              liveSearch.currencyConditions.length > 0 && (
+                <CurrencyConditionView
+                  currencyConditions={liveSearch.currencyConditions || []}
+                />
+              )}
+          </div>
+          {resultsCount > 0 && (
+            <p className="self-end text-xs text-gray-500 text-nowrap">
+              Results:{" "}
+              <span
+                className={clsx("text-gray-300", {
+                  "text-orange-100": resultsCount > 4,
+                  "text-orange-200": resultsCount > 8,
+                  "text-orange-300": resultsCount > 12,
+                  "text-orange-400": resultsCount > 16,
+                  "text-orange-500": resultsCount > 20,
+                  "text-orange-600": resultsCount > 24,
+                  "text-red-800": resultsCount > 28,
+                  "text-red-700": resultsCount > 28,
+                  "text-red-600": resultsCount > 32,
+                })}
+              >
+                {resultsCount}
+              </span>
+            </p>
+          )}
         </div>
-        {resultsCount > 0 && (
-          <p className="self-end text-xs text-gray-500 text-nowrap">
-            Results:{" "}
-            <span
-              className={clsx("text-gray-300", {
-                "text-orange-100": resultsCount > 4,
-                "text-orange-200": resultsCount > 8,
-                "text-orange-300": resultsCount > 12,
-                "text-orange-400": resultsCount > 16,
-                "text-orange-500": resultsCount > 20,
-                "text-orange-600": resultsCount > 24,
-                "text-red-800": resultsCount > 28,
-                "text-red-700": resultsCount > 28,
-                "text-red-600": resultsCount > 32,
-              })}
-            >
-              {resultsCount}
-            </span>
-          </p>
-        )}
-      </div>
-
+      )}
       <EditLiveSearchModal
         isOpen={isEditModalOpen}
         setIsOpen={setIsEditModalOpen}

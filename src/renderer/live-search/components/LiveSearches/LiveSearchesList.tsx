@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { useLiveSearchContext } from "../../context/hooks/useLiveSearchContext";
 import LiveSearchItem from "./components/LiveSearchItem";
@@ -14,14 +14,28 @@ import clsx from "clsx";
 import ImportModal from "../modals/ImportModal";
 import { electronAPI } from "src/renderer/api/electronAPI";
 import { useResults } from "src/shared/store/hooks";
+import {
+  ArrowsPointingInIcon,
+  ArrowsPointingOutIcon,
+} from "@heroicons/react/24/solid";
 
 const LiveSearchesList: React.FC<{ isConnectingAll: boolean }> = ({
   isConnectingAll,
 }) => {
   const [newFormOpen, setNewFormOpen] = useState(false);
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    // Initialize from localStorage, default to false if not found
+    const saved = localStorage.getItem("liveSearchesCollapsed");
+    return saved ? JSON.parse(saved) : false;
+  });
   const { results } = useResults();
   const { liveSearches, deleteAllLiveSearches } = useLiveSearchContext();
+
+  const handleSetCollapsed = (value: boolean) => {
+    setIsCollapsed(value);
+    localStorage.setItem("liveSearchesCollapsed", JSON.stringify(value));
+  };
 
   const handleDeleteAll = async () => {
     if (liveSearches.length === 0) {
@@ -63,6 +77,28 @@ const LiveSearchesList: React.FC<{ isConnectingAll: boolean }> = ({
         <h1 className="text-xl text-gray-300 mb-2">Live Searches</h1>
 
         <div className="flex flex-row">
+          {!isCollapsed ? (
+            <button
+              title="Collapse Searches"
+              onClick={() => handleSetCollapsed(true)}
+              className={clsx(
+                "text-xs p-1 transition-transform duration-200 opacity-60 hover:opacity-100 hover:scale-[104%]"
+              )}
+            >
+              <ArrowsPointingInIcon className="size-[22px]" />
+            </button>
+          ) : (
+            <button
+              title="Expand Searches"
+              onClick={() => handleSetCollapsed(false)}
+              className={clsx(
+                "text-xs p-1 transition-transform duration-200 opacity-60 hover:opacity-100 hover:scale-[104%]"
+              )}
+            >
+              <ArrowsPointingOutIcon className="size-[22px]" />
+            </button>
+          )}
+
           <button
             title="Import Searches"
             onClick={() => setIsImportExportOpen(true)}
@@ -132,6 +168,7 @@ const LiveSearchesList: React.FC<{ isConnectingAll: boolean }> = ({
                 liveSearch={liveSearch}
                 isConnectingAll={isConnectingAll}
                 resultsCount={resultsCount}
+                isCollapsed={isCollapsed}
               />
             </div>
           );
