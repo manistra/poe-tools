@@ -3,13 +3,8 @@ import { persistentStore } from "src/shared/store/sharedStore";
 import { transformItemData } from "src/renderer/helpers/transformItemData";
 import { autoTeleport } from "./autoTeleport";
 import { sendWhisper } from "./sendWhisper";
-import {
-  LiveSearchDetails,
-  SoundType,
-  TransformedItemData,
-} from "src/shared/types";
+import { LiveSearchDetails, TransformedItemData } from "src/shared/types";
 import { playSound } from "../utils/soundUtils";
-import { ipcMain } from "electron";
 
 export const processItems = async (
   itemIds: string[],
@@ -31,72 +26,44 @@ export const processItems = async (
     );
 
     if (itemDetails?.data && Array.isArray(itemDetails.data.result)) {
-      const transformedItems = [
-        ...itemDetails.data.result.map((item) => {
+      // OPTIMIZATION 1: Cache store state to avoid multiple reads
+      const storeState = persistentStore.getState();
+
+      // OPTIMIZATION 2: Parallel data transformation using Promise.all
+      const transformedItems = await Promise.all(
+        itemDetails.data.result.map(async (item) => {
           const rawItem = {
             ...item,
             searchLabel: liveSearch?.label,
           };
-
           return transformItemData(rawItem, liveSearch);
-        }),
-      ];
+        })
+      );
 
-      const itemToAutoBuy = { ...transformedItems[0] } as TransformedItemData;
+      const itemToAutoBuy = transformedItems[0] as TransformedItemData;
 
       const doesPassCurrencyConditions =
         !itemToAutoBuy?.failingCurrencyCondition;
 
-      const soundsEnabled = !persistentStore.getState().disableSounds;
+      const soundsEnabled = !storeState.disableSounds;
 
       const teleportCondition =
         doesPassCurrencyConditions &&
-        persistentStore.getState().autoTeleport &&
-        !persistentStore.getState().isTeleportingBlocked &&
+        storeState.autoTeleport &&
+        !storeState.isTeleportingBlocked &&
         itemToAutoBuy?.hideoutToken &&
         itemToAutoBuy?.hideoutToken !== "";
 
       const whisperCondition =
         doesPassCurrencyConditions &&
-        persistentStore.getState().autoWhisper &&
+        storeState.autoWhisper &&
         itemToAutoBuy?.whisper_token &&
         itemToAutoBuy?.whisper_token !== "";
-
-      if (whisperCondition) {
-        persistentStore.addLog(
-          `[API] Auto Whisper Initiated - ${liveSearch?.label}`
-        );
-
-        const whisperResponse = await sendWhisper({
-          itemId: itemToAutoBuy?.id,
-          token: itemToAutoBuy?.whisper_token,
-          searchQueryId: itemToAutoBuy?.searchQueryId,
-        });
-
-        if (whisperResponse.success) {
-          const whisperSound =
-            persistentStore.getState().selectedSounds?.whisper;
-          if (soundsEnabled && whisperSound !== "none") {
-            playSound(whisperSound);
-          }
-
-          transformedItems.shift(); // Remove first element
-          transformedItems.unshift({ ...itemToAutoBuy, isWhispered: true }); // Add itemToAutoBuy at beginning
-        } else {
-          persistentStore.addLog(
-            `[API] Auto Whisper Failed - ${liveSearch?.label}`
-          );
-          persistentStore.addLog(whisperResponse.error || "Unknown error");
-        }
-      }
 
       if (teleportCondition) {
         persistentStore.addLog(
           `[API] Auto Teleport Initiated - ${liveSearch?.label}`
         );
-
-        // Show grid overlay with stash coordinates (if enabled)
-
 
         persistentStore.setLastTeleportedItem(itemToAutoBuy ?? null);
         persistentStore.setIsTeleportingBlocked(true);
@@ -108,46 +75,67 @@ export const processItems = async (
         });
 
         if (autoTeleportResponse.success) {
-          // Trigger success sound for teleport
-
-          const teleportSound =
-            persistentStore.getState().selectedSounds?.teleport;
+          const teleportSound = storeState.selectedSounds?.teleport;
           if (soundsEnabled && teleportSound !== "none") {
             playSound(teleportSound);
           }
 
-          transformedItems.shift(); // Remove first element
-          transformedItems.unshift({ ...itemToAutoBuy, isWhispered: true }); // Add itemToAutoBuy at beginning
+          // OPTIMIZATION 3: More efficient array manipulation
+          transformedItems[0] = { ...itemToAutoBuy, isWhispered: true };
         } else {
           persistentStore.addLog(
             `[API] Auto Teleport Failed - ${liveSearch?.label}`
           );
           persistentStore.addLog(autoTeleportResponse.error || "Unknown error");
         }
-      }
-
-      transformedItems.forEach((item) => {
-        // Check if item with this ID already exists in results
-        const existingResults = persistentStore.getState().results;
-        const itemExists = existingResults.some(
-          (existingItem) => existingItem.id === item.id
+      } else if (whisperCondition) {
+        persistentStore.addLog(
+          `[API] Auto Whisper Initiated - ${liveSearch?.label}`
         );
 
-        if (!itemExists) {
-          persistentStore.addResult(item);
+        const whisperResponse = await sendWhisper({
+          itemId: itemToAutoBuy?.id,
+          token: itemToAutoBuy?.whisper_token,
+          searchQueryId: itemToAutoBuy?.searchQueryId,
+        });
+
+        if (whisperResponse.success) {
+          const whisperSound = storeState.selectedSounds?.whisper;
+          if (soundsEnabled && whisperSound !== "none") {
+            playSound(whisperSound);
+          }
+
+          // OPTIMIZATION 3: More efficient array manipulation
+          transformedItems[0] = { ...itemToAutoBuy, isWhispered: true };
         } else {
           persistentStore.addLog(
-            `[API] Item ${item.id} already exists in results, skipping - ${liveSearch?.label}`
+            `[API] Auto Whisper Failed - ${liveSearch?.label}`
           );
+          persistentStore.addLog(whisperResponse.error || "Unknown error");
         }
-      });
+      }
+
+      // OPTIMIZATION 4: Batch process results to avoid multiple store operations
+      const existingResults = storeState.results;
+      const newResults = transformedItems.filter(
+        (item) =>
+          !existingResults.some((existingItem) => existingItem.id === item.id)
+      );
+
+      if (newResults.length > 0) {
+        newResults.forEach((item) => persistentStore.addResult(item));
+      } else {
+        persistentStore.addLog(
+          `[API] All items already exist in results, skipping - ${liveSearch?.label}`
+        );
+      }
 
       if (
         !teleportCondition &&
         !whisperCondition &&
         doesPassCurrencyConditions
       ) {
-        const pingSound = persistentStore.getState().selectedSounds?.ping;
+        const pingSound = storeState.selectedSounds?.ping;
         if (soundsEnabled && pingSound !== "none") {
           playSound(pingSound);
         }

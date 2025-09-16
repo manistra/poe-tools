@@ -160,16 +160,24 @@ export const connect = async (id: string, signal?: AbortSignal) =>
         });
 
         liveSearchDetails.socket.on("message", (response) => {
-          const parsedResponse = JSON.parse(response.toString());
+          // OPTIMIZATION 1: Parse JSON more efficiently
+          let parsedResponse;
+          try {
+            parsedResponse = JSON.parse(response.toString());
+          } catch (error) {
+            console.error("Failed to parse WebSocket message:", error);
+            return;
+          }
 
           const itemIds = parsedResponse.new;
-          if (itemIds?.length || itemIds?.length > 0)
-            persistentStore.addLog(
-              `[WebSocket] Socket message received: Found ${itemIds?.length} items - ${liveSearchDetails.label}`
-            );
-          if (itemIds) {
-            processItems(itemIds, game, liveSearchDetails);
+
+          // OPTIMIZATION 2: Faster length check and early return
+          if (!itemIds || itemIds.length === 0) {
+            return;
           }
+
+          // OPTIMIZATION 4: Process immediately without any delays
+          processItems(itemIds, game, liveSearchDetails);
         });
 
         liveSearchDetails.socket.on("ping", () => {

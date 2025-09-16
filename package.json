@@ -1,7 +1,7 @@
 {
   "name": "poe-tools",
   "productName": "PoE Sniper",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "My Electron application description",
   "main": ".webpack/main",
   "scripts": {
